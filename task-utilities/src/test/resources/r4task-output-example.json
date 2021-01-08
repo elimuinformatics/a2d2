@@ -1,0 +1,154 @@
+{
+  "resourceType": "Task",
+  "id": "452",
+  "meta": {
+    "versionId": "2",
+    "lastUpdated": "2020-06-18T03:23:52.634+00:00",
+    "source": "#e8xbGzeqqaWvlbSz"
+  },
+  "identifier": [ {
+    "use": "secondary",
+    "system": "http://hl7.org/fhir/identifier-use",
+    "value": "89?c"
+  } ],
+  "basedOn": [ {
+    "display": "HumanTaskTest-89"
+  } ],
+  "groupIdentifier": {
+    "use": "official",
+    "system": "http:/elimu.io/jbpm/user/identifiers",
+    "value": "1"
+  },
+  "status": "completed",
+  "businessStatus": {
+    "text": "Reserved"
+  },
+  "priority": "routine",
+  "code": {
+    "text": "HumanTaskTest"
+  },
+  "description": "Human Task test",
+  "executionPeriod": {
+    "start": "2020-06-18T03:21:32Z"
+  },
+  "authoredOn": "2020-06-18T03:21:32Z",
+  "lastModified": "2020-06-18T03:21:32Z",
+  "requester": {
+    "reference": "Patient/1",
+    "display": "1"
+  },
+  "performerType": [ {
+    "coding": [ {
+      "system": "org.jbpm.task:peopleassignments:businessadministrator",
+      "code": "Patient/Administrator",
+      "display": "Administrator"
+    } ],
+    "text": "Administrator"
+  }, {
+    "coding": [ {
+      "system": "org.jbpm.task:peopleassignments:businessadministrator",
+      "code": "Organization/Administrators",
+      "display": "Administrators"
+    } ],
+    "text": "Administrators"
+  }, {
+    "coding": [ {
+      "system": "org.jbpm.task:peopleassignments:potentialowner",
+      "code": "Patient/1",
+      "display": "1"
+    } ],
+    "text": "1"
+  } ],
+  "owner": {
+    "reference": "Patient/1",
+    "display": "1"
+  },
+  "note": [ {
+    "text": "Complete Human entered data"
+  } ],
+  "relevantHistory": [ {
+    "display": "draft"
+  } ],
+  "restriction": {
+    "repetitions": 1,
+    "period": {
+      "start": "2020-06-18T03:21:32Z"
+    }
+  },
+  "output": [ {
+    "type": {
+      "text": "taskOutput"
+    },
+    "valueString": "text123"
+  } ],
+  "input": [ {
+    "type": {
+      "text": "org.jbpm.task:taskType"
+    }
+  }, {
+    "type": {
+      "text": "org.jbpm.task:deploymentId"
+    },
+    "valueString": "fhir4-task-test"
+  }, {
+    "type": {
+      "text": "org.jbpm.task:parentId"
+    },
+    "valueInteger": -1
+  }, {
+    "type": {
+      "text": "org.jbpm.task:processId"
+    },
+    "valueString": "test-case"
+  }, {
+    "type": {
+      "text": "org.jbpm.task:processInstanceId"
+    },
+    "valueInteger": 89
+  }, {
+    "type": {
+      "text": "org.jbpm.task:processSessionId"
+    },
+    "valueInteger": 2024
+  }, {
+    "type": {
+      "text": "org.jbpm.task:workItemId"
+    },
+    "valueInteger": 410
+  }, {
+    "type": {
+      "text": "io.elimu.fhir:subscriptionid"
+    }
+  }, {
+    "type": {
+      "text": "Comment"
+    },
+    "valueString": "TestHumanTask"
+  }, {
+    "type": {
+      "text": "Description"
+    },
+    "valueString": "Human Task test"
+  }, {
+    "type": {
+      "text": "TaskName"
+    },
+    "valueString": "HumanTaskTest"
+  }, {
+    "type": {
+      "text": "NodeName"
+    },
+    "valueString": "Complete Human entered data"
+  }, {
+    "type": {
+      "text": "Skippable"
+    },
+    "valueString": "false"
+  }, {
+    "type": {
+      "text": "ActorId"
+    },
+    "valueString": "1"
+  } ]
+}
+

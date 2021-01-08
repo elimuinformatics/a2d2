@@ -1,0 +1,79 @@
+{
+  "id":"recommend-pro",
+  "hook":"patient-view",
+  "title":"Recommend PRO",
+  "description":"A2D2 Recommend PRO CDS Service",
+  "responseBuilderClass": "io.elimu.a2d2.cdsresponse.builder.CdsCardResponseBuilder", 
+  "steps":[
+    {
+      "resourceType":"io.elimu.a2d2.steps.Json2Fhir2TranslateStep"
+    },
+    {
+      "resourceType":"io.elimu.a2d2.steps.BuildProcessRequestStep",
+      "searchBeanOfType": "ca.uhn.fhir.model.dstu2.resource.Patient",
+      "processRequestOutputKey": "key-1"
+    },
+    {
+      "resourceType":"io.elimu.a2d2.step.WorkflowEngineSyncProcessStep",
+      "persistent": false,
+      "processId": "PRO-recommend",
+      "processInputContextKey": "key-1",
+      "processOutputContextKey": "key-2"
+    }
+  ],
+  "modelDependencies":[
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"patient-review-kjar-helper",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"pro-recommend",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"cds-hook-steps",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-structures-dstu2",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-structures-dstu3",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-client",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-base",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-utilities",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"org.apache.httpcomponents",
+      "artifactId":"httpclient",
+      "version":"4.5.3"
+    },
+    {
+      "groupId":"org.apache.commons",
+      "artifactId":"commons-lang3",
+      "version":"3.6"
+    }
+  ],
+  "prefetch":{
+    "patient":"Patient/{{Patient.id}}"
+  }
+}

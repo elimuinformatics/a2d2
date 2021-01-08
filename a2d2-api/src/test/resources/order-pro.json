@@ -1,0 +1,86 @@
+{
+  "id":"order-pro",
+  "hook":"procedure-request-save",
+  "title":"Order PRO",
+  "description":"A2D2 Order PRO CDS Service",
+  "responseBuilderClass": "io.elimu.a2d2.cdsresponse.builder.CdsCardResponseBuilder", 
+  "steps":[
+    {
+      "resourceType":"io.elimu.a2d2.steps.Json2Fhir3TranslateStep"
+    },
+    {
+      "resourceType":"io.elimu.a2d2.step.WorkflowEngineSyncProcessStep",
+      "persistent": false,
+      "processId": "order-pro",
+      "processInputContextKey": "parsed-json-prefetch",
+      "processOutputContextKey": "process-1-output"
+    },
+    {
+      "resourceType":"io.elimu.a2d2.step.WorkflowEngineSyncProcessStep",
+      "persistent": false,
+      "processIdContextKey": "next-process",
+      "processInputContextKey": "parsed-json-prefetch",
+      "processOutputContextKey": "process-2-output"
+    }
+  ],
+  "modelDependencies":[
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"order-pro-kjar",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"order-pro-bar",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"hoos-series-bar",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"phq9onetime-bar",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"io.elimu.a2d2",
+      "artifactId":"cds-hook-steps",
+      "version":"0.0.1-SNAPSHOT"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-structures-dstu3",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-client",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-base",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"ca.uhn.hapi.fhir",
+      "artifactId":"hapi-fhir-utilities",
+      "version":"3.2.0"
+    },
+    {
+      "groupId":"org.apache.httpcomponents",
+      "artifactId":"httpclient",
+      "version":"4.5.3"
+    },
+    {
+      "groupId":"org.apache.commons",
+      "artifactId":"commons-lang3",
+      "version":"3.6"
+    }
+  ],
+  "prefetch":{
+    "procedure-request":"ProcedureRequest/{{ProcedureRequest.id}}"
+  }
+}

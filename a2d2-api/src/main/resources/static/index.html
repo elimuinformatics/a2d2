@@ -1,0 +1,73 @@
+<!--
+   Copyright 2018-2020 Elimu Informatics
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http:  www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Save Rules</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="index.js"></script>
+<link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+	<form id="ruleform">
+		<div class="container">
+			<h2>CDS Hook Services</h2>
+			<div class="dropdown" id="ruledropdown">
+		    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select CDS Service
+		    <span class="caret"></span></button>
+		    <ul class="dropdown-menu">
+		      <li class="dropdown-submenu">
+		        <a class="test" tabindex="-1" href="#">PRO-recommend<span class="caret"></span></a>
+		        <ul class="dropdown-menu">
+		          <li><a id="1" tabindex="-1" href="#">rules.drl</a></li>
+		        </ul>
+		      </li>
+		    </ul>
+		   </div>
+            <br/>
+			<div id="rulesresponse" class="container" style="display: none">
+				<div class="row" id="saveit">
+					<div class="col-sm-1">
+						<button type="button" id="save" class="btn btn-primary">Save</button>
+					</div>
+					<div class="row">
+						<div id="success" class="alert alert-success col-sm-2"
+							data-alert="alert">
+							<strong>Success!</strong> rule.drl file updated successfully
+						</div>
+
+						<div id="restartalert" class="alert alert-success col-sm-4"
+							data-alert="alert">Application restarted successfully!</div>
+					</div>
+
+				</div>
+				<div>
+					<textarea id="response" rows="20" cols="80"> </textarea>
+					<br>
+				</div>
+			</div>
+		</div>
+	</form>
+
+</body>
+</html>

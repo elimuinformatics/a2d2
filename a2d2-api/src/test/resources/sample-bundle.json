@@ -1,0 +1,270 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+	  "fullUrl": "6b1dafb229e74e1fab815e66b6604682",
+      "resource": {
+        "resourceType": "Patient",
+        "meta": {
+          "versionId": "33",
+          "lastUpdated": "2017-11-01T12:00:26.000+00:00"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"> <div class=\"hapiHeaderText\">Ms. James <b>DICAPRIO </b> </div> <table class=\"hapiPropertyTable\"> <tbody> <tr> <td>Address</td> <td> <span>221 B Wall Street </span> <br/> <span>New York </span> <span>New York </span> <span>USA </span> </td> </tr> <tr> <td>Date of birth</td> <td> <span>30 January 1990</span> </td> </tr> </tbody> </table> </div>"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/v2/0232",
+                  "code": "MR"
+                }
+              ]
+            },
+            "system": "http://acme.org/mrns",
+            "value": "1235"
+          },
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/v2/0232",
+                  "code": "MRN",
+                  "display": "Medical record number",
+                  "userSelected": false
+                }
+              ],
+              "text": "MRN"
+            },
+            "value": "10003805",
+            "period": {
+              "start": "2017-03-02T17:17:23.000Z"
+            }
+          },
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/v2/0232",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "1235"
+          }
+        ],
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": [
+              "Dicaprio"
+            ],
+            "given": [
+              "James"
+            ],
+            "prefix": [
+              "Mr."
+            ],
+            "suffix": [
+              "Jr"
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "2136155258",
+            "use": "mobile"
+          },
+          {
+            "system": "phone",
+            "value": "6323954125",
+            "use": "home"
+          }
+        ],
+        "gender": "Male",
+        "birthDate": "1990-02-21",
+        "deceasedBoolean": false,
+        "address": [
+          {
+            "use": "home",
+            "type": "Postal",
+            "line": [
+              "221 B Wall Street"
+            ],
+            "city": "New York",
+            "state": "New York",
+            "postalCode": "85641235",
+            "country": "USA"
+          },
+          {
+            "use": "work",
+            "type": "Physical",
+            "line": [
+              "308 Congress St"
+            ],
+            "city": "Boston",
+            "state": "New York",
+            "postalCode": "02210",
+            "country": "USA"
+          }
+        ],
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/v3/MaritalStatus",
+              "code": "U",
+              "display": "Unmarried"
+            }
+          ]
+        },
+        "multipleBirthBoolean": false,
+        "photo": [
+          {
+            "contentType": "image/*",
+            "data": "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCABSAFIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/Kz/ABT4i0/wh4dvdW1a+tNL0vTYHubu7uplhgtYkUs8juxCqqqCSScACtCvFP8AgoR+y14e/bF/ZU8SeCfE+s+INA0iVU1GS90eSIXMTWzeeuUlVopUynMcilW9iAwipK0W0XTipSSbsmfnd+2R/wAHFWp+I/FV34f+BOm2Vnolo7Rnxbq1q00+pcgb7O1bCxR56ST72cE4iThz8m69+2z8VviDcNda58VPiFeTvklYfEFzYoATkAR27xqAOn3e/evY/CP/AAb46zcwQNc/tAXEczKDKkHw8slKtgbgGNyeAf8AZH0HSu/s/wDggJ4Y0e2H9qfGL4o6lMOT9mg02yh+uz7PJ79SeCa/L8xx+IxLbdTTyuvy/U/W8rwmX4NKKppvu1d/e/0Pj6D9uf4v/C7VVvPD3xY+IthPGRhZvEFzfQ4BztMVy8iEHGD8ue2e9fpD/wAEhv8Agt7dftZfEOD4TfFK10+x8e3Ns8mh6zYx+Ta+I/KjLywPCOIbpUV5BtPlyKrYCMm1vzu/4KI/8E+NU/Yu8CyeMdL8SX3jPwZBdRWl4by1jg1PSnlfZE8nl4imhd8IXVY2RmUFGVi6fF/wp/aZvPhF+0D4L8Z6fO9ifCet2mrLKNpYCGdJHPXHKK645+8Tz0q8kzDEUakbTcoN21u1+O1is9y3CYuhJqCUrNppWd/1Xqf2FQD5M5BzT6r6XfR6nYQ3MWTFcIsqZ9GAI/Q1Yr9PTPx8KKKKYBRRRQAVx/x/vDY/BvxC4Gd1o0Z9CHIQj8mNdhXBftQQSXH7P/isR/ejsWmJzjAQhyfyU1yY9tYao1/K/wAjqwMU8TTT6yX5o8G0TxDHZqS0ijZ33c/Sl8QeOFngKRsQpHLdfyrxrTvF4KBiwYnkEnJFWLjxoPKOXzxg5Nfhjx142R+4/wBme9zM8h/4KtatBL+wB8XI2RZzLoLxxRY3NLI0iLGEHUtuIAxzkjA6V+FH7SH7M/xG/Z58N6bP478J6x4bTxbp89xpbXcaj7VtQb1+VjtkXzIyyNhlDjIGa/oF8c3Vl4m05rTUbS21C1EsVx5FzEskfmRSLLG5VuCySKrqT0ZQeor578e/s7Xn/BUL9t34V/CPTLO4vPCXwn1r/hNviNrYUfZ9LikWL7Npm9sg3NysRPl8tslDkbUbPtcNYidWvHDwjdttt9lZf5HLnlGFDCyr1JWSVrdz9rvh+rJ4I0cMCCLGAH/v0tbFR2qKkQCoEUDAAGAAO1SV+xpWPw9sKKKKYgooooAKo+JtBtvFOgXumXiGSz1GCS1nUHBaN0KMM9uCavMdoJIJAqtqF/DY2rTTSpDDGNzSOQqqPUk9qTSasxptO6Pyt8Vw6l8MPF+qeHNXJGpaJcvaTEKVWTaflkXP8DrtdfZh0ORWdceMiYiQWJFe+/8ABRT4Uv8AFXV7Dxt4F0+61aa0kbRtaFpD5jHZGZEmKqC6iNVZGLgEh4toIUkfF1p47s51XyJJtVmblUg3JFj/AGpDg49lBz696/AM/wAoxGX4yVGUXy7xfSx/RHDmb4fMsFCupLn2klunt+O53uteLPK06W6c5jH7qNSQTNIRwoHfHVvb3Nfob/wTo8P+FtG/ZK8KXXhnSdM0htatzqOufY4BGb/V3IW+u5m+9LNJOjlpJCzkbcnGK/MfT9E1DWLltS1JkCwRmK2gVNsNuDxhF5wcc56k9z1ru/8Agl14/wDiVqn7VnxBs/CniibT/Anhyxt7O8sr9jLpcmqy3CfOqNwsghjuFYx7WY+XuyAhH2Phjg6+JxmI9krQhT5pN+TSSXm27JHyPiniKGHwOH9o/flU5Ul1vFt/cle/+Z+uKNwRmlDA96828J/tBWjxwR+JbSbw3Nc3L2ttNdlUgvGTOcZO6MnBIV+Owdq9EinWWMOpDK4yCOQR6jHav1GcJQdpI/IYTUleLJqKB0FFSWFFFFAEcsh8skcfzrxDx38RbLx7ea1Ja+MbDQ7bwfqEa3UhENxDaCKQCUTpIcB35VS33AQyjcd1exeJdXHh/wAOahqJQyiwtpLjYDgvsUtj8cYr5gsHvofDevWtzp/gdWWxu7aJ7xllsdSjiNuI5r7CnDEKQ4IYoFAxwAevCU1J3l0a7d10aZyYqbSsnvfv27po6r4g6w/hvwh8U47DWfBXhETWTaxbXWnwo92Q8R824vUICu0jAKj/ADEggk7toPwv8I/2dUt7GKcwR/Z3RZUaMDbIjcqykcEEEEEdRX3RZ2lj4p8XWkGpWPw/1LSfEPhpI9WTyhNd6kAy7VQbT5lgAzY3E4JGAOo+QfiV/wAEy9V8BeC0Hhr4y+Nvhho2q3q2dj4S1DV3ubO1mldhHax3ETnCsAcBlJxgMTya4M64Oo577OlPEqjKP80W07pJ6xTkmuW+qtq9V19LIuMK+QqpUp4d1lJfZkk009NJNJp826d9NmeW/tE+OJdG1qz8B+C7KbxB4+16X7Fp2k2QEktuzD/WSdlwOcMRjlmwqk19bfsg/s9aH+x58H4PB95qOhXl3oH/ABPfHN9eWR8u41SaMPHLb3EihTFCAUViM7QchS5Aj/Z6/YT+Hv7MvjO10/QdDv7/AFZIV1DUPGN7qyHUmuFkCramJTvS3kBeQqihGMab2ZlXGl4z+IBf4eFtT1XWtPHibXpQLXxLoS3jQ2u93axMC5VIjGjBWckAeuSR7uVZRl+U4JZdljclJqVSclaU3rayV+WMVfli9bu71PDzbOMxzjHf2hmSUeW8acE7qC0vdu3NKTspSWllZaXNW18fz6xeT6l4hh2wXkI1S40vUJ4b6z0C1hBX7bG6cCRwVKEHcWbA+UNjX/Z/+N3/AArn4naX4NvdYi1fSPE1u99pc8EL/ZoEeTMJRzkBWDIpQY5dXCqN5ry5fGDQN4fiuLy0tpvHUNzrNzpjWbs0loqlLKBZcbIkji3OVP3jL93PzLy2o+N5ZvgtpOot4lit18L602nzzW2lNFFKscpjitRFtJRV3QrvTj5BggDNDo+1g21va3le9ul9189BKp7OSt0389r9fM/SAZwM9aKwvh34tTxp4L0jVFbJ1GyhuSuRld6KxB9wSR+FbteO0esmFFFFIDC+I3h2fxb4C1rS7Z44rjUbKW3jaRiqBmUgbiOQuTzgHjPB6V8ZalqjfD3wN4otr/SvDng7VLnVJ7VrfUVa8s55LmVQrXEa7uZecquVOOMpgn7n8vOcnOa5H4nfBPRvijFG95E1tqMC7YL+DAmjHXacgh0z/C4IB5GGAI6MNiHSequtPw19PvTOavQ9otH3/HT1Pnnw74vS18Ra1eRaH4cum8K6fFpunS6dLG182Iy8tmVIzAmVj2qWxhumapadrkXhTQPAGgabJrXh0XU7XT2V5bDVHaNIjJLazTvuETBpBhwQcoRxzmr8Wv2WPGvhLwfrtmmgaR45tNbuy90+mq2nTS25ZATOkbec8qIOHjZmbaM4wAeWXxXJH8VDFIuu2Vpp+nC1SN7oR2F4zPyPKY7zKoB5PQD127vT9rBq8Xfd79lZaPzbtocDpTTtJa+nd9/RLqdBe+OILq9+IGuWUXhrVrtFGjJJYXYtL2QxLta0uZ5Nqo6ylgpU4GVyQQMef/FW4u7PR/C3hiyPinTrZNPFtIFuVuLKUuFRoZ5jy8qYbaRhSOVwvIx7vxynij4c6VaX1/pOryeItWZXXWtOaxN6iylnRYIwP3y7VIY8Eg5OcVnXkKa/4p8U3y29pJOlw0Tiy1RjNKI4dqK4chLaYZI+XAPUk4yemUeWLXbT7rR628+hhGSbVvX85efl16HSah4s1DXPGmgfaLfXdJiNpcRPp6xxS2KCMKsYlmHzIygZVRxzjuKow317/wAKX11ze+L1nj19gkg02I3kaech2RxgENEBxuPO0sc9jR0WxfRtU8IPNZ6xaRWmlukr3erRSR2p8sfJcAH9/JknDLkZI4yvG58N/hp4j+J/gvUNB0Xw74skW81aS7+2SaiBCEEilStx90RsQD5a7mC9QOoylOnTXkrdF3fmaxjUm7Wd9er6pH0H8BPiydI8JabaNKQLRHjA6YVZGUfkAPyr33wd4oPiW28wK20dWIIB+leQfA39j6TwrFFc+JdQF3dgmR7W3YrCrFixGepGSfrXumnafFplssMMSQxoMBV6YrwZPU9lLQlLNk4UEfWinUUhhRRRQBG/M4B5G0n9azvFHhbTPEdhIuo6bYX6lduLi3SUY9PmBoopx3FLZnzH8e/h/oOiamGstE0izaFGkjMNnHGUbH3hgcH3ryHwP4b07V/Ekdpd6fZXVrqDE3UM0CvHckjBLqRhsgAc56CiivQh/DX9faOWe7/r7J9YfAb4V+F7exSSPw3oMciJ8rLp8IIwQBg7ewAFerBFhVURQiKMBQMAcGiivNe79Wdj2JYeYxnnpUlFFCEFFFFMD//Z"
+          },
+          {
+            "contentType": "image/*",
+            "data": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAFAAUAMBIgACEQEDEQH/xAAcAAACAwEBAQEAAAAAAAAAAAAABgQFBwMBAgj/xAA2EAABAwMABwUFCAMAAAAAAAABAgMEAAURBhIhMUFRkRNhcYGhMjNCweEHFBUiI1JysWKy0f/EABoBAQEBAQADAAAAAAAAAAAAAAAFAQQCAwb/xAAeEQACAwADAQEBAAAAAAAAAAAAAQIDEQQSMSFBBf/aAAwDAQACEQMRAD8A3GvlxaW0KW4oJSkElROABzr6pX+0Wc/B0dzFAK3n0NbRkYOTu8q8Zy6xcjyjHtJI6y73Mkg/hjIQzwkPDGt/EH+z0pau8y4NoUt+VIc5lLpA6DA9KntaKxnGkqui350gj87jrqsZ5AA4AqPI0UiIGYjsiMeSV6yehqVbdN/WUK4Vx+ITDfLmmUBbpklDmdmq6ceY3Gn6w6Vy23Y0e+qZV26g2l1CdUpUd2sN2CdmzGP6XUWRFkDjzpQ6hWcuJGqWydxxtyKSrlc35XanJSdXWT3EVtV0k9i/hs6otPT9G0VHgPfeYEZ873Wkr6gGpFViYFFFFAFV1+tzV0tbsZ3uWgj4VJOQeoqxrw99Y1qw1PHpDSEFvWHGoMkDbR2paBbJ9g6vSo7zueNSrrY5h21we6VN9bLttlNpTrFTSgEjicVklwjyIilCQypslCsZG/ZWtXF8JQdtLFptS9JtK2GdQmDAUHpS+BOwpR54HlmuXj7Kzqv06rMVbkzWLa0WLdFZIwW2UJ6ACpNAor6AjhRRRQBRRUeZMaht67mST7KE71GgKi+p+7Ph7H5HNhPJQ+n9VRSLghIOCKmXe4yZjakLw2z+xPHxNQ0RI78NqWypxAdbCwkY/Lkbs4z61H51DjLuvGUeLamur9KO7TNVpRdJCyPyN8T3nkKc9AH4TmjzCIyme3GTISjAVrk71Dft2baS5Wj7zzb0vXKIyBtWsbVHgBzJPSqlqI/DfRIjSVR30ey42do+lez+fVJNzaM5tkWlBM2+ikvRvTIuuIhX3s23zsbkp2NueP7T6eG6nSqhPCiiigClqXKD8x9Z2hKi2nuCTg+uaZCcAnlWfNSSptKidqhk+dAd7m4ExX1j4W1H0plsMNkWSElxpCilpPtJzwpKuTutCfTn2kFPXZTdc5/4VY2UtnD60BDfds2ny/5WNJ+jcKPS64iTJENk/osHbjcV/Td1pWk7qkqNQpS99aCCtQXllwZSd2eFaH9m97XPtz1vlLK5EEhIUreps51fEjBHSszdcw6k99W+gs0xNM2284TKZW2fEDWH+vrQGzUVwSHeWPOuqQobzQHqhkEc6ze4RH7XI+6yEkY92vg4kcR38xw6E6TXGXEjzWSzKaS62fhUOPMcj30BmDiu01UHcpaQc/yFS71cDPmFYP6SBqNj/EcfPfV3cdDlZKrbIGN4af4eCh8x50uTbTdopIct8gjm2ntAfNOfWgITzgSKrJLu+u8huWnOtFkDxaUPlUB2LOc93ClL/iwo/KgIEh3bUi1PdlpXbVg/H8jXRvRjSKcoJj2eXt4uI7MdVYp80S+zsQpbdyvziH5SPdR2j+m33k/Edvh40A3WNx52MVuA9mfd54/SrOvAABgbq9oD/9k="
+          }
+        ],
+        "contact": [
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/patient-contact-relationship",
+                    "code": "partner",
+                    "display": "Partner"
+                  }
+                ]
+              }
+            ],
+            "name": {
+              "use": "usual",
+              "text": "Lita"
+            },
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "546389512",
+                "use": "home"
+              }
+            ]
+          },
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/patient-contact-relationship",
+                    "code": "family",
+                    "display": "Family"
+                  }
+                ]
+              }
+            ],
+            "name": {
+              "use": "usual",
+              "text": "Merry"
+            },
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "879546213",
+                "use": "home"
+              }
+            ]
+          }
+        ],
+        "communication": [
+          {
+            "language": {
+              "text": "English"
+            },
+            "preferred": true
+          },
+          {
+            "language": {
+              "text": "German"
+            }
+          },
+          {
+            "language": {
+              "text": "French"
+            }
+          }
+        ],
+        "careProvider": [
+          {
+            "display": "Good Health Clinic"
+          },
+          {
+            "display": "IMAX HealthCare"
+          }
+        ],
+        "managingOrganization": {
+          "display": "ACME Healthcare, Inc"
+        },
+        "link": [
+          {
+            "other": {
+              "reference": "Patient/2252",
+              "display": "Mary Contrary"
+            },
+            "type": "seealso"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "f90f4bb47fb74a8bb75fe4e28b26ab29",
+      "resource": {
+        "resourceType": "MedicationOrder",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2017-01-17T13:43:18.000+00:00"
+        },
+       "dateWritten": "2017-01-03T00:00:00",
+       "status": "on hold",
+       "dateEnded": "2017-01-16T08:05:00",
+       "prescriber": {
+         "display": "James"
+       },
+       "medicationReference": {
+         "reference": "Medication/152",
+         "display": "PAIN-A-LAY GARGLE (Mouthwash)"
+       },
+       "dosageInstruction": [
+        {
+          "text": "every day",
+          "route": {
+            "coding": [
+              {
+                "display": "Mouthwash"
+              }
+            ]
+          },
+          "doseQuantity": {
+            "value": 1
+          }
+        }
+      ],
+      "dispenseRequest": {
+        "quantity": {
+          "value": 12
+        }
+      }
+    }
+    }
+  ]
+}

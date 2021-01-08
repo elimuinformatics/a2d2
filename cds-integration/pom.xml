@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cds-integration-test</artifactId>
+    <groupId>cds.api.itegration</groupId>
+    <version>0.0.1</version>
+
+   <properties>
+        <version.org.jboss.shrinkwrap>1.2.6</version.org.jboss.shrinkwrap>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <version.junit>4.12</version.junit>
+        <version.shrinkwrap-resolver-depchain>2.2.2</version.shrinkwrap-resolver-depchain>
+        <version.spring-boot-starter-web>2.2.9.RELEASE</version.spring-boot-starter-web>
+        <version.assertj-core>2.5.0</version.assertj-core>
+        <version.awaitility>2.0.0</version.awaitility>
+        <version.rest-assured>3.0.1</version.rest-assured>
+    </properties>
+
+    <dependencies>
+     <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${version.spring-boot-starter-web}</version>
+            </dependency>
+ 
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${version.awaitility}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${version.rest-assured}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                <artifactId>shrinkwrap-resolver-depchain</artifactId>
+                <version>${version.shrinkwrap-resolver-depchain}</version>
+                <scope>test</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${version.assertj-core}</version>
+                <scope>test</scope>
+            </dependency>
+    </dependencies>
+
+</project>

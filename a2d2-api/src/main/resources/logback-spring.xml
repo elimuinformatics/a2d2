@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright 2018-2020 Elimu Informatics
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http:  www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<configuration>
+ <!--  <springProfile name="dev"> -->
+   <appender name="Console"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] [%X{correlationId}] %-5level %logger{36}.%M - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+    <appender name="RollingFile"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/a2d2.log</file>
+        <encoder
+            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] [%X{correlationId}] %-5level %logger{36}.%M - %msg%n</Pattern>
+        </encoder>
+ 
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+	<appender name="CLOUDWATCH" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+		<region>us-west-2</region>
+		<logGroup>a2d2-logs</logGroup>
+		<logStream>a2d2-stream</logStream>
+		<layout	class="com.j256.cloudwatchlogbackappender.Ec2PatternLayout">
+			<!-- note: the %n is necessary to separate from any exceptions -->
+			<pattern>[%instance] [%thread] %level %logger{20} - %msg%n%xThrowable
+			</pattern>
+		</layout>
+		<initialWaitTimeMillis>3000</initialWaitTimeMillis>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="Console" />
+		<appender-ref ref="RollingFile" />
+		<appender-ref ref="CLOUDWATCH" />
+	</root>
+  <!-- </springProfile> -->
+</configuration>

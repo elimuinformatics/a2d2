@@ -1,0 +1,17 @@
+package io.elimu.generic;
+
+import io.elimu.a2d2.genericmodel.ServiceResponse;
+
+rule "Test rule"
+ruleflow-group "example-rules"
+when
+  sresp: ServiceResponse(body == null)
+then
+  sresp.setBody("This is an example response to test the model");
+  java.util.Map headers = new java.util.HashMap();
+  java.util.List list = new java.util.ArrayList();
+  list.add("text/plain");
+  headers.put("Content-Type", list);
+  sresp.setHeaders(headers);
+  //sresp.addHeader("Content-Type", "text/plain")
+end

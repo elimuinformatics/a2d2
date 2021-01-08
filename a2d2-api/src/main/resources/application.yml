@@ -1,0 +1,153 @@
+# Copyright 2018-2020 Elimu Informatics
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+### This is the main way to configure the application (other than annotations).
+### This file is in Yaml format but you can also configure spring boot using the traditional
+### Java properties file format. 
+
+spring.jmx.enabled: false
+spring:
+  profiles:
+    active: staging, default, test
+  mvc:
+    dispatch-options-request: false
+---
+
+server:
+  port: 8080
+
+spring.profiles: default 
+
+
+spring.jackson.default-property-inclusion: NON_NULL
+
+#todo: make sure to always enable security in production
+security.basic.enabled: false
+
+jasypt:
+    encryptor:
+        password: ${jasypt_encryptor_password}
+        algorithm: PBEWithMD5AndDES
+        iv-generator-classname: org.jasypt.iv.NoIvGenerator
+
+#management endpoints on a separate port
+management:
+  port: 8091
+  security:
+    enabled: false # management port is internal only. no need to secure it.
+
+#default project info followed by actual injected pom-specified values.
+project:
+  name: cds-hook-api
+  version: 0.1
+  description: CDS-Hook API [Clinical Intelligence Platform]
+info:
+  build:
+    artifact: ${project.artifactId}
+    name: ${project.name}
+    description: ${project.description}
+    version: ${project.version}
+
+cds.service:
+  name: 'default profile:'
+
+proc.envvar.prefix: var.a2d2
+
+services.pom.path: /app/services
+  
+---
+spring:
+  profiles: test
+  h2:
+    console:
+      enabled: true  
+         
+spring.jpa:
+    hibernate.ddl-auto: update
+    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    hibernate.naming.strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties.hibernate.show_sql: true 
+    
+cds.service:
+  name: 'cds profile:'
+  
+logging:
+  file: logs/a2d2.log
+
+---
+spring: 
+  profiles: dev
+  datasource:
+    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://192.168.1.7:5438/a2d2
+#    username: postgres
+#    password: postgres 
+#    serverName: 192.168.1.7
+    url: jdbc:postgresql://localhost:5432/a2d2
+    username: postgres
+    password: ENC(g0iZccNWoSXq41hViVtu4w==)
+    serverName: localhost
+    databaseName: a2d2
+    className: org.postgresql.xa.PGXADataSource
+    quartz.config: quartz-dev.properties   
+spring.jpa:
+    properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+
+---
+spring: 
+  profiles: staging
+  datasource:
+#    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://35.166.85.92:5432/a2d2
+#    username: postgres
+#    password: postgres 
+#    serverName: 35.166.85.92
+#    databaseName: a2d2
+#    className: org.postgresql.xa.PGXADataSource
+     driverClassName: com.mysql.jdbc.Driver
+     url: jdbc:mysql://dev-product-rds.cfmtrcvottnq.us-west-2.rds.amazonaws.com:3306/a2d2?autoReconnect=true
+     username: a2d2_user
+     password: ENC(arNEunnrgijhgMSP7ntbbgi/tBw8umtt) 
+     className: com.mysql.cj.jdbc.MysqlXADataSource
+     quartz.config: quartz-staging.properties   
+spring.jpa:
+    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect   
+    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+---
+spring: 
+  profiles: prod
+  datasource:
+     driverClassName: com.mysql.jdbc.Driver
+     url: jdbc:mysql://fdbca.cfmtrcvottnq.us-west-2.rds.amazonaws.com:3306/a2d2?autoReconnect=true
+     username: a2d2_user
+     password: ENC(arNEunnrgijhgMSP7ntbbgi/tBw8umtt) 
+     className: com.mysql.cj.jdbc.MysqlXADataSource
+     quartz.config: quartz-prod.properties 
+spring.jpa:
+    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext   
+---
+spring: 
+  profiles: local
+  datasource:
+     driverClassName: com.mysql.jdbc.Driver
+     url: jdbc:mysql://mydatabase:3306/fhir_420_dev
+     username: root
+     password: ENC(jfJpEylxzIDVqvMel1B2ig==)
+     className: com.mysql.cj.jdbc.MysqlXADataSource
+     quartz.config: quartz-staging.properties   
+spring.jpa:
+    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect   
+    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext

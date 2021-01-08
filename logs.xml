@@ -1,0 +1,3 @@
+<Context override="true" docBase="/usr/local/tomcat/logs" path="/logs" />
+
+
