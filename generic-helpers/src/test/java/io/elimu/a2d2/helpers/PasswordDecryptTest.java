@@ -15,9 +15,16 @@
 package io.elimu.a2d2.helpers;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PasswordDecryptTest {
+	
+	@BeforeClass
+	public static void setup() {
+		String salt = System.getenv("jasypt_encryptor_password");
+	    org.junit.Assume.assumeTrue(salt != null );
+	}
 
 	@Test
 	public void testEncryptDecrypt() throws Exception {
