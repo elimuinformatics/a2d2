@@ -15,17 +15,24 @@
 package io.elimu.a2d2.helpers;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class PasswordDecryptTest {
 
-	@Test
-	public void testEncryptDecrypt() throws Exception {
-		String value = "to_be_encrypted";
-		String valueEncrypted = PasswordDecryptUtil.encrypt(value);
-		Assert.assertNotNull(valueEncrypted);
-		System.out.println(valueEncrypted);
-		String valueDecrypted = PasswordDecryptUtil.decrypt(valueEncrypted);
-		Assert.assertEquals(value, valueDecrypted);
-	}
+    @BeforeClass
+    public static void setup() {
+        String salt = System.getenv("jasypt_encryptor_password");
+        org.junit.Assume.assumeTrue(salt != null);
+    }
+
+    @Test
+    public void testEncryptDecrypt() throws Exception {
+        String value = "to_be_encrypted";
+        String valueEncrypted = PasswordDecryptUtil.encrypt(value);
+        Assert.assertNotNull(valueEncrypted);
+        System.out.println(valueEncrypted);
+        String valueDecrypted = PasswordDecryptUtil.decrypt(valueEncrypted);
+        Assert.assertEquals(value, valueDecrypted);
+    }
 }
