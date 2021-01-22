@@ -305,11 +305,6 @@
             <artifactId>spring-security-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.elimu</groupId>
-            <artifactId>java-commons</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>sms-wih</artifactId>
 			<version>${project.version}</version>
