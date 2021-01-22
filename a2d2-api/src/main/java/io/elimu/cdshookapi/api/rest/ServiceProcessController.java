@@ -102,7 +102,7 @@ public class ServiceProcessController extends AbstractRestHandler {
 
 	@CrossOrigin
 	@RequestMapping(value = "/service-processes/defs/{processId}/list-instances", method = RequestMethod.GET, produces = {
-			"application/json", "application/xml" })
+			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseStatus(HttpStatus.OK)
 	public void getProcessInstances(@PathVariable("processId") String processId, HttpServletResponse resp) {
 		ServiceResponse response = new ServiceResponse();
@@ -124,10 +124,10 @@ public class ServiceProcessController extends AbstractRestHandler {
 				}
 				response.setBody(new Gson().toJson(mapList));
 				em.close();
-				response.addHeaderValue("Content-Type", "application/json");
+				response.addHeaderValue(HttpHeaders.CONTENT_TYPE , MediaType.APPLICATION_JSON_VALUE);
 				response.setResponseCode(200);
 			} else {
-				response.setBody("Process id not found");
+				response.setBody(PROCESS_NOT_FOUND);
 				response.setResponseCode(404);
 			}
 			WebUtils.populate(resp, response);
@@ -176,7 +176,7 @@ public class ServiceProcessController extends AbstractRestHandler {
 
         @CrossOrigin
         @RequestMapping(value = "service-processes/instances/{processInstanceId}/abort", method = RequestMethod.POST, produces = {
-                        "application/json", "application/xml" })
+        		MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
         @ResponseStatus(HttpStatus.OK)
         public @ResponseBody ServiceResponse abortProcess(@PathVariable("processInstanceId") Long processInstanceId) {
                 ServiceResponse response = new ServiceResponse();
@@ -184,14 +184,14 @@ public class ServiceProcessController extends AbstractRestHandler {
                         RuntimeManager manager = RuntimeManagerHelper.findRuntimeManagerByProcessInstanceId(processInstanceId);
                         if (manager == null) {
                                 response.setBody("Process instance manager not found");
-                                response.addHeaderValue("Content-Type", "text/plain");
+                                response.addHeaderValue(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
                                 response.setResponseCode(404);
                                 return response;
                         }
                         RuntimeEngine engine = manager.getRuntimeEngine(ProcessInstanceIdContext.get(processInstanceId));
                         if (engine == null)  {
                                 response.setBody("Process instance engine not found");
-                                response.addHeaderValue("Content-Type", "text/plain");
+                                response.addHeaderValue(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
                                 response.setResponseCode(404);
                                 return response;
                         }
@@ -199,11 +199,11 @@ public class ServiceProcessController extends AbstractRestHandler {
                         if (instance != null && instance.getState() == ProcessInstance.STATE_ACTIVE) {
                                 engine.getKieSession().abortProcessInstance(processInstanceId);
                                 response.setBody("{ 'status': '" + getStatusFromProcess(ProcessInstance.STATE_ABORTED) + "'}");
-                                response.addHeaderValue("Content-Type", "application/json");
+                                response.addHeaderValue(HttpHeaders.CONTENT_TYPE , MediaType.APPLICATION_JSON_VALUE);
                                 response.setResponseCode(200);
                         } else if (instance == null) {
-                                response.setBody("Process instance id not found");
-                                response.addHeaderValue("Content-Type", "text/plain");
+                                response.setBody(PROCESS_NOT_FOUND);
+                                response.addHeaderValue(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
                                 response.setResponseCode(404);
                         } else {
                                 response.setBody("Cant stop process instance that is in state " + getStatusFromProcess(instance.getState()));
@@ -212,9 +212,9 @@ public class ServiceProcessController extends AbstractRestHandler {
                         }
                         return response;
                 } catch (Exception e) {
-                        log.error("Error executing process", e);
+                        log.error(ERROR_MSG, e);
                         response.setBody("{'status': 'Process already aborted or completed'}");
-                        response.addHeaderValue("Content-Type", "application/json");
+                        response.addHeaderValue(HttpHeaders.CONTENT_TYPE , MediaType.APPLICATION_JSON_VALUE);
                         response.setResponseCode(500);
                         return response;
                 }
