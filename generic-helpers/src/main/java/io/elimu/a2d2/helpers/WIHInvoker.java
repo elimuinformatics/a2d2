@@ -16,6 +16,7 @@ package io.elimu.a2d2.helpers;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.drools.core.WorkItemHandlerNotFoundException;
 import org.drools.core.process.instance.impl.DefaultWorkItemManager;
 import org.drools.core.process.instance.impl.WorkItemImpl;
@@ -24,6 +25,8 @@ import org.drools.persistence.jpa.processinstance.JPAWorkItemManager;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
+
+import io.elimu.a2d2.exception.BaseException;
 
 public class WIHInvoker {
 
@@ -34,7 +37,7 @@ public class WIHInvoker {
 	public static Map<String, Object> invokeDyn(KnowledgeHelper helper, String wihName, Object... params) {
 		Map<String, Object> mapParams = new HashMap<>();
 		if (params == null || params.length %2 != 0) {
-			throw new RuntimeException("invokeDyn requires an even number of parameters");
+			throw new BaseException("invokeDyn requires an even number of parameters");
 		}
 		for (int index = 0; index < params.length; index+=2) {
 			mapParams.put(String.valueOf(params[index]), params[index+1]);
@@ -57,7 +60,7 @@ public class WIHInvoker {
 		workItem.setProcessInstanceId(-1);
 		handler.executeWorkItem(workItem, pseudoManager);
 		if (!pseudoManager.isCompleted()) {
-			throw new RuntimeException("WorkItemHandlers invoked with " + WIHInvoker.class.getSimpleName()
+			throw new BaseException("WorkItemHandlers invoked with " + WIHInvoker.class.getSimpleName()
 					+ " must be sync (the must invoke completeWorkItem)");
 		}
 		return workItem.getResults();

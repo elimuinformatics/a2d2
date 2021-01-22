@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import io.elimu.a2d2.cdsmodel.Dependency;
+import io.elimu.a2d2.exception.BaseException;
 import io.elimu.a2d2.process.ServiceUtils;
 import io.elimu.genericapi.service.GenericServiceConfigException;
 import io.elimu.genericapi.service.MavenJarResolver;
@@ -212,7 +213,7 @@ public abstract class AbstractKieService {
 					Element node = (Element) list.item(0);
 					return node.getAttribute("id");
 				} catch (Exception e) {
-					throw new RuntimeException("Cannot obtain process ID", e);
+					throw new BaseException("Cannot obtain process ID", e);
 				}
 			} else {
 				//No processId

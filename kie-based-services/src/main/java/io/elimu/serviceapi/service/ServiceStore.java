@@ -1,5 +1,6 @@
 package io.elimu.serviceapi.service;
 
+import io.elimu.a2d2.exception.BaseException;
 import io.elimu.genericapi.service.GenericKieBasedService;
 
 public interface ServiceStore {
@@ -9,7 +10,7 @@ public interface ServiceStore {
 			Class<?> c = Class.forName("io.elimu.serviceapi.service.ServiceStoreImpl");
 			return (ServiceStore) c.getMethod("getInstance").invoke(null);
 		} catch (Exception e) {
-			throw new RuntimeException("Couldn't obtain ServiceStoreImpl instance", e);
+			throw new BaseException("Couldn't obtain ServiceStoreImpl instance", e);
 		}
 	}
 

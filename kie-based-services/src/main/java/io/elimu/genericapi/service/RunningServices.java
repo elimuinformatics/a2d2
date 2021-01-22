@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.elimu.a2d2.cdsmodel.Dependency;
+import io.elimu.a2d2.exception.BaseException;
 import io.elimu.a2d2.process.ServiceUtils;
 import io.elimu.serviceapi.service.AppContextUtils;
 import io.elimu.serviceapi.service.ServiceStore;
@@ -116,7 +117,7 @@ public class RunningServices {
 				}
 				pomModel = PomModel.Parser.parse("pom.xml", new ByteArrayInputStream(pomXmlBytes));
 			} catch (IOException e) {
-				throw new RuntimeException("Problem reading initial pom.xml", e);
+				throw new BaseException("Problem reading initial pom.xml", e);
 			} catch (RuntimeException e) {
 				ArtifactNotFoundException anfe = extractArtifactNotFound(e);
 				if (anfe == null) {
@@ -168,7 +169,7 @@ public class RunningServices {
 						rid, jarContent, pomContent);
 			}
 		} catch (IOException | URISyntaxException e) {
-			throw new RuntimeException("Couldn't read JAR or POM from URL: " + kieWbMavenLocation, e);
+			throw new BaseException("Couldn't read JAR or POM from URL: " + kieWbMavenLocation, e);
 		}
 	}
 
@@ -186,12 +187,12 @@ public class RunningServices {
 		try {
 			file = File.createTempFile(releaseId.getArtifactId() + "-" + releaseId.getVersion(), extension );
 		} catch (IOException e) {
-			throw new RuntimeException( e );
+			throw new BaseException( e );
 		}
 		try(FileOutputStream fos = new FileOutputStream( file )) {
 			fos.write( bytes );
 		} catch ( IOException e ) {
-			throw new RuntimeException( e );
+			throw new BaseException( e );
 		}
 		return file;
 	}

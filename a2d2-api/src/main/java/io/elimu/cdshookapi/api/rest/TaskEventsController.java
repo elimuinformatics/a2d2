@@ -42,6 +42,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
+import io.elimu.a2d2.exception.BaseException;
 import io.elimu.cdshookapi.service.TaskServiceHelper;
 import io.elimu.genericapi.service.GenericKieBasedService;
 import io.elimu.genericapi.service.GenericService;
@@ -91,7 +92,7 @@ public class TaskEventsController {
 				//update task with the flag on (the listener will remove it after finding it should be ignored from FHIR updating step)
 				service.updateTask(toStoreJbpmTask);
 			} else {
-				throw new RuntimeException("Unable to get jbpm task");
+				throw new BaseException("Unable to get jbpm task");
 			}
 			return new ResponseEntity<>(body, HttpStatus.OK);
 		} catch(Exception e) {
