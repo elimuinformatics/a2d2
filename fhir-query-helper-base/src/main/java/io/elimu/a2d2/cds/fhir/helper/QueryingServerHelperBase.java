@@ -229,7 +229,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 				client.registerInterceptor(tracker);
 				try {
 					result = callback.execute(client);
-				} catch (Throwable t) {
+				} catch (RuntimeException t) {
 					log.error(ERROR_MSG  + t.getMessage());
 				}
 				for (IClientInterceptor i : interceptors) {
