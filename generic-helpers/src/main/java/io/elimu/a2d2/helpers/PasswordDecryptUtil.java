@@ -31,7 +31,7 @@ public class PasswordDecryptUtil {
 	protected static StringEncryptor stringEncryptor() {
 		String salt = System.getenv("jasypt_encryptor_password");
 		if (salt == null || "".equals(salt.trim())) {
-			LOG.debug("Couldn't find environment variable jasypt_encryptor_password");
+			LOG.warn("Couldn't find environment variable jasypt_encryptor_password");
 			throw new IllegalStateException("Couldn't find environment variable jasypt_encryptor_password.");
 		}
 		StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
