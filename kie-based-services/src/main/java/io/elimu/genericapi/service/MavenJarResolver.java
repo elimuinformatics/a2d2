@@ -53,6 +53,7 @@ public class MavenJarResolver {
 							build());
 				}
 				else {
+						LOGGER.debug("Looking into M2 Repository for loading kjars");
 						Path path = Paths.get(Optional.ofNullable(System.getenv("M2_REPO")).orElse(REPO_PATH));
 						RemoteRepository local = new RemoteRepository.Builder("local", DEFAULT, path.toFile().toURI().toString()).build();
 						REPOS.add (local);		

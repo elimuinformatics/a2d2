@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import io.elimu.a2d2.cdsmodel.Dependency;
 import io.elimu.a2d2.cdsresponse.entity.TemplateRepository;
+import io.elimu.a2d2.exception.BaseException;
 
 public class ServiceUtils {
 
@@ -82,7 +83,7 @@ public class ServiceUtils {
 			}
 			return f.toURI().toURL();
 		} catch (Exception e) {
-			throw new RuntimeException("Couldn't write non-existing file " + f, e);
+			throw new BaseException("Couldn't write non-existing file " + f, e);
 		}
 	}
 
