@@ -143,8 +143,10 @@ public class RunningServices {
 
 	public void downloadDependency(Dependency dep) {
 		if ("true".equalsIgnoreCase(String.valueOf(System.getProperty("kie.maven.offline.force")))) {
+			LOG.debug("Running in offline read mode");
 			return;
 		}
+		LOG.debug("Running in online mode");
 		String kieWbMavenLocation = ServiceUtils.getMavenLocation();
 		String kieWbUser = ServiceUtils.getMavenUser();
 		String kieWbPassword = ServiceUtils.getMavenPassword();
