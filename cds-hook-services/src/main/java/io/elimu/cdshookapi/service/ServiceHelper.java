@@ -74,6 +74,7 @@ public class ServiceHelper {
 	@PostConstruct
 	public void init() {
 		if (StringUtils.equalsIgnoreCase(System.getProperty("kie.maven.offline.force"), "true")) {
+			log.debug("Reading xmls for kjar services in offline mode");
 			Map<String, Object> pomData = readPomDependencies();
 			Collection<String> dependencies = (Collection<String>) pomData.get(DEPENDENCIES);
 			dependencies.forEach(dep -> RunningServices.getInstance()
@@ -112,8 +113,10 @@ public class ServiceHelper {
 	private Map<String, Object> readPomDependencies() {
 		Map<String, Object> pomData = new ConcurrentSkipListMap<>();
 		Collection<String> dependencies = new TreeSet<>();
+		String servicePomPath = System.getProperty("services.pom.path");
 		try {
-			for (File file : new File(System.getProperty("services.pom.path")).listFiles()) {
+			for (File file : new File(servicePomPath).listFiles()) {
+				log.debug("Loading xml : " + file.getAbsolutePath());
 				if (!file.isDirectory()) {
 					Optional<Model> model = getModel(file);
 					if(model.isPresent()) {
@@ -127,7 +130,7 @@ public class ServiceHelper {
 			pomData.put(DEPENDENCIES, dependencies);
 		} catch(NullPointerException e) {
 			pomData.put(DEPENDENCIES, Collections.emptyList());
-			log.error("Couldn't initialize services due to invalid path", e);
+			log.error("Couldn't initialize services due to invalid path :"+servicePomPath, e);
 		}
 		return pomData;
 	}
