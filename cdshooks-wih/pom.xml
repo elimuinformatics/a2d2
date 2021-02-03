@@ -31,14 +31,25 @@
   </properties>
 
  <dependencies>
-   	<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
     <dependency>
-    	<groupId>io.elimu.a2d2</groupId>
-    	<artifactId>kie-based-services</artifactId>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.kie</groupId>
+    	<artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-core</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-dmn-core</artifactId>
+        <version>${kie.version}</version>
+	<scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>io.elimu.a2d2</groupId>
