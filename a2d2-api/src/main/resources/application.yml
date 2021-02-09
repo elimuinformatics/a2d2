@@ -75,7 +75,7 @@ spring:
          
 spring.jpa:
     hibernate.ddl-auto: update
-    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
     hibernate.naming.strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties.hibernate.show_sql: true 
     
@@ -123,7 +123,7 @@ spring:
      className: com.mysql.cj.jdbc.MysqlXADataSource
      quartz.config: quartz-staging.properties   
 spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect   
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect   
     properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
 ---
 spring: 
@@ -136,7 +136,7 @@ spring:
      className: com.mysql.cj.jdbc.MysqlXADataSource
      quartz.config: quartz-prod.properties 
 spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
     properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext   
 ---
 spring: 
@@ -149,5 +149,5 @@ spring:
      className: com.mysql.cj.jdbc.MysqlXADataSource
      quartz.config: quartz-staging.properties   
 spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect   
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect   
     properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
