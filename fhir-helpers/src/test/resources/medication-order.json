@@ -1,0 +1,41 @@
+{
+  "resourceType": "MedicationOrder",
+  "id": "457",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2017-01-10T08:59:40.000+00:00"
+  },
+  "dateWritten": "2017-01-05T00:00:00",
+  "status": "active",
+  "dateEnded": "2017-01-31T21:45:00",
+  "patient": {
+    "reference": "Patient/435"
+  },
+  "prescriber": {
+    "display": "Dr.Mark Antony"
+  },
+  "medicationReference": {
+    "reference": "Medication/602",
+    "display": "CANCIDAS (Injectable)"
+  },
+  "dosageInstruction": [
+    {
+      "text": "every day",
+      "route": {
+        "coding": [
+          {
+            "display": "Injectable"
+          }
+        ]
+      },
+      "doseQuantity": {
+        "value": 1
+      }
+    }
+  ],
+  "dispenseRequest": {
+    "quantity": {
+      "value": 15
+    }
+  }
+}

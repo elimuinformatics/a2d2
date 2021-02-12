@@ -1,0 +1,37 @@
+{
+  "resourceType": "Condition",
+  "id": "608",
+  "meta": {
+    "versionId": "2",
+    "lastUpdated": "2017-02-27T13:44:19.000+00:00"
+  },
+  "text": {
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"></div>"
+  },
+  "patient": {
+    "reference": "Patient/2"
+  },
+  "asserter": {
+    "display": "Dr.Robb"
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "ICD9",
+        "code": "906.0",
+        "display": "Late effect of open wound of head, neck, and trunk"
+      }
+    ],
+    "text": "Late effect of open wound of head, neck, and trunk (ICD9 Code : 906.0 )"
+  },
+  "category": {
+    "coding": [
+      {
+        "system": " http://hl7.org/fhir/condition-category",
+        "code": "symptom",
+        "display": "Symptom"
+      }
+    ]
+  },
+  "onsetDateTime": "2017-01-03T03:35:00.000Z"
+}
