@@ -1,0 +1,123 @@
+{
+  "resourceType": "Patient",
+  "id": "2252",
+  "meta": {
+    "versionId": "17",
+    "lastUpdated": "2017-06-08T08:50:42.000+00:00"
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div class=\"hapiHeaderText\">Ms. Mary <b>CONTRARY </b></div><table class=\"hapiPropertyTable\"><tbody><tr><td>Identifier</td><td>60418273</td></tr><tr><td>Address</td><td><span>168 Florence Street </span><br/><span>Springfield </span><span>IL </span><span>USA </span></td></tr><tr><td>Date of birth</td><td><span>29 October 1989</span></td></tr></tbody></table></div>"
+  },
+  "identifier": [
+    {
+      "use": "usual",
+      "type": {
+        "coding": [
+          {
+            "system": "http://hl7.org/fhir/v2/0203",
+            "code": "MR"
+          }
+        ]
+      },
+      "value": "60418273"
+    },
+    {
+      "use": "usual",
+      "type": {
+        "coding": [
+          {
+            "system": "http://hl7.org/fhir/v2/0203",
+            "code": "PLAC"
+          }
+        ]
+      },
+      "value": "12345"
+    }
+  ],
+  "active": true,
+  "name": [
+    {
+      "use": "official",
+      "family": [
+        "Contrary"
+      ],
+      "given": [
+        "Mary"
+      ],
+      "prefix": [
+        "Ms."
+      ]
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "708-555-1212",
+      "use": "mobile"
+    },
+    {
+      "system": "phone",
+      "value": "708-555-6666",
+      "use": "home"
+    }
+  ],
+  "gender": "Female",
+  "birthDate": "1989-10-29",
+  "deceasedBoolean": false,
+  "address": [
+    {
+      "use": "home",
+      "line": [
+        "168 Florence Street"
+      ],
+      "city": "Springfield",
+      "state": "IL",
+      "postalCode": "60321",
+      "country": "USA"
+    }
+  ],
+  "maritalStatus": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/v3/MaritalStatus",
+        "code": "S",
+        "display": "Never Married"
+      }
+    ]
+  },
+  "multipleBirthBoolean": false,
+  "contact": [
+    {
+      "relationship": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/patient-contact-relationship",
+              "code": "family",
+              "display": "Family"
+            }
+          ]
+        }
+      ],
+      "name": {
+        "use": "usual",
+        "text": "Terry Contrary"
+      },
+      "telecom": [
+        {
+          "system": "phone",
+          "value": "708-555-4321",
+          "use": "home"
+        }
+      ]
+    }
+  ],
+  "communication": [
+    {
+      "language": {
+        "text": "Engliish (UK)"
+      }
+    }
+  ]
+}

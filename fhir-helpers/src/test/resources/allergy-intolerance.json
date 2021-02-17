@@ -1,0 +1,79 @@
+{
+  "resourceType": "AllergyIntolerance",
+  "id": "87",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2020-01-10T05:32:16.000+00:00"
+  },
+  "text": {
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"></div>"
+  },
+  "onset": "2016-12-16T15:55:00",
+  "recorder": {
+    "display": "Dr James"
+  },
+  "patient": {
+    "fhir_comments": [
+      "   the patient that actually has the risk of adverse reaction   "
+    ],
+    "reference": "Patient/1"
+  },
+  "substance": {
+    "fhir_comments": [
+      "   subtance - either coded, or text. A few times, \n    there's a full description of a complex substance - in these caes, use the\n    extension [url] to refer to a Substance resource   "
+    ],
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "406466009"
+      }
+    ]
+  },
+  "lastOccurence": "2016-12-07T01:05:00.000Z",
+  "reaction": [
+    {
+      "fhir_comments": [
+        " past events. There's no claim that this is all the events, and \n that should not be assumed "
+      ],
+      "substance": {
+        "fhir_comments": [
+          " \n It's possible to list specific things to which the patient responded,\n e.g. chocolate (that happened to contain cashew nuts). This event has\n such a specific substance. Note that systems should ensure that what\n goes in here does not conflict with the substance above, and systems\n processing the data can be sure that what is here does not contravene\n the substance above\n "
+        ],
+        "coding": [
+          {
+            "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+            "code": "3092008"
+          }
+        ]
+      },
+      "manifestation": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "display": "Anaphylactic"
+            }
+          ]
+        }
+      ],
+      "severity": "moderate"
+    },
+    {
+      "certainty": "likely",
+      "_certainty": {
+        "fhir_comments": [
+          " this was the first occurrence "
+        ]
+      },
+      "manifestation": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
