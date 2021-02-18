@@ -70,6 +70,12 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>web-util</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jboss.spec.javax.servlet</groupId>
+					<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -79,6 +85,10 @@
 				<exclusion>
 					<groupId>com.thoughtworks.xstream</groupId>
 					<artifactId>xstream</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.spec.javax.servlet</groupId>
+					<artifactId>jboss-servlet-api_3.1_spec</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
