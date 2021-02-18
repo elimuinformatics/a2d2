@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor;
+import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.ResponseEvent;
 
@@ -91,9 +92,13 @@ public class CacheUtil {
 		String token = null;
 		for (int i = 0; i < interceptors.size(); i++) {
 			try {
-				SimpleRequestHeaderInterceptor header = (SimpleRequestHeaderInterceptor) interceptors.get(i);
-				if (header.getHeaderName().equals(BASIC)) {
-					token = header.getHeaderValue();
+				IClientInterceptor interceptor = interceptors.get(i);
+				if ((interceptor instanceof SimpleRequestHeaderInterceptor) && ((SimpleRequestHeaderInterceptor) interceptor).getHeaderName().equals(BASIC)) {
+					token = ((SimpleRequestHeaderInterceptor) interceptor).getHeaderValue();
+					break;
+				} else if (interceptor instanceof BearerTokenAuthInterceptor) {
+					BearerTokenAuthInterceptor header = (BearerTokenAuthInterceptor) interceptor;
+					token = header.getToken();
 					break;
 				}
 			} catch (Exception e) {

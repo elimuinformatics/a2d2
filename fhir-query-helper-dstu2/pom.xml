@@ -25,7 +25,7 @@
 	</parent>
 
 	<artifactId>fhir-query-helper-dstu2</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>jar</packaging>
 	<description>CDS Helper</description>
 
