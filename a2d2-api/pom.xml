@@ -113,6 +113,23 @@
 			<artifactId>fhir-resource-wih</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- Added for phq9-registry converters to work -->
+		<dependency>
+                        <groupId>ca.uhn.hapi.fhir</groupId>
+                        <artifactId>hapi-fhir-utilities</artifactId>
+                        <version>${hapi.fhir.version}</version>
+                </dependency>
+                <dependency>
+                        <groupId>ca.uhn.hapi.fhir</groupId>
+                        <artifactId>hapi-fhir-converter</artifactId>
+                        <version>${hapi.fhir.version}</version>
+                </dependency>
+                <dependency>
+                        <groupId>ca.uhn.hapi.fhir</groupId>
+                        <artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
+                        <version>${hapi.fhir.version}</version>
+                </dependency>
+		<!-- END added for phq9-registry converters -->
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cdshooks-wih</artifactId>
