@@ -20,7 +20,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.elimu.a2d2</groupId>
 	<artifactId>fhir-helpers</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1.2</version>
 	<packaging>jar</packaging>
 	<name>fhir-helpers</name>
 	<url>http://maven.apache.org</url>
@@ -76,4 +76,21 @@
 			<version>${hapi.fhir.version}</version>
 		</dependency>
 	</dependencies>
+       <distributionManagement>
+                <repository>
+                        <uniqueVersion>false</uniqueVersion>
+                        <id>nexus-repo-releases</id>
+                        <name>Nexus Repository</name>
+                        <url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
+                        <layout>default</layout>
+                </repository>
+                <snapshotRepository>
+                        <uniqueVersion>true</uniqueVersion>
+                        <id>nexus-repo-snapshots</id>
+                        <name>Nexus Repository</name>
+                        <url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
+                        <layout>default</layout>
+                </snapshotRepository>
+        </distributionManagement>
+
 </project>
