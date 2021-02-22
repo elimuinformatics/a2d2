@@ -147,10 +147,6 @@
 					<artifactId>wagon-provider-api</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>javax.enterprise</groupId>
-					<artifactId>cdi-api</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.jboss.spec.javax.ws.rs</groupId>
 					<artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
 				</exclusion>
