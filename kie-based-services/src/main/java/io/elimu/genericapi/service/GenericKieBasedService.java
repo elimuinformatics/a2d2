@@ -131,6 +131,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			Thread.currentThread().setContextClassLoader(getKieContainer().getClassLoader());
 			runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
 			KieSession ksession = runtime.getKieSession();
+			enableDebugging(ksession, request);
 			String procId = getProcessId(request.getMethod());
 			if (procId != null && !NOT_ALLOWED_METHOD_KEY.equals(procId)) {
 				LOG.info("Executing process " + procId + " for service " + getId());
@@ -169,6 +170,15 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		}
 	}
 	
+	private void enableDebugging(KieSession ksession, ServiceRequest request) {
+		String defaultEnabled = System.getProperty("service.debug.enabled", "false");
+		String header = request.getHeader("X-Enable-Debug");
+		if ("true".equalsIgnoreCase(defaultEnabled) || (header != null && "true".equalsIgnoreCase(header))) {
+			//enables listeners
+			new GenericDebugListener(getId(), ksession);
+		}
+	}
+
 	private boolean ignoreScrubbing() {
 		Predicate<? super Object> f = k -> k.toString().equalsIgnoreCase("kie.project.ignorescrub"); 
 		Optional<Object> ignorescrub = config.keySet().stream().filter(f).findFirst();
