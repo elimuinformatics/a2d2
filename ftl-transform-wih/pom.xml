@@ -81,6 +81,11 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.0.24</version>
+		</dependency>
 	</dependencies>
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
