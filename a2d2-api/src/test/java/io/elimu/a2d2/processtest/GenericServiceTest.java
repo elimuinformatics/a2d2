@@ -63,7 +63,7 @@ public class GenericServiceTest {
 	}
 	
 	@Before
-	public void setUp() throws Exception {  
+	public void setUp() throws Exception {
 		Properties prop = new Properties();
 		prop.load(GenericServiceTest.class.getResourceAsStream("/generic-service-test.properties"));
 		for (Object key : prop.keySet()) {
@@ -140,7 +140,7 @@ public class GenericServiceTest {
 		//Assert.assertNotNull(request.getUser());//user set from Authorization header
 		//Assert.assertEquals("user", request.getUser());
 		Assert.assertNotNull(response);
-		Assert.assertNotNull(response.getBody()); 
+		Assert.assertNotNull(response.getBody());
 		System.out.println(response.getBody());
 		Assert.assertNotNull(response.getResponseCode());
 		Assert.assertEquals(200, response.getResponseCode().intValue());
