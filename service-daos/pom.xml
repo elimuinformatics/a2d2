@@ -68,7 +68,7 @@
 			<artifactId>hibernate-core</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>dom4j</groupId>
+					<groupId>org.dom4j</groupId>
     					<artifactId>dom4j</artifactId>
 				</exclusion>
 			</exclusions>
@@ -84,6 +84,12 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.dom4j</groupId>
+    					<artifactId>dom4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

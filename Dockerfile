@@ -26,4 +26,6 @@ COPY --from=maven /usr/src/services /app/services
 
 HEALTHCHECK --interval=60s --timeout=30s --start-period=30s --retries=3 CMD curl -f $HEALTHCHECKURL 2>&1 | grep UP || exit 1
 
+EXPOSE 8080
+EXPOSE 8443
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar a2d2-api.war"]

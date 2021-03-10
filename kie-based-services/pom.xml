@@ -55,7 +55,86 @@
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-utils</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.aether</groupId>
+    					<artifactId>aether-spi</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.aether</groupId>
+    					<artifactId>aether-util</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.aether</groupId>
+    					<artifactId>aether-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+    					<artifactId>commons-io</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+    					<artifactId>plexus-component-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jsoup</groupId>
+    					<artifactId>jsoup</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.sonatype.plexus</groupId>
+    					<artifactId>plexus-cipher</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.wagon</groupId>
+    					<artifactId>wagon-provider-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.aether</groupId>
+    					<artifactId>aether-impl</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.aether</groupId>
+    			<artifactId>aether-impl</artifactId>
+    			<version>1.1.0</version>
+			</dependency>
+		<dependency>
+			<groupId>org.apache.maven.wagon</groupId>
+    			<artifactId>wagon-provider-api</artifactId>
+    			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.plexus</groupId>
+    			<artifactId>plexus-cipher</artifactId>
+    			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+    			<artifactId>plexus-component-annotations</artifactId>
+    			<version>1.6</version>
+		</dependency>
+		<dependency>
+    			<groupId>org.eclipse.aether</groupId>
+    			<artifactId>aether-spi</artifactId>
+    			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+    			<groupId>org.eclipse.aether</groupId>
+    			<artifactId>aether-util</artifactId>
+    			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.aether</groupId>
+    			<artifactId>aether-api</artifactId>		
+    			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jbpm</groupId>
@@ -155,6 +234,12 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mvel</groupId>
+    					<artifactId>mvel2</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
@@ -175,6 +260,12 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu3</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+   			 		<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
@@ -183,23 +274,86 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-base</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+   			 		<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-utilities</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+   			 		<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml</groupId>
+					<artifactId>classmate</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.logging</groupId>
+					<artifactId>jboss-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.ow2.asm</groupId>
+    					<artifactId>asm</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.junit.jupiter</groupId>
+    					<artifactId>junit-jupiter-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+    			<artifactId>junit-jupiter-api</artifactId>
+    			<version>5.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -214,11 +368,23 @@
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
 			<version>2.1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 		    <groupId>org.freemarker</groupId>
@@ -228,12 +394,36 @@
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>3.3.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+   			 		<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>service-daos</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.gson</groupId>
+    					<artifactId>gson</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.aspectj</groupId>
+    					<artifactId>aspectjweaver</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+    					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		<!-- input scrubbing libraries -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+    			<artifactId>aspectjweaver</artifactId>
+    			<version>1.9.6</version>
+		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>

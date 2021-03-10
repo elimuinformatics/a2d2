@@ -260,6 +260,12 @@
 		    <groupId>com.nimbusds</groupId>
 		    <artifactId>nimbus-jose-jwt</artifactId>
 		    <version>8.2</version>
+		    <exclusions>
+				<exclusion>
+					<groupId>org.ow2.asm</groupId>
+    					<artifactId>asm</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
@@ -274,11 +280,23 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
+			<exclusions>
+				<exclusion>
+   					<groupId>org.dom4j</groupId>
+    				 	<artifactId>dom4j</artifactId> 
+				</exclusion>
+			</exclusions>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
+			<exclusions>
+				<exclusion>
+   					<groupId>org.dom4j</groupId>
+    				 	<artifactId>dom4j</artifactId> 
+				</exclusion>
+			</exclusions>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
