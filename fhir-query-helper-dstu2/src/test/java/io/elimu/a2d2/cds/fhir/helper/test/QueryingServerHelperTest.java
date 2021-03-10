@@ -78,6 +78,7 @@ public class QueryingServerHelperTest {
 	@Test
 	public void fhirQueryAsync() {
 		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponseObservation).when(queryingServerHelper).getResourceByIdResponse(any(), any());
 		long from = System.currentTimeMillis();
 		FhirFuture<FhirResponse<List<IBaseResource>>> f = queryingServerHelper.queryResourcesAsync("Observation",
 				patient.getId().getIdPart(), SUBJECT, IDENTIFIER, "test-1");
@@ -86,7 +87,6 @@ public class QueryingServerHelperTest {
 											// this is so any env can run this test successfuly)
 		Assert.assertNotNull(f);
 		from = System.currentTimeMillis();
-		doReturn(fhirResponseObservation).when(queryingServerHelper).getResourceByIdResponse(any(), any());
 		FhirFuture<FhirResponse<IBaseResource>> f2 = queryingServerHelper.getResourceByIdAsync("Observation",
 				observation.getId().getIdPart(), "test-2");
 		to = System.currentTimeMillis();

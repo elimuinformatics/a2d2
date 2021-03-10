@@ -43,11 +43,11 @@ public class BasicRegisterableItemsFactory extends DefaultRegisterableItemsFacto
         	Map<String, Object> params = getParametersMap(runtime);
         	for (NamedObjectModel model : descriptor.getWorkItemHandlers()) {
         		Object hInstance = getInstanceFromModel(model, getRuntimeManager().getEnvironment().getClassLoader(), params);
-        		if (hInstance instanceof RuntimeEngineAware) {
-        			RuntimeEngineAware reaware = (RuntimeEngineAware) defaultHandlers.get(HUMAN_TASK);
-        			reaware.setRuntimeManager(((RuntimeEngineImpl) runtime).getManager());
-        		}
         		if (hInstance != null) {
+        			if (hInstance instanceof RuntimeEngineAware) {
+        				RuntimeEngineAware reaware = (RuntimeEngineAware) hInstance;
+	        			reaware.setRuntimeManager(((RuntimeEngineImpl) runtime).getManager());
+        			}
         			defaultHandlers.put(model.getName(), (WorkItemHandler) hInstance);
         		}
         	}
