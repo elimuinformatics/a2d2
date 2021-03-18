@@ -63,7 +63,8 @@ public class ResourceWriteDelegate implements WorkItemHandler {
 				}
 
 				if (client != null) {
-					if (!completeworkItem(client, fhirResource, workItemResult, manager, workItem, workItemParam.get("authHeader").toString(),actionType)) {
+					Object auth = workItemParam.get("authHeader");
+					if (!completeworkItem(client, fhirResource, workItemResult, manager, workItem, auth == null ? null : auth.toString(), actionType)) {
 						log.error(serverUrl.toString(), CLIENT_NULL);
 						throw new FhirServerException(serverUrl.toString(), CLIENT_NULL);
 					}
