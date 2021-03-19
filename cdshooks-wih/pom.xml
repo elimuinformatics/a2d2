@@ -44,6 +44,12 @@
         <groupId>org.drools</groupId>
         <artifactId>drools-core</artifactId>
         <scope>test</scope>
+        <exclusions>
+		<exclusion>
+			<groupId>org.mvel</groupId>
+    			<artifactId>mvel2</artifactId>
+		</exclusion>
+	</exclusions>				
     </dependency>
     <dependency>
         <groupId>org.kie</groupId>
