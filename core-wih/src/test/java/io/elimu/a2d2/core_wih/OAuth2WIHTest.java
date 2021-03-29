@@ -43,7 +43,9 @@ public class OAuth2WIHTest {
 
 		Assert.assertTrue(manager.isCompleted(workItem.getId()));
 		Assert.assertNotNull(workItem.getResults().get("token"));
-		Assert.assertNotNull(workItem.getResults().get("expiresInSeconds"));
+		Assert.assertNotNull(workItem.getResults().get("expiresIn"));
+		Assert.assertNotNull(workItem.getResults().get("refreshToken"));
+		Assert.assertNotNull(workItem.getResults().get("refreshExpiresIn"));
 	}
 	
 	@Test
