@@ -90,7 +90,7 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 	        Matcher matcher = patToken.matcher(response);
 	        if (matcher.matches() && matcher.groupCount() > 0) {
 	            String token = matcher.group(1);
-	            results.put("token", token);
+	            results.put("accessToken", token);
 	        }
 	        matcher = patExpires.matcher(response);
 	        if (matcher.matches() && matcher.groupCount() > 0) {
