@@ -29,6 +29,8 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 	
 	private final Pattern patToken = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
 	private final Pattern patExpires = Pattern.compile(".*\"expires_in\"\\s*:\\s*([^,]+).*");
+	private final Pattern patRefreshToken = Pattern.compile(".*\"refresh_token\"\\s*:\\s*\"([^\"]+)\".*");
+	private final Pattern patRefreshExpires = Pattern.compile(".*\"refresh_expires_in\"\\s*:\\s*([^,]+).*");
 
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
@@ -65,7 +67,6 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 				+ "&password=" + password;
 	    BufferedReader reader = null; 
 	    HttpsURLConnection connection = null;
-	    String token = "";
 	    Map<String, Object> results = workItem.getResults();
 	    try {
 	        URL url = new URL(tokenUrl);
@@ -88,18 +89,32 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 	        String response = out.toString();
 	        Matcher matcher = patToken.matcher(response);
 	        if (matcher.matches() && matcher.groupCount() > 0) {
-	            token = matcher.group(1);
+	            String token = matcher.group(1);
 	            results.put("token", token);
 	        }
 	        matcher = patExpires.matcher(response);
 	        if (matcher.matches() && matcher.groupCount() > 0) {
 	        	String expires = matcher.group(1);
 	        	try {
-	        		results.put("expiresInSeconds", Long.parseLong(expires));
+	        		results.put("expiresIn", Long.parseLong(expires));
 	        	} catch (Exception e) { 
 	        		LOG.warn("Cannot parse expires text '" + expires + "' from OAuth2 response");
 	        	}
 	        }
+		matcher = patRefreshToken.matcher(response);
+		if (matcher.matches() && matcher.groupCount() > 0) {
+			String refreshToken = matcher.group(1);
+			results.put("refreshToken", refreshToken);
+		}
+		matcher = patRefreshExpires.matcher(response);
+		if (matcher.matches() && matcher.groupCount() > 0) {
+			String refreshExpires = matcher.group(1);
+			try {
+				results.put("refreshExpiresIn", Long.parseLong(refreshExpires));
+			} catch (Exception e) {
+				LOG.warn("Cannot parse refresh_expires text '" + refreshExpires + "' from OAuth2 response");
+			}
+		}
 	    } catch (Exception e) {
 	    	results.put("error", e);
 	    	results.put("errorMessage", e.getMessage());
