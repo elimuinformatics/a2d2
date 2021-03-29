@@ -36,21 +36,26 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 		String password = (String) workItem.getParameter("password");
 		String grantType = (String) workItem.getParameter("grantType");
 		String tokenUrl = (String) workItem.getParameter("tokenUrl");
+		String refreshToken = (String) workItem.getParameter("refreshToken");
 		List<String> missingValues = new ArrayList<>();
 		if (StringUtils.isEmpty(clientId)) {
 			missingValues.add("clientId");
 		}
-		if (StringUtils.isEmpty(username)) {
-			missingValues.add("username");
-		}
-		if (StringUtils.isEmpty(password)) {
-			missingValues.add("password");
+		if (StringUtils.isEmpty(refreshToken)) {
+			if (StringUtils.isEmpty(username)) {
+				missingValues.add("username");
+			}
+			if (StringUtils.isEmpty(password)) {
+				missingValues.add("password");
+			}
 		}
 		if (StringUtils.isEmpty(scope)) {
 			scope = "offline_access";
 		}
 		if (StringUtils.isEmpty(grantType)) {
-			grantType = "password";
+			grantType = StringUtils.isEmpty(refreshToken) ? "password" : "refresh_token";
+		} else if (!StringUtils.isEmpty(refreshToken)) {
+			grantType = "refresh_token";
 		}
 		if (StringUtils.isEmpty(tokenUrl)) {
 			missingValues.add("tokenUrl");
@@ -59,8 +64,12 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 			throw new WorkItemHandlerException("Missing mandatory parameters: " + missingValues);
 		}
 		String content = "grant_type=" + grantType + "&client_id=" + clientId 
-				+ "&scope=" + scope + "&username=" + username 
-				+ "&password=" + password;
+				+ "&scope=" + scope;
+		if (StringUtils.isEmpty(refreshToken)) {
+			content += "&username=" + username + "&password=" + password;
+		} else {
+			content += "&refresh_token=" + refreshToken;
+		}
 	    BufferedReader reader = null; 
 	    HttpsURLConnection connection = null;
 	    Map<String, Object> results = workItem.getResults();

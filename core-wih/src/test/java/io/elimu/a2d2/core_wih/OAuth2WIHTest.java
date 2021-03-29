@@ -50,13 +50,31 @@ public class OAuth2WIHTest {
 		Assert.assertNotNull(expiresIn);
 		Assert.assertNotNull(refreshToken);
 		Assert.assertNotNull(refreshExpiresIn);
+		
+		WorkItemImpl workItem2 = new WorkItemImpl();
+		workItem2.setId(2L);
+		workItem2.setParameter("tokenUrl", tokenUrl);
+		workItem2.setParameter("clientId", clientId);
+		workItem2.setParameter("refreshToken", refreshToken);
+		handler.executeWorkItem(workItem2, manager);
+		
+		Assert.assertTrue(manager.isCompleted(workItem2.getId()));
+		accessToken = workItem2.getResults().get("accessToken");
+		expiresIn = workItem2.getResults().get("expiresIn");
+		refreshToken = workItem2.getResults().get("refreshToken");
+		refreshExpiresIn = workItem2.getResults().get("refreshExpiresIn");
+		Assert.assertNotNull(accessToken);
+		Assert.assertNotNull(expiresIn);
+		Assert.assertNotNull(refreshToken);
+		Assert.assertNotNull(refreshExpiresIn);
+		
 	}
 	
 	@Test
 	public void testBadCredentials() {
 		OAuth2WorkItemHandler handler = new OAuth2WorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
-		workItem.setId(2L);
+		workItem.setId(3L);
 		workItem.setParameter("username", user);
 		workItem.setParameter("password", "SomethingElse"+pass);
 		workItem.setParameter("tokenUrl", tokenUrl);
