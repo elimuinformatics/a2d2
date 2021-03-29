@@ -10,16 +10,17 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 
@@ -27,11 +28,6 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OAuth2WorkItemHandler.class);
 	
-	private final Pattern patToken = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
-	private final Pattern patExpires = Pattern.compile(".*\"expires_in\"\\s*:\\s*([^,]+).*");
-	private final Pattern patRefreshToken = Pattern.compile(".*\"refresh_token\"\\s*:\\s*\"([^\"]+)\".*");
-	private final Pattern patRefreshExpires = Pattern.compile(".*\"refresh_expires_in\"\\s*:\\s*([^,]+).*");
-
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
 		String clientId = (String) workItem.getParameter("clientId");
@@ -41,22 +37,22 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 		String grantType = (String) workItem.getParameter("grantType");
 		String tokenUrl = (String) workItem.getParameter("tokenUrl");
 		List<String> missingValues = new ArrayList<>();
-		if (clientId == null || "".equals(clientId.trim())) {
+		if (StringUtils.isEmpty(clientId)) {
 			missingValues.add("clientId");
 		}
-		if (username == null || "".equals(username.trim())) {
+		if (StringUtils.isEmpty(username)) {
 			missingValues.add("username");
 		}
-		if (password == null || "".equals(password.trim())) {
+		if (StringUtils.isEmpty(password)) {
 			missingValues.add("password");
 		}
-		if (scope == null || "".equals(scope.trim())) {
+		if (StringUtils.isEmpty(scope)) {
 			scope = "offline_access";
 		}
-		if (grantType == null || "".equals(grantType.trim())) {
+		if (StringUtils.isEmpty(grantType)) {
 			grantType = "password";
 		}
-		if (tokenUrl == null || "".equals(tokenUrl.trim())) {
+		if (StringUtils.isEmpty(tokenUrl)) {
 			missingValues.add("tokenUrl");
 		}
 		if (!missingValues.isEmpty()) {
@@ -87,34 +83,20 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 	            out.append(line);
 	        }
 	        String response = out.toString();
-	        Matcher matcher = patToken.matcher(response);
-	        if (matcher.matches() && matcher.groupCount() > 0) {
-	            String token = matcher.group(1);
-	            results.put("accessToken", token);
+	        Gson gson = new Gson();
+	        Map<?, ?> output = (Map<?, ?>) gson.fromJson(response, Map.class);
+	        results.put("accessToken", output.get("access_token"));
+	        results.put("refreshToken", output.get("refresh_token"));
+	        try {
+	        	results.put("expiresIn", ((Number) output.get("expires_in")).longValue());
+	        } catch (Exception e) {
+	        	LOG.warn("Cannot parse expires_in value '" + output.get("expires_in") + "' to a Long");
 	        }
-	        matcher = patExpires.matcher(response);
-	        if (matcher.matches() && matcher.groupCount() > 0) {
-	        	String expires = matcher.group(1);
-	        	try {
-	        		results.put("expiresIn", Long.parseLong(expires));
-	        	} catch (Exception e) { 
-	        		LOG.warn("Cannot parse expires text '" + expires + "' from OAuth2 response");
-	        	}
+	        try {
+	        	results.put("refreshExpiresIn", ((Number) output.get("refresh_expires_in")).longValue());
+	        } catch (Exception e) {
+	        	LOG.warn("Cannot parse refresh_expires_in value '" + output.get("refresh_expires_in") + "' to a Long");
 	        }
-		matcher = patRefreshToken.matcher(response);
-		if (matcher.matches() && matcher.groupCount() > 0) {
-			String refreshToken = matcher.group(1);
-			results.put("refreshToken", refreshToken);
-		}
-		matcher = patRefreshExpires.matcher(response);
-		if (matcher.matches() && matcher.groupCount() > 0) {
-			String refreshExpires = matcher.group(1);
-			try {
-				results.put("refreshExpiresIn", Long.parseLong(refreshExpires));
-			} catch (Exception e) {
-				LOG.warn("Cannot parse refresh_expires text '" + refreshExpires + "' from OAuth2 response");
-			}
-		}
 	    } catch (Exception e) {
 	    	results.put("error", e);
 	    	results.put("errorMessage", e.getMessage());
