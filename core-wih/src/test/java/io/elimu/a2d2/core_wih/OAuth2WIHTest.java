@@ -38,6 +38,7 @@ public class OAuth2WIHTest {
 		workItem.setParameter("password", pass);
 		workItem.setParameter("tokenUrl", tokenUrl);
 		workItem.setParameter("clientId", clientId);
+		workItem.setParameter("grantType", "password");
 		TestWorkItemManager manager = new TestWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 
@@ -56,6 +57,7 @@ public class OAuth2WIHTest {
 		workItem2.setParameter("tokenUrl", tokenUrl);
 		workItem2.setParameter("clientId", clientId);
 		workItem2.setParameter("refreshToken", refreshToken);
+		workItem2.setParameter("grantType", "refresh_token");
 		handler.executeWorkItem(workItem2, manager);
 		
 		Assert.assertTrue(manager.isCompleted(workItem2.getId()));
@@ -75,6 +77,7 @@ public class OAuth2WIHTest {
 		OAuth2WorkItemHandler handler = new OAuth2WorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
 		workItem.setId(3L);
+		workItem.setParameter("grantType", "password");
 		workItem.setParameter("username", user);
 		workItem.setParameter("password", "SomethingElse"+pass);
 		workItem.setParameter("tokenUrl", tokenUrl);
