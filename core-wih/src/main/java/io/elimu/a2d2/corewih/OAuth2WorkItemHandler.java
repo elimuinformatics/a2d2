@@ -86,13 +86,16 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 		//Extracted logic so we can use it also in QueryingServerHelper
 		Map<String, Object> results = workItem.getResults();
 		Map<String, Object> output = OAuthUtils.authenticate(content, tokenUrl, clientId, clientSecret);
-        results.put("accessToken", output.get("access_token"));
-        results.put("refreshToken", output.get("refresh_token"));
-        results.put("expiresIn", output.get("expires_in"));
-    	results.put("refreshExpiresIn", output.get("refresh_expires_in"));
-    	results.put("error", output.get("error"));
-    	results.put("errorMessage", output.get("errorMessage"));
-        manager.completeWorkItem(workItem.getId(), results);
+        	results.put("accessToken", output.get("access_token"));
+	        results.put("refreshToken", output.get("refresh_token"));
+        	results.put("expiresIn", output.get("expires_in"));
+	    	results.put("refreshExpiresIn", output.get("refresh_expires_in"));
+    		results.put("error", output.get("error"));
+	    	results.put("errorMessage", output.get("errorMessage"));
+		results.put("scope", output.get("scope"));
+		results.put("tokenType", output.get("token_type"));
+		results.put("sessionState", output.get("session_type"));
+        	manager.completeWorkItem(workItem.getId(), results);
 	}
 
 	@Override
