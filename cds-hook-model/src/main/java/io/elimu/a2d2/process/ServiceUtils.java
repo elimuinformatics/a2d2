@@ -45,6 +45,10 @@ import io.elimu.a2d2.exception.BaseException;
 public class ServiceUtils {
 
 	private static final String DEFAULT_CONFIG_FOLDER = System.getProperty("catalina.base", "/mnt1/setup") + "/conf/";
+	
+	private static final String M2_REPO_PATH = System.getProperty("a2d2m2repository",
+			System.getProperty("user.home") + File.separatorChar + ".m2" + File.separatorChar + "repository");
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceUtils.class);
 
 	private ServiceUtils() {
@@ -67,8 +71,7 @@ public class ServiceUtils {
 		} catch (Exception e) {
 			groupIdPath = dep.getGroupId().replaceAll("\\\\.", Matcher.quoteReplacement(File.separator));
 		}
-		String jarPath = new StringBuilder(System.getProperty("user.home")).
-				append(s).append(".m2").append(s).append("repository").
+		String jarPath = new StringBuilder(M2_REPO_PATH).
 				append(s).append(groupIdPath).append(s).append(dep.getArtifactId()).
 				append(s).append(releaseOrSnapshot(dep.getVersion())).append(s).append(dep.getArtifactId()).
 				append('-').append(dep.getVersion()).append(".jar").toString();
