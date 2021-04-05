@@ -1,3 +1,17 @@
+// Copyright 2018-2021 Elimu Informatics
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package io.elimu.a2d2.oauth;
 
 import java.io.BufferedReader;
@@ -45,12 +59,11 @@ public class OAuthUtils {
 	}
 
 	private static Map<String, Object> _authenticate(String body, String tokenUrl, String clientId, String clientSecret) {
-		BufferedReader reader = null; 
-	    HttpsURLConnection connection = null;
+		HttpsURLConnection connection = null;
 	    Map<String, Object> results = new HashMap<>();
 	    try {
-	        URL url = new URL(tokenUrl);
-	        connection = (HttpsURLConnection) url.openConnection();
+	    	URL url = new URL(tokenUrl);
+	    	connection = (HttpsURLConnection) url.openConnection();
 	        connection.setRequestMethod("POST");
 	        connection.setDoOutput(true);
 	        connection.setRequestProperty("Accept", "*/*");
@@ -60,29 +73,24 @@ public class OAuthUtils {
 	        PrintStream os = new PrintStream(connection.getOutputStream());
 	        os.print(body);
 	        os.close();
-	        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	        String line = null;
-	        StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
-	        while ((line = reader.readLine()) != null) {
-	            out.append(line);
+	        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))){
+		        String line = null;
+		        StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+		        while ((line = reader.readLine()) != null) {
+		            out.append(line);
+		        }
+		        String response = out.toString();
+		        results = new Gson().fromJson(response, new TypeToken<Map<String, Object>>() {
+					private static final long serialVersionUID = 1L; 
+		        }.getType());
+		        longify(results, "expires_in");
+		        longify(results, "refresh_expires_in");
+	        } catch (Exception e2) {
+	        	throw e2;
 	        }
-	        String response = out.toString();
-	        results = new Gson().fromJson(response, new TypeToken<Map<String, Object>>() {
-				private static final long serialVersionUID = 1L; 
-	        }.getType());
-	        longify(results, "expires_in");
-	        longify(results, "refresh_expires_in");
 	    } catch (Exception e) {
 	    	results.put("error", e);
 	    	results.put("errorMessage", e.getMessage());
-	    } finally {
-	        if (reader != null) {
-	            try {
-	                reader.close();
-	            } catch (IOException e) {
-	            	LOG.info("Couldn't close the reader's conneciton in finally block: " + e.getMessage());
-	            }
-	        }
 	        connection.disconnect();
 	    }
 	    return results;
@@ -91,8 +99,13 @@ public class OAuthUtils {
 	private static void longify(Map<String, Object> results, String key) {
 		if (results.containsKey(key)) {
 			try {
-				String value = String.valueOf(results.get("expires_in")).replace(".0", "");
-				results.put(key, Long.valueOf(value));
+				Object val = results.get(key);
+				if (val instanceof Number) {
+					results.put(key, ((Number)val).longValue());
+				} else {
+					String value = String.valueOf(val);
+					results.put(key, Long.parseLong(value));
+				}
 			} catch (Exception e) {
 				LOG.warn("Couldn't parse value '" + results.get(key) + "' from key '" + key + "' as long");
 			}
