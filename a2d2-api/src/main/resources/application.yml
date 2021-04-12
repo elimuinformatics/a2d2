@@ -19,7 +19,7 @@
 spring.jmx.enabled: false
 spring:
   profiles:
-    active: staging, default, test
+    active: local, default, test
   mvc:
     dispatch-options-request: false
 ---
@@ -85,59 +85,6 @@ cds.service:
 logging:
   file: logs/a2d2.log
 
----
-spring: 
-  profiles: dev
-  datasource:
-    driverClassName: org.postgresql.Driver
-#    url: jdbc:postgresql://192.168.1.7:5438/a2d2
-#    username: postgres
-#    password: postgres 
-#    serverName: 192.168.1.7
-    url: jdbc:postgresql://localhost:5432/a2d2
-    username: postgres
-    password: ENC(g0iZccNWoSXq41hViVtu4w==)
-    serverName: localhost
-    databaseName: a2d2
-    className: org.postgresql.xa.PGXADataSource
-    quartz.config: quartz-dev.properties   
-spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-
----
-spring: 
-  profiles: staging
-  datasource:
-#    driverClassName: org.postgresql.Driver
-#    url: jdbc:postgresql://35.166.85.92:5432/a2d2
-#    username: postgres
-#    password: postgres 
-#    serverName: 35.166.85.92
-#    databaseName: a2d2
-#    className: org.postgresql.xa.PGXADataSource
-     driverClassName: com.mysql.jdbc.Driver
-     url: jdbc:mysql://dev-product-rds.cfmtrcvottnq.us-west-2.rds.amazonaws.com:3306/a2d2?autoReconnect=true
-     username: a2d2_user
-     password: ENC(arNEunnrgijhgMSP7ntbbgi/tBw8umtt) 
-     className: com.mysql.cj.jdbc.MysqlXADataSource
-     quartz.config: quartz-staging.properties   
-spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect   
-    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
----
-spring: 
-  profiles: prod
-  datasource:
-     driverClassName: com.mysql.jdbc.Driver
-     url: jdbc:mysql://fdbca.cfmtrcvottnq.us-west-2.rds.amazonaws.com:3306/a2d2?autoReconnect=true
-     username: a2d2_user
-     password: ENC(arNEunnrgijhgMSP7ntbbgi/tBw8umtt) 
-     className: com.mysql.cj.jdbc.MysqlXADataSource
-     quartz.config: quartz-prod.properties 
-spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
-    properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext   
 ---
 spring: 
   profiles: local
