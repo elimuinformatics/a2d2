@@ -1,20 +1,24 @@
+// Copyright 2018-2021 Elimu Informatics
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package io.elimu.a2d2.corewih;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import org.apache.commons.lang3.StringUtils;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
@@ -22,97 +26,90 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.elimu.a2d2.exception.WorkItemHandlerException;
+import io.elimu.a2d2.oauth.BodyBuilder;
+import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class OAuth2WorkItemHandler implements WorkItemHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OAuth2WorkItemHandler.class);
 	
-	private final Pattern patToken = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
-	private final Pattern patExpires = Pattern.compile(".*\"expires_in\"\\s*:\\s*([^,]+).*");
-
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
-		String clientId = (String) workItem.getParameter("clientId");
+		String clientId = (String) workItem.getParameter("clientId");		
+		String clientSecret = (String) workItem.getParameter("clientSecret");
 		String scope = (String) workItem.getParameter("scope");
 		String username = (String) workItem.getParameter("username");
 		String password = (String) workItem.getParameter("password");
 		String grantType = (String) workItem.getParameter("grantType");
 		String tokenUrl = (String) workItem.getParameter("tokenUrl");
+		String refreshToken = (String) workItem.getParameter("refreshToken");
+		String redirectUri = (String) workItem.getParameter("redirectUri");
+		String code = (String) workItem.getParameter("code");
 		List<String> missingValues = new ArrayList<>();
-		if (clientId == null || "".equals(clientId.trim())) {
-			missingValues.add("clientId");
+		if (StringUtils.isEmpty(tokenUrl)) {
+			missingValues.add("tokenUrl");
 		}
-		if (username == null || "".equals(username.trim())) {
-			missingValues.add("username");
-		}
-		if (password == null || "".equals(password.trim())) {
-			missingValues.add("password");
-		}
-		if (scope == null || "".equals(scope.trim())) {
+		if (StringUtils.isEmpty(scope)) {
 			scope = "offline_access";
 		}
-		if (grantType == null || "".equals(grantType.trim())) {
-			grantType = "password";
+		if (StringUtils.isEmpty(clientId)) {
+			missingValues.add("clientId");
 		}
-		if (tokenUrl == null || "".equals(tokenUrl.trim())) {
-			missingValues.add("tokenUrl");
+		if (StringUtils.isEmpty(grantType)) {
+			missingValues.add("grantType");
+		} else {
+			switch (grantType) {
+				case "password":
+					if (StringUtils.isEmpty(password)) {
+						missingValues.add("password");
+					}
+					if (StringUtils.isEmpty(username)) {
+						missingValues.add("username");
+					}
+					break;
+				case "refresh_token":
+					if (StringUtils.isEmpty(refreshToken)) {
+						missingValues.add("refreshToken");
+					}
+					break;
+				case "client_credentials":
+					break;
+				case "authorization_code":
+					if (StringUtils.isEmpty(code)) {
+						missingValues.add("code");
+					}
+					break;
+			}
 		}
 		if (!missingValues.isEmpty()) {
 			throw new WorkItemHandlerException("Missing mandatory parameters: " + missingValues);
 		}
-		String content = "grant_type=" + grantType + "&client_id=" + clientId 
-				+ "&scope=" + scope + "&username=" + username 
-				+ "&password=" + password;
-	    BufferedReader reader = null; 
-	    HttpsURLConnection connection = null;
-	    String token = "";
-	    Map<String, Object> results = workItem.getResults();
-	    try {
-	        URL url = new URL(tokenUrl);
-	        connection = (HttpsURLConnection) url.openConnection();
-	        connection.setRequestMethod("POST");
-	        connection.setDoOutput(true);
-	        connection.setRequestProperty("Accept", "*/*");
-	        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-	        connection.setRequestProperty("Authorization", 
-	        		"Basic " + Base64.getEncoder().encodeToString((clientId + ":").getBytes()));
-	        PrintStream os = new PrintStream(connection.getOutputStream());
-	        os.print(content);
-	        os.close();
-	        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	        String line = null;
-	        StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
-	        while ((line = reader.readLine()) != null) {
-	            out.append(line);
-	        }
-	        String response = out.toString();
-	        Matcher matcher = patToken.matcher(response);
-	        if (matcher.matches() && matcher.groupCount() > 0) {
-	            token = matcher.group(1);
-	            results.put("token", token);
-	        }
-	        matcher = patExpires.matcher(response);
-	        if (matcher.matches() && matcher.groupCount() > 0) {
-	        	String expires = matcher.group(1);
-	        	try {
-	        		results.put("expiresInSeconds", Long.parseLong(expires));
-	        	} catch (Exception e) { 
-	        		LOG.warn("Cannot parse expires text '" + expires + "' from OAuth2 response");
-	        	}
-	        }
-	    } catch (Exception e) {
-	    	results.put("error", e);
-	    	results.put("errorMessage", e.getMessage());
-	    } finally {
-	        if (reader != null) {
-	            try {
-	                reader.close();
-	            } catch (IOException e) {
-	            }
-	        }
-	        connection.disconnect();
-	        manager.completeWorkItem(workItem.getId(), results);
-	    }
+
+		String content = new BodyBuilder().
+			addToBody("grant_type", grantType).
+			addToBody("client_id", clientId).
+			addToBody("client_secret", clientSecret).
+			addToBody("scope", scope).
+			addToBody("username", username).
+			addToBody("password", password).
+			addToBody("redirect_uri", redirectUri).
+			addToBody("code", code).
+			addToBody("refresh_token", refreshToken).
+			build();
+		
+		//Extracted logic so we can use it also in QueryingServerHelper
+		Map<String, Object> results = workItem.getResults();
+		Map<String, Object> output = OAuthUtils.authenticate(content, tokenUrl, clientId, clientSecret);
+        	results.put("accessToken", output.get("access_token"));
+	        results.put("refreshToken", output.get("refresh_token"));
+        	results.put("expiresIn", output.get("expires_in"));
+	    	results.put("refreshExpiresIn", output.get("refresh_expires_in"));
+    		results.put("error", output.get("error"));
+	    	results.put("errorMessage", output.get("errorMessage"));
+		results.put("scope", output.get("scope"));
+		results.put("tokenType", output.get("token_type"));
+		results.put("sessionState", output.get("session_type"));
+        	manager.completeWorkItem(workItem.getId(), results);
 	}
 
 	@Override

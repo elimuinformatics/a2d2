@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,8 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor;
 import io.elimu.a2d2.cds.fhir.cache.CacheService;
 import io.elimu.a2d2.cds.fhir.cache.CacheUtil;
+import io.elimu.a2d2.oauth.BodyBuilder;
+import io.elimu.a2d2.oauth.OAuthUtils;
 import io.elimu.a2d2.serviceapi.performance.PerformanceHelper;
 
 @SuppressWarnings("unchecked")
@@ -78,6 +81,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	public static final String BEARER = "Bearer";
 	protected static final String BASIC = "Basic";
 	protected static final String HEADER = "Header";
+	public static final String OAUTH = "OAuth";
 
 	protected final List<IClientInterceptor> interceptors = new LinkedList<>();
 
@@ -163,6 +167,26 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 				log.warn("Header authentication needs to have one or two params. Currently we have {}", params.length);
 				return (T) this;
 			}
+		} else if (OAUTH.equalsIgnoreCase(authType)) {
+			//use OAuthUtils and as many params as needed
+			Map<String, String> paramsMap = new HashMap<>();
+			for (int index = 0; index < params.length; index+=2) {
+				String key = params[index];
+				String value = null;
+				if (index+1 < params.length) {
+					value = params[index + 1];
+				}
+				paramsMap.put(key, value);
+			}
+			BodyBuilder builder = new BodyBuilder();
+			for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+				builder.addToBody(entry.getKey(), entry.getValue());
+			}
+			String tokenUrl = paramsMap.get("token_url");
+			String clientId = paramsMap.get("client_id");
+			String clientSecret = paramsMap.get("client_secret");
+			Map<String, Object> results = OAuthUtils.authenticate(builder.build(), tokenUrl, clientId, clientSecret);
+			registerInterceptor(new BearerTokenAuthInterceptor(String.valueOf(results.get("access_token"))));
 		}
 		return (T) this;
 	}
