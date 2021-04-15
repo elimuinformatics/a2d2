@@ -45,7 +45,7 @@ public class ServiceSoapAPIDelegateTest {
 		workItemManager.registerWorkItemHandler("ServiceSoapAPIDelegate", wih);
 	}
 
-	@Test
+	@Test @Ignore("Address throwing a 302")
 	public void testSOAPAPIWithParameters() {
 
 		WorkItemImpl execution = new WorkItemImpl();

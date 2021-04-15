@@ -17,6 +17,7 @@ package io.elimu.a2d2.cds.fhir.helper.test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class QueryingServerHelperTest {
 											// this is so any env can run this test successfuly)
 		Assert.assertNotNull(f);
 		from = System.currentTimeMillis();
-		doReturn(fhirResponseObservation).when(queryingServerHelper).getResourceByIdResponse(any(), any());
+		when(queryingServerHelper.getResourceByIdResponse(any(), any())).thenReturn(fhirResponseObservation);
 		FhirFuture<FhirResponse<IBaseResource>> f2 = queryingServerHelper.getResourceByIdAsync("Observation",
 				observation.getId().getIdPart(), "test-2");
 		to = System.currentTimeMillis();
