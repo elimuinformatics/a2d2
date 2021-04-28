@@ -15,14 +15,18 @@
 package io.elimu.a2d2.oauth;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -33,11 +37,56 @@ import org.slf4j.LoggerFactory;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import io.elimu.a2d2.cdsresponse.entity.TemplateRepository;
+
 public class OAuthUtils {
     
     private static final Logger LOG = LoggerFactory.getLogger(OAuthUtils.class);
     private static final Map<String, Map<String, Object>> CACHE = new HashMap<>();
+    private static final Map<String, String> KEYS = new HashMap<>();
 
+    public static void registerPrivateKey(String tokenUrl, String privateKeyContent) {
+    	if (!KEYS.containsKey(tokenUrl)) {
+    		KEYS.put(tokenUrl, privateKeyContent);
+    	}
+    }
+    
+    public static String jwtToken(String tokenUrl, String clientId) {
+    	try {
+    		String header = "{\"alg\":\"RS384\",\"typ\":\"JWT\"}";
+    		String payload = "{  \"iss\": \"" + clientId + "\",  \"sub\": \"" + clientId + "\",  \"aud\": \"" 
+    				+ tokenUrl + "\",  \"jti\": \" "+ UUID.randomUUID().toString() + "\",  \"exp\": " 
+    				+ Double.valueOf((System.currentTimeMillis() + 300_000)/1000).longValue() +"}";
+    		String signatureUnsigned = Base64.getUrlEncoder().encodeToString(header.getBytes()) + "." + 
+    				Base64.getUrlEncoder().encodeToString(payload.getBytes());
+    		
+    		String key = KEYS.get(tokenUrl);
+    		if (key == null) {
+    			throw new IllegalArgumentException("No registered key");
+    		}
+    		
+    		String privateKeyPEM = key
+    			      .replace("-----BEGIN PRIVATE KEY-----", "")
+    			      .replaceAll(System.lineSeparator(), "")
+    			      .replace("-----END PRIVATE KEY-----", "");
+    		byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
+    		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+    		PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpec);
+    		Signature instance = Signature.getInstance("SHA1withRSA");
+    		instance.initSign(privateKey);
+    		instance.update(signatureUnsigned.getBytes());
+    		byte[] signature = instance.sign();
+
+    		String jwtToken = Base64.getUrlEncoder().encodeToString(header.getBytes()) + '.' + 
+    				Base64.getUrlEncoder().encodeToString(payload.getBytes()) + '.' + 
+    				Base64.getUrlEncoder().encodeToString(signature);
+    		return jwtToken;
+    	} catch (Exception e) {
+    		//TODO handle errors and test that this works once you register something in KEYS
+    	}
+    	return null;
+    }
+    
     //TODO invoke this from QueryingServerHelper
     public static Map<String, Object> authenticate(String body, String tokenUrl, String clientId, String clientSecret) {
         String keyUnhashed = "url=" + tokenUrl + "&" + body + "&client_id=" + clientId + "&client_secret=" + clientSecret;
@@ -91,7 +140,9 @@ public class OAuthUtils {
         } catch (Exception e) {
             results.put("error", e);
             results.put("errorMessage", e.getMessage());
-            connection.disconnect();
+            if (connection != null) {
+            	connection.disconnect();
+            }
         }
         return results;
     }
@@ -111,4 +162,21 @@ public class OAuthUtils {
             }
         }
     }
+    
+    public static void main(String[] args) {
+		String pkcsFileName = "covid-tracker-program_privatekey.pkcs";
+		String tokenUrl = "https://apporchard.epic.com/interconnect-aocurprd-oauth/oauth2/token";
+		String clientId = "12345-1234123-1234566";
+		
+		String pk = TemplateRepository.getInstance().getFltMap().get(pkcsFileName);
+		OAuthUtils.registerPrivateKey(tokenUrl, pk);
+		String jwtToken = OAuthUtils.jwtToken(tokenUrl, clientId);
+		
+		String body = new BodyBuilder().addToBody("grant_type", "client_credentials").
+				addToBody("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer").
+				addToBody("client_assertion", jwtToken).build();
+		Map<String, Object> retval = OAuthUtils.authenticate(body, tokenUrl, clientId,"");
+
+		System.out.println("accessToken = " + retval.get("access_token"));
+	}
 }

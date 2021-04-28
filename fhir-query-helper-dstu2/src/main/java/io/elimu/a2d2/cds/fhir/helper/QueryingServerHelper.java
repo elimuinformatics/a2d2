@@ -52,6 +52,32 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 	public IBaseResource getResourceById(String resourceType, String resourceId) {
 		return getResourceByIdResponse(resourceType, resourceId).getResult();
 	}
+	
+	@Override 
+	public FhirResponse<IBaseResource> fetchServer(final String resourceType, String resourceQuery) {
+		FhirClientWrapper client = clients.next();
+		FhirResponse<IBaseResource> resource = null;
+		log.debug("Fetching {} {} resource using client for version {} ", client.getFhirContext().getVersion().getVersion().name(),
+				resourceType,  client.getFhirContext().getVersion().getVersion().name());
+		resource = runWithInterceptors(new QueryingCallback<IBaseResource>() {
+			@Override
+			@SuppressWarnings("unchecked")
+			public IBaseResource execute(FhirClientWrapper client) {
+				log.debug("Invoking url {}", resourceQuery);
+				try {
+					Class<IBaseResource> clz = (Class<IBaseResource>) Class.forName("ca.uhn.fhir.model.dstu2.resource." + resourceType);
+					return client.fetchResourceFromUrl(clz, resourceQuery);
+				} catch (ClassNotFoundException e) {
+					log.error("ResourceType " + resourceType + " not supported for direct path reading in fhir " + client.getFhirContext().getVersion().getVersion().name());
+					return null;
+				}
+			}
+		}, client);
+		if (resource == null) {
+			return new FhirResponse<>(null, 404, "Not Found");
+		}
+		return resource;
+	}
 
 	@Override
 	public FhirResponse<List<IBaseResource>> queryServer(final String resourceQuery) {
