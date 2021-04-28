@@ -21,6 +21,7 @@ import java.io.ObjectOutput;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -324,16 +325,24 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	}
 
 	public FhirResponse<IBaseResource> getResourceByIdResponse(String resourceType, String resourceId) {
+		return getResourceByIdResponse(resourceType, resourceId, false);
+	}
+	
+	public FhirResponse<IBaseResource> getResourceByIdInPathResponse(String resourceType, String resourceId) {
+		return getResourceByIdResponse(resourceType, resourceId, true);
+	}
+	
+	public FhirResponse<IBaseResource> getResourceByIdResponse(String resourceType, String resourceId, boolean usePath) {
 		try {
 			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "getResourceById");
-			String resourceQuery = "/" + resourceType + "?_id=" + resourceId;
+			String resourceQuery = "/" + resourceType + (usePath ? "/" + resourceId : "?_id=" + resourceId);
 			FhirResponse<IBaseResource> retval = null;
 
 			String cacheKey = CacheUtil.getCacheKey(resourceQuery, interceptors);
 			if (!avoidCache.get().booleanValue() && cacheService!= null && cacheService.containsKey(cacheKey)) {
 				retval = (FhirResponse<IBaseResource>) cacheService.get(cacheKey).getValue();
 			} else {
-				retval = getResourceList(resourceQuery);
+				retval = getResourceList(resourceType, resourceQuery, usePath);
 				if(!avoidCache.get().booleanValue() && cacheService!= null && CacheUtil.isValidState(retval.getResponseStatusCode())) {
 					cacheService.put(cacheKey, new ResponseEvent<>(retval, RESPONSE_EVENT_TIMEOUT));
 				}
@@ -347,10 +356,16 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return new FhirResponse<>(null, -1, "not invoked");
 	}
 	
-	private FhirResponse<IBaseResource> getResourceList(String resourceQuery) {
+	private FhirResponse<IBaseResource> getResourceList(String resourceType, String resourceQuery, boolean usePath) {
 		FhirResponse<List<IBaseResource>> resourceList = null;
 		if (ctx.getVersion().getVersion().equals(this.fhirVersionEnum)) {
-			resourceList = queryServer(resourceQuery);
+			if (usePath) {
+				FhirResponse<IBaseResource> resp = fetchServer(resourceType, resourceQuery);
+				List<IBaseResource> result = resp == null || resp.getResult() == null ? null : Arrays.asList(resp.getResult());
+				resourceList = new FhirResponse<List<IBaseResource>>(result, resp.getResponseStatusCode(), resp.getResponseStatusInfo());
+			} else {
+				resourceList = queryServer(resourceQuery);
+			}
 		}
 		if(resourceList != null) {
 			if (resourceList.getResult() != null && resourceList.getResult().size()==1) {
@@ -440,6 +455,8 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 
 	public abstract FhirResponse<List<IBaseResource>> queryServer(String resourceQuery);
 
+	public abstract FhirResponse<IBaseResource> fetchServer(final String resourceType, String resourceQuery);
+	
 	public interface FhirVersionAbs {
 		FhirContext getCtx();
 	}
