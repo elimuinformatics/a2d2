@@ -14,6 +14,8 @@
 
 package io.elimu.cdshookapi.api.rest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +33,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import io.elimu.genericapi.service.GenericService;
 import io.elimu.genericapi.service.RunningServices;
+import io.elimu.serviceapi.service.AbstractKieService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -57,12 +65,39 @@ public class StatusController {
 	        	
 	        	}
 	        }
+	        List<String> failedServices = new ArrayList<>();
+	        for (String serviceId : RunningServices.getInstance().serviceNames()) {
+	        	GenericService gs = RunningServices.getInstance().get(serviceId);
+	        	boolean up = false;
+	        	if (gs instanceof AbstractKieService) {
+	        		AbstractKieService aks = (AbstractKieService) gs;
+	        		if ("STARTED".equals(aks.getStatus())) {
+	        			up = true;
+	        		}
+	        	}
+	        	if (up == false) {
+	        		failedServices.add(serviceId);
+	        	}
+	        }
+	        String json = toJson(failedServices);
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.add("Content-Type", "application/json");
-	        output.setResult(new ResponseEntity<String>("{\"status\": \"UP\"}", headers , HttpStatus.OK));
+	        output.setResult(new ResponseEntity<String>(json, headers , failedServices.isEmpty() ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE));
 	    });
 	    
 	    LOG.info("servlet thread freed");
 	    return output;
+	}
+
+	private String toJson(List<String> failedServices) {
+		JsonObject jsonObj = new JsonObject();
+		jsonObj.addProperty("status", failedServices.isEmpty() ? "UP": "DOWN");
+		if (!failedServices.isEmpty()) {
+			JsonArray array = new JsonArray();
+			failedServices.forEach(e -> array.add(e));
+			jsonObj.add("failedServices", array);
+		}
+		String json = new Gson().toJson(jsonObj);
+		return json;
 	}
 }
