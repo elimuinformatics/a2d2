@@ -142,6 +142,9 @@ public class RunningServices {
 	}
 
 	public void downloadDependency(Dependency dep) {
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+			LOG.debug(String.format("\tat%s.%s(%s:%d)", ste.getClassName(), ste.getMethodName(), ste.getFileName(), ste.getLineNumber()));
+		}
 		if ("true".equalsIgnoreCase(String.valueOf(System.getProperty("kie.maven.offline.force")))) {
 			LOG.debug("Running in offline read mode");
 			return;
