@@ -142,9 +142,6 @@ public class RunningServices {
 	}
 
 	public void downloadDependency(Dependency dep) {
-		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-			LOG.debug(String.format("\tat%s.%s(%s:%d)", ste.getClassName(), ste.getMethodName(), ste.getFileName(), ste.getLineNumber()));
-		}
 		if ("true".equalsIgnoreCase(String.valueOf(System.getProperty("kie.maven.offline.force")))) {
 			LOG.debug("Running in offline read mode");
 			return;
@@ -203,7 +200,11 @@ public class RunningServices {
 	}
 
 	public void restartService(Dependency dep) {
-		register(new GenericKieBasedService(dep), true);
+		restartService(dep, true);
+	}
+	
+	public void restartService(Dependency dep, boolean store) {
+		register(new GenericKieBasedService(dep), store);
 		Set<String> services = servicesWithDependency(dep);
 		for (String serviceName : services) {
 			restartService(serviceName);
