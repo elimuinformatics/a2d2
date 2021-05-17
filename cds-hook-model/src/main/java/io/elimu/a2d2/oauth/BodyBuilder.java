@@ -16,10 +16,25 @@ package io.elimu.a2d2.oauth;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Used to build a body parameter's structure for OAuth. Basically a params encoding helper<br>
+ * 
+ * Here's an example on how to use it:<br>
+ * 
+ * <code>
+ * String body = new BodyBuilder().addToBody("grant_type", "password_credentials").addToBody("client_id", "omnibus-api").addToBody("client_secret", "1234").build();
+ * </code>
+ */
 public class BodyBuilder {
 
 	StringBuilder sb = new StringBuilder();
-	
+
+	/**
+	 * Adds a new key value parameter pair to the body structure
+	 * @param key the parameter name
+	 * @param value the parameter value
+	 * @return itself to keep building
+	 */
 	public BodyBuilder addToBody(String key, String value) {
 		if (StringUtils.isEmpty(value)) {
 			return this;
@@ -31,6 +46,10 @@ public class BodyBuilder {
 		return this;
 	}
 
+	/**
+	 * Returns the string containing the body structure
+	 * @return the string containing the body structure
+	 */
 	public String build() {
 		return sb.toString();
 	}

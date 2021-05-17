@@ -16,6 +16,11 @@ package io.elimu.a2d2.cds.fhir.helper;
 
 import java.io.Serializable;
 
+/**
+ * Wrapper for an HTTP response received from a FHIR server. 
+ *
+ * @param <T> the Resource specific class, depending on the FHIR version
+ */
 public class FhirResponse<T> implements Serializable {
 
 	/**
@@ -23,9 +28,17 @@ public class FhirResponse<T> implements Serializable {
 	 */
 	private static final long serialVersionUID = 4205440029216884021L;
 
-
+	/**
+	 * The result object, if the {@link #responseStatusCode} is 200
+	 */
 	private final T result;
+	/**
+	 * The HTTP status received from the FHIR server
+	 */
 	private int responseStatusCode;
+	/**
+	 * The response string related to the HTTP status
+	 */
 	private String responseStatusInfo;
 
 	public FhirResponse(T result, int responseStatusCode, String responseStatusInfo) {
@@ -34,22 +47,37 @@ public class FhirResponse<T> implements Serializable {
 		this.responseStatusInfo = responseStatusInfo;
 	}
 
+	/**
+	 * @return the result object for the query
+	 */
 	public T getResult() {
 		return result;
 	}
 
+	/**
+	 * @return the HTTP status received from the FHIR server
+	 */
 	public int getResponseStatusCode() {
 		return responseStatusCode;
 	}
 
+	/**
+	 * @return the response string related to the HTTP status
+	 */
 	public String getResponseStatusInfo() {
 		return responseStatusInfo;
 	}
 
+	/**
+	 * @param responseStatusCode sets an HTTP status
+	 */
 	public void setResponseStatusCode(int responseStatusCode) {
 		this.responseStatusCode = responseStatusCode;
 	}
 
+	/**
+	 * @param responseStatusInfo sets an HTT status info
+	 */
 	public void setResponseStatusInfo(String responseStatusInfo) {
 		this.responseStatusInfo = responseStatusInfo;
 	}
