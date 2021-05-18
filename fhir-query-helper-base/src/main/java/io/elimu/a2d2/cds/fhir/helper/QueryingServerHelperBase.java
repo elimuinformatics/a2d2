@@ -55,6 +55,11 @@ import io.elimu.a2d2.oauth.BodyBuilder;
 import io.elimu.a2d2.oauth.OAuthUtils;
 import io.elimu.a2d2.serviceapi.performance.PerformanceHelper;
 
+/**
+ * Base class for all implementations of QueryingServerHelper.
+ * @param <T> the actual implementation of QueryingServerHelper
+ * @param <U> the type of {@link IBaseResource} that will be returned by queries, since each FHIR model returns a different type
+ */
 @SuppressWarnings("unchecked")
 public abstract class QueryingServerHelperBase<T, U extends IBaseResource> implements Externalizable {
 
@@ -133,6 +138,11 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return ctxt.getVersion().getVersion().name()+fhirUrl;
 	}
 
+	/**
+	 * Allows you to set a group of headers all at once.
+	 * @param headers A Map of HTTP headers to add for every call you will do with this helper.
+	 * @return it returns itself, in case you want to call a chain of methods
+	 */
 	public T setHeaders(Map<String, String> headers) {
 		if (headers != null) {
 			for(Map.Entry<String, String> entry : headers.entrySet()) {
@@ -142,6 +152,30 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return (T) this;
 	}
 
+	/**
+	 * Allows you to set authentication against the FHIR server, following pre-established structures.<br>
+	 * There are multiple ways to authenticate to a FHIR server, but here are provided a set of pre-established ways to call this method:
+	 * <ul>
+	 *   <li> <strong>addAuthentication("Basic", "user", "pass"):</strong> will add an Authorization: Basic headerValue HTTP header to every call done</li>
+	 *   <li> <strong>addAuthentication("Bearer", "bearertoken"):</strong> will add an Authorization: Basic bearertoken HTTP header to every call done</li>
+	 *   <li> <strong>addAuthentication("Header", "x-api-key: 1234"): </strong> will add an x-api-key: 1234 HTTP header to every call done</li>
+	 *   <li> <strong>addAuthentication("Header", "x-api-key", "1234"): </strong> will ALSO add an x-api-key: 1234 HTTP header to every call done</li>
+	 *   <li> <strong>addAuthentication("OAuth", <br>
+	 *   		"token_url", "https://path.to.your.auth.url/token",<br> 
+	 *   		"client_id", "your-app-name", <br>
+	 *   		"grant_type", "password",<br>
+	 *   		"username", "your-user",<br>
+	 *   		"password", "your-password",<br>
+	 *   		"scope", "offline_access"):</strong> this will request for a token from the token_url, using your-user:your-password as Basic auth, reuqest a token for client id your-app-name, and add it to the output</li>
+	 * </ul>
+	 * 
+	 * The last option, OAuth, is the one that will be preferred. The different values provided for the client id, token url, grant type, etc and all necessary fields is yet TBD on how they are going
+	 * to be included into the process, but please assume that the rules that invoke a QueryingServerHelper with OAuth like this will have these values provided, and not hard-coded on the rules.
+	 * 
+	 * @param authType one of "Basic", "Bearer", "Header", or "OAuth".
+	 * @param params a variable list of parameters, depending on the authType selected
+	 * @return it returns itself, in case you want to call a chain of methods
+	 */
 	public T addAuthentication(String authType, String... params) {
 		if (authType == null) {
 			return (T) this;
@@ -200,15 +234,29 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		this.interceptors.add(interceptor);
 	}
 
+	/**
+	 * Adds an HTTP header, of any kind, to the requests made by the QueryingServerHelper
+	 * @param headerName the HTTP header name
+	 * @param headerValue the HTTP header value
+	 * @return itself
+	 */
 	public T addHeader(String headerName, String headerValue) {
 		registerInterceptor(new SimpleRequestHeaderInterceptor(headerName, headerValue));
 		return (T) this;
 	}
 
+	/**
+	 * Returns the base URL used for creating this QueryingServerHelper. Ideal to identify two different instances of QueryingServerHelper 
+	 * @return the base URL used for creating this QueryingServerHelper
+	 */
 	public String getFhirUrl() {
 		return fhirUrl;
 	}
 
+	/**
+	 * Sets the base URL, not really intended for use in the rules. 
+	 * @param fhirUrl the new base URL to be used
+	 */
 	public void setFhirUrl(String fhirUrl) {
 		this.fhirUrl = fhirUrl;
 	}
@@ -230,6 +278,9 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return encodedURL.toString();
 	}
 
+	/**
+	 * Cleans up any headers or authentication added to this instance of QueryingServerHelper.
+	 */
 	public void resetInterceptors() {
 		interceptors.clear();
 	}
@@ -315,6 +366,15 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return resourceBundle;
 	}
 
+	/**
+	 * Returns a specific Resource by ID.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * The main difference of this method with {@link #getResourceByIdResponse(String, String)} is that this method will not
+	 * cache the response for a few minutes. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param resourceId the internal identifier to fetch
+	 * @return the single object that is a result of invoking HTTP GET {baseurl}/{resourceType}?_id={resourceId}
+	 */
 	public FhirResponse<IBaseResource> getResourceByIdResponseNoCache(String resourceType, String resourceId) {
 		try {
 			avoidCache.set(Boolean.TRUE);
@@ -324,14 +384,41 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		}
 	}
 
+	/**
+	 * Returns a specific Resource by ID.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param resourceId the internal identifier to fetch
+	 * @return the single object that is a result of invoking HTTP GET {baseurl}/{resourceType}?_id={resourceId}
+	 */
 	public FhirResponse<IBaseResource> getResourceByIdResponse(String resourceType, String resourceId) {
 		return getResourceByIdResponse(resourceType, resourceId, false);
 	}
 	
+	/**
+	 * Returns a specific Resource by ID.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * The main difference this method has is that the call is done by path instead of by "_id" parameter, which is necessary
+	 * for some servers when the authorization is restricted to a very limited scope.
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param resourceId the internal identifier to fetch
+	 * @return the single object that is a result of invoking HTTP GET {baseurl}/{resourceType}/{resourceId}
+	 */
 	public FhirResponse<IBaseResource> getResourceByIdInPathResponse(String resourceType, String resourceId) {
 		return getResourceByIdResponse(resourceType, resourceId, true);
 	}
 	
+	/**
+	 * Returns a specific Resource by ID.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param resourceId the internal identifier to fetch
+	 * @param usePath if true, the request query will be {baseurl}/{resourceType}/{resourceId}. If false, {baseurl}/{resourceType}?_id={resourceId}
+	 * @return the single object that is a result of invoking HTTP GET on the query
+	 */
 	public FhirResponse<IBaseResource> getResourceByIdResponse(String resourceType, String resourceId, boolean usePath) {
 		try {
 			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "getResourceById");
@@ -398,6 +485,17 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return retval;
 	}
 
+	/**
+	 * Returns a list of Resources from a specific filtering query.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * This method will not cache the response, so it will re-do the call if called immediately after
+	 *      for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param subjectId the value of the main parameter to be used for filtering in the query
+	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
+	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 */
 	public FhirResponse<List<IBaseResource>> queryResourcesResponseNoCache(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery) {
 		try {
@@ -408,6 +506,16 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		}
 	}
 
+	/**
+	 * Returns a list of Resources from a specific filtering query.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param subjectId the value of the main parameter to be used for filtering in the query
+	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
+	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 */
 	public FhirResponse<List<IBaseResource>> queryResourcesResponse(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery) {
 		try {
@@ -422,6 +530,30 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return new FhirResponse<>(new ArrayList<>(), -1, "not invoked due to internal error");
 	}
 	
+	/**
+	 * Returns a list of Resources from a specific filtering query.
+	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param subjectId the value of the main parameter to be used for filtering in the query
+	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
+	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
+	 * @param asyncId it will gput a parameter
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 */
+
+	
+	/**
+	 * Creates a separate thread where a query to the FHIR server will be done.
+	 * The return type is a {@link FhirFuture} wrapper for the {@link FhirResponse} of that call. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param subjectId the value of the main parameter to be used for filtering in the query
+	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
+	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
+	 * @param asyncId a name for the Future to be returned
+	 * @return a {@link FhirFuture} with the asyncId as name, and ready to return the List of IBaseResource as result.
+	 */
 	public FhirFuture<FhirResponse<List<IBaseResource>>> queryResourcesAsync(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery, String asyncId) {
 		Callable<FhirResponse<List<IBaseResource>>> callable = new Callable<FhirResponse<List<IBaseResource>>>() {
@@ -433,6 +565,15 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return new FhirFuture<>(asyncId, pool.submit(callable));
 	}
 	
+	/**
+	 * Creates a separate thread where a single resource fetch from the FHIR server will be done.
+	 * The return type is a {@link FhirFuture} wrapper for the {@link FhirResponse} of that call. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
+	 * @param resourceId the value of the id to fetch the resource
+	 * @param asyncId a name for the Future to be returned
+	 * @return a {@link FhirFuture} with the asyncId as name, and ready to return the List of IBaseResource as result.
+	 */
 	public FhirFuture<FhirResponse<IBaseResource>> getResourceByIdAsync(String resourceType, String resourceId,
 			String asyncId) {
 		Callable<FhirResponse<IBaseResource>> callable = new Callable<FhirResponse<IBaseResource>>() {

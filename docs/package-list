@@ -1,0 +1,13 @@
+io.elimu.a2d2.cds.fhir.cache
+io.elimu.a2d2.cds.fhir.helper
+io.elimu.a2d2.cds.fhir.helper.dstu3
+io.elimu.a2d2.cds.fhir.helper.r4
+io.elimu.a2d2.cdsmodel
+io.elimu.a2d2.cdsresponse.entity
+io.elimu.a2d2.exception
+io.elimu.a2d2.fhir
+io.elimu.a2d2.genericmodel
+io.elimu.a2d2.helpers
+io.elimu.a2d2.oauth
+io.elimu.a2d2.process
+io.elimu.a2d2.serviceapi.performance

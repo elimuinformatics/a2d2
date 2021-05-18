@@ -14,16 +14,31 @@
 
 package io.elimu.a2d2.genericmodel;
 
+/**
+ * {@link ServiceRequest} extension that can be used to invoke a REST endpoint from the client side.
+ */
 public class ClientRequest extends ServiceRequest{
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Bearer token to be used for Bearer auth. Also setteable as headers.
+	 */
 	String authToken;
 
+	/**
+	 * The URL to be invoked.
+	 */
 	String url;
 
+	/**
+	 * Username to be used for Basic auth. Also setteable as headers, but you would need a Base64 encoding mechanism to set it
+	 */
 	String basicUserName;
 
+	/**
+	 * Password to be used for Basic auth. Also setteable as headers, but you would need a Base64 encoding mechanism to set it
+	 */
 	String basicPassword;
 
 

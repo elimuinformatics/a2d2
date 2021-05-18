@@ -28,12 +28,43 @@ import org.kie.api.runtime.process.WorkItemManager;
 
 import io.elimu.a2d2.exception.BaseException;
 
+/**
+ * WIHInvoker is used to call WorkItemHandlers that you have configured for the processes, from the rules.<br> 
+ * 
+ * You can invoke different Work Item Managers using the WorkDefinition's name you have under TaskName in your service tasks. 
+ * As long as you pass the expected inputs, you will receive the result of invoking it. Here's a short example for CallREST:<br>
+ * 
+ * <code>
+ * java.util.Map params = new java.util.HashMap();<br>
+ * params.put("url", "https://google.com");<br>
+ * params.put("method", "GET");<br>
+ * java.util.Map results = io.elimu.a2d2.helpers.WIHInvoker.invoke(drools, "CallREST", params);<br>
+ * ServiceResponse resp = (ServiceResponse) results.get("serviceResponse");<br>
+ * </code>
+ * <br>
+ * There is a similar variance for {@link #invokeDyn(KnowledgeHelper, String, Object...)} where you would pass the parameters directly
+ * as method parameters instead of a map. Be sure for that variation to always pass an even number of parameters, like this:<br>
+ * 
+ * <code>
+ * java.util.Map results = io.elimu.a2d2.helpers.WIHInvoker.invokeDyn(drools, "CallREST", "url", "https://google.com", "method", "GET");<br>
+ * ServiceResponse resp = (ServiceResponse) results.get("serviceResponse");<br>
+ * </code>
+ * 
+ */
 public class WIHInvoker {
 
 	private WIHInvoker() {
 		throw new IllegalStateException("Utility class");
 	}
 	
+	/**
+	 * Invokes a work item handler, parameters passed as dynamic parameters
+	 * @param helper A parameter you always have available in DRL under the keyword "drools"
+	 * @param wihName the WorkItemHandler definition name, to identify which WorkItemHandler contract to adhere to.
+	 * @param params A list of parameters, first containing a key, then a value, for each parameter to be passed to the WIH.
+	 * @return The result map from invoking the work item handler.
+	 * @throws BaseException if the WorkItemHandler invoked is not auto completed. If it needs an external interaction to finish, this call won't work
+	 */
 	public static Map<String, Object> invokeDyn(KnowledgeHelper helper, String wihName, Object... params) {
 		Map<String, Object> mapParams = new HashMap<>();
 		if (params == null || params.length %2 != 0) {
@@ -45,6 +76,14 @@ public class WIHInvoker {
 		return invoke(helper, wihName, mapParams);
 	}
 
+	/**
+	 * Invokes a work item handler, parameters passed as a Map
+	 * @param helper  A parameter you always have available in DRL under the keyword "drools"
+	 * @param wihName the WorkItemHandler definition name, to identify which WorkItemHandler contract to adhere to.
+	 * @param params A Map with the parameters to be passed to the WIH.
+	 * @return The result map from invoking the work item handler.
+	 * @throws BaseException if the WorkItemHandler invoked is not auto completed. If it needs an external interaction to finish, this call won't work
+	 */
 	public static Map<String, Object> invoke(KnowledgeHelper helper, String wihName, Map<String, Object> params) {
 		WorkItemHandler handler = getWorkItemHandler(helper, wihName);
 		if (handler == null) {

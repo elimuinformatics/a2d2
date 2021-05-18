@@ -28,8 +28,17 @@ import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.QueryingCallback;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelperBase;
 
+/**
+ * QueryingServerHelper implementation for FHIR R4 servers and model.
+ * Please also check methods at {@link QueryingServerHelperBase} because this class will contain all 
+ * the methods available there as well.
+ */
 public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServerHelper, Bundle> {
-	
+
+	/**
+	 * Default Constructor to use
+	 * @param url it will be the baseUrl for the FHIR server. Basically, if you do a query for all Patient objects in your FHIR R4 server, then you remove the "/Patient" from the URL, you have what should be placed here
+	 */
 	public QueryingServerHelper(String url) {
 		this(url, FhirVersion.FHIR4);
 	}

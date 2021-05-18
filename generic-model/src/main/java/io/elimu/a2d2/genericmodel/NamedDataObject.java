@@ -16,34 +16,65 @@ package io.elimu.a2d2.genericmodel;
 
 import java.io.Serializable;
 
+/**
+ * Name value pair object to map primitive values and specific objects of similar type
+ * from the process into the rules, and from one group of rules to the next one.
+ */
 public class NamedDataObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Name of the name-value pair. Just an identifier string
+	 */
 	private String name;
+
+	/**
+	 * Value of the name-value pair. Basically any kind of object
+	 */
 	private Object value;
 
+	/**
+	 * A Constructor for both parameters
+	 * @param name the name
+	 * @param value the value
+	 */
 	public NamedDataObject(String name, Object value) {
 		super();
 		this.name = name;
 		this.value = value;
 	}
 
+	/**
+	 * A default constructor
+	 */
 	public NamedDataObject() {
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the value
+	 */
 	public Object getValue() {
 		return value;
 	}
 
+	/**
+	 * @param value the value to set
+	 */
 	public void setValue(Object value) {
 		this.value = value;
 	}
