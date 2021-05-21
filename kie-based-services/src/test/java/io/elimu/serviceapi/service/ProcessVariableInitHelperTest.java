@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -15,7 +16,9 @@ import java.util.jar.Manifest;
 import org.drools.core.io.impl.BaseResource;
 import org.drools.core.io.impl.ByteArrayResource;
 import org.drools.core.io.impl.ClassPathResource;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.kie.api.KieServices;
 import org.mockito.InjectMocks;
 
@@ -119,5 +122,15 @@ public class ProcessVariableInitHelperTest {
 			target.close();
 		}
 
-
+		@Test
+		public void testNewPropertiesForAllProcesses() {
+			AppContextUtils.getInstance().testSetEnvironmentName("dev");
+			Dependency dep = new Dependency(System.getProperty("test.service.release") + ".test4");
+			System.setProperty("proc.envvar.prefix", "a2d2test");
+			System.setProperty("a2d2test.allservices.sid", "mynewsid");
+			Map<String, Object> variables = pvh.initVariables(dep);
+			Assert.assertNotNull(variables);
+			Assert.assertNotNull(variables.get("sid"));
+			Assert.assertEquals("mynewsid", variables.get("sid"));
+		}
 }
