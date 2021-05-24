@@ -28,8 +28,16 @@ public class ProcessVariableInitHelper {
 			String envPrefix = System.getProperty("proc.envvar.prefix");
 			if (envPrefix != null) {
 				String prefix = envPrefix.toLowerCase() + "." + dep.getArtifactId().toLowerCase();
+				String defaultPrefix = envPrefix.toLowerCase() + ".allservices";
 				String keySet = System.getProperties().keySet().toString();
 				log.trace("System properties available for loading are {}", keySet);
+				System.getProperties().keySet().stream().
+					filter(k -> k.toString().toLowerCase().startsWith(defaultPrefix)).
+					forEach(k -> setServiceProperty(
+						serviceProperty,
+						k.toString().substring(defaultPrefix.length() + 1),
+						System.getProperty(k.toString())
+					));
 				System.getProperties().keySet().stream().
 					filter(k -> k.toString().toLowerCase().startsWith(prefix)).
 					forEach(k -> setServiceProperty(
