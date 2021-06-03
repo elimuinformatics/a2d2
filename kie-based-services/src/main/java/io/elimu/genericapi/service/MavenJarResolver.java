@@ -41,12 +41,14 @@ public class MavenJarResolver {
 		synchronized(REPOS) {
 			if (REPOS.isEmpty()) {
 				if (!"true".equalsIgnoreCase(String.valueOf(System.getProperty("kie.maven.offline.force")))) {
+					//for dev, we want to refresh everything when we resolve dependencies every 5 minutes
+					String releasePolicy = ServiceUtils.getMavenLocation().contains("maven-dev") ? RepositoryPolicy.UPDATE_POLICY_INTERVAL + ":5" : RepositoryPolicy.UPDATE_POLICY_NEVER;
 					REPOS.add(
 						new RemoteRepository.Builder("private-repo", DEFAULT, ServiceUtils.getMavenLocation()).
 							setAuthentication(
 								new AuthenticationBuilder().addUsername(ServiceUtils.getMavenUser()).
 								addPassword(ServiceUtils.getMavenPassword()).build()).
-							setReleasePolicy(new RepositoryPolicy(true, RepositoryPolicy.UPDATE_POLICY_NEVER, 
+							setReleasePolicy(new RepositoryPolicy(true, releasePolicy, 
 									RepositoryPolicy.CHECKSUM_POLICY_IGNORE)).
 							setSnapshotPolicy(new RepositoryPolicy(true, RepositoryPolicy.UPDATE_POLICY_DAILY, 
 									RepositoryPolicy.CHECKSUM_POLICY_IGNORE)).
