@@ -41,6 +41,7 @@
 		<module>fhir-query-helper-dstu2</module>
 		<module>fhir-query-helper-dstu3</module>
 		<module>fhir-query-helper-r4</module>
+		<module>oauth-helpers</module>
 		<module>fhir-helpers</module>
 		<module>task-utilities</module>
 		<module>sms-wih</module>
