@@ -131,7 +131,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			Thread.currentThread().setContextClassLoader(getKieContainer().getClassLoader());
 			runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
 			KieSession ksession = runtime.getKieSession();
-			enableDebugging(ksession, request);
+			GenericDebugListener listener = enableDebugging(ksession, request);
 			String procId = getProcessId(request.getMethod());
 			if (procId != null && !NOT_ALLOWED_METHOD_KEY.equals(procId)) {
 				LOG.info("Executing process " + procId + " for service " + getId());
@@ -142,7 +142,9 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {
-					return new ServiceResponse("There were 0 ServiceResponse objects obtained from execution.", 400);
+					return new ServiceResponse(appendListenerOutput(request, listener, "There were 0 ServiceResponse objects obtained from execution."), 400);
+				} else {
+					response.setBody(appendListenerOutput(request, listener, response.getBody()));
 				}
 				return response;
 			} else if (!NOT_ALLOWED_METHOD_KEY.equals(procId)) {
@@ -151,12 +153,14 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				ksession.fireAllRules();
 				Collection<?> retvals = ksession.getObjects(new ClassObjectFilter(ServiceResponse.class));
 				if (retvals.size() == 1) {
-					return (ServiceResponse) retvals.iterator().next();
+					ServiceResponse retval = (ServiceResponse) retvals.iterator().next();
+					retval.setBody(appendListenerOutput(request, listener, retval.getBody()));
+					return retval;
 				} else {
-					return new ServiceResponse("There were " + retvals.size() + " ServiceResponse objects obtained from execution. Only 1 is allowed", 400);
+					return new ServiceResponse(appendListenerOutput(request, listener, "There were " + retvals.size() + " ServiceResponse objects obtained from execution. Only 1 is allowed"), 400);
 				}
 			} else {
-				return new ServiceResponse("Method " + request.getMethod() + " not allowed", 405);
+				return new ServiceResponse(appendListenerOutput(request, listener, "Method " + request.getMethod() + " not allowed"), 405);
 			}
 		} catch (Exception e) {
 			LOG.error("Problem executing service", e);
@@ -170,13 +174,22 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		}
 	}
 	
-	private void enableDebugging(KieSession ksession, ServiceRequest request) {
-		String defaultEnabled = System.getProperty("service.debug.enabled", "false");
-		String header = request.getHeader("X-Enable-Debug");
-		if ("true".equalsIgnoreCase(defaultEnabled) || (header != null && "true".equalsIgnoreCase(header))) {
-			//enables listeners
-			new GenericDebugListener(getId(), ksession);
+	private String appendListenerOutput(ServiceRequest request, GenericDebugListener listener, String body) {
+		if ("true".equalsIgnoreCase(request.getHeader("x-output-debug"))) {
+			return listener.toJson(body); //outputs JSON with the listener collected data
 		}
+		return body;
+	}
+
+	private GenericDebugListener enableDebugging(KieSession ksession, ServiceRequest request) {
+		String defaultEnabled = System.getProperty("service.debug.enabled", "false");
+		String header = request.getHeader("x-enable-debug");
+		String header2 = request.getHeader("x-output-debug"); 
+		if ("true".equalsIgnoreCase(defaultEnabled) || (header != null && "true".equalsIgnoreCase(header)) || (header2 != null && "true".equalsIgnoreCase(header2))) {
+			//enables listeners
+			return new GenericDebugListener(getId(), ksession, "true".equalsIgnoreCase(header2));
+		}
+		return null;
 	}
 
 	private boolean ignoreScrubbing() {
