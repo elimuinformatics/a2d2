@@ -1,5 +1,7 @@
 package io.elimu.genericapi.service;
 
+import java.util.regex.Pattern;
+
 import org.kie.api.event.KieRuntimeEvent;
 import org.kie.api.event.process.ProcessCompletedEvent;
 import org.kie.api.event.process.ProcessEventListener;
@@ -58,7 +60,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("ruleName", new JsonPrimitive(event.getMatch().getRule().getName()));
 		JsonArray array = new JsonArray();
 		for (Object obj : event.getMatch().getObjects()) {
-			array.add(obj.toString());
+			array.add(hidePasswordValue(obj));
 		}
 		evt.add("objects", array);
 		events.add(evt);
@@ -73,7 +75,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("ruleName", new JsonPrimitive(event.getMatch().getRule().getName()));
 		JsonArray array = new JsonArray();
 		for (Object obj : event.getMatch().getObjects()) {
-			array.add(obj.toString());
+			array.add(hidePasswordValue(obj));
 		}
 		evt.add("objects", array);
 		events.add(evt);
@@ -87,7 +89,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("ruleName", new JsonPrimitive(event.getMatch().getRule().getName()));
 		JsonArray array = new JsonArray();
 		for (Object obj : event.getMatch().getObjects()) {
-			array.add(obj.toString());
+			array.add(hidePasswordValue(obj));
 		}
 		evt.add("objects", array);
 		events.add(evt);
@@ -101,7 +103,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("ruleName", new JsonPrimitive(event.getMatch().getRule().getName()));
 		JsonArray array = new JsonArray();
 		for (Object obj : event.getMatch().getObjects()) {
-			array.add(obj.toString());
+			array.add(hidePasswordValue(obj));
 		}
 		evt.add("objects", array);
 		events.add(evt);
@@ -169,7 +171,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		if (event.getRule() != null) {
 			evt.add("ruleName", new JsonPrimitive(event.getRule().getName()));
 		}
-		evt.add("object", new JsonPrimitive(event.getObject().toString()));
+		evt.add("object", new JsonPrimitive(hidePasswordValue(event.getObject())));
 		events.add(evt);
 	}
 
@@ -181,7 +183,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		if (event.getRule() != null) {
 			evt.add("ruleName", new JsonPrimitive(event.getRule().getName()));
 		}
-		evt.add("object", new JsonPrimitive(event.getObject().toString()));
+		evt.add("object", new JsonPrimitive(hidePasswordValue(event.getObject())));
 		events.add(evt);
 	}
 
@@ -193,7 +195,7 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		if (event.getRule() != null) {
 			evt.add("ruleName", new JsonPrimitive(event.getRule().getName()));
 		}
-		evt.add("object", new JsonPrimitive(event.getOldObject().toString()));
+		evt.add("object", new JsonPrimitive(hidePasswordValue(event.getOldObject())));
 		events.add(evt);
 	}
 
@@ -289,8 +291,13 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("processId", new JsonPrimitive(event.getProcessInstance().getProcessId()));
 		evt.add("processInstanceId", new JsonPrimitive(event.getProcessInstance().getId()));
 		evt.add("variableId", new JsonPrimitive(event.getVariableId()));
-		evt.add("oldValue", event.getOldValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(event.getOldValue().toString()));
-		evt.add("newValue", event.getNewValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(event.getNewValue().toString()));
+		if (event.getVariableId().toLowerCase().contains("password")) {
+			evt.add("oldValue", event.getOldValue() == null ? JsonNull.INSTANCE : new JsonPrimitive("*******"));
+			evt.add("newValue", event.getNewValue() == null ? JsonNull.INSTANCE : new JsonPrimitive("*******"));
+		} else {
+			evt.add("oldValue", event.getOldValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(hidePasswordValue(event.getOldValue())));
+			evt.add("newValue", event.getNewValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(hidePasswordValue(event.getNewValue())));
+		}
 		events.add(evt);
 	}
 
@@ -302,8 +309,13 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("processId", new JsonPrimitive(event.getProcessInstance().getProcessId()));
 		evt.add("processInstanceId", new JsonPrimitive(event.getProcessInstance().getId()));
 		evt.add("variableId", new JsonPrimitive(event.getVariableId()));
-		evt.add("oldValue", event.getOldValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(event.getOldValue().toString()));
-		evt.add("newValue", event.getNewValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(event.getNewValue().toString()));
+		if (event.getVariableId().toLowerCase().contains("password")) {
+			evt.add("oldValue", event.getOldValue() == null ? JsonNull.INSTANCE : new JsonPrimitive("*******"));
+			evt.add("newValue", event.getNewValue() == null ? JsonNull.INSTANCE : new JsonPrimitive("*******"));
+		} else {
+			evt.add("oldValue", event.getOldValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(hidePasswordValue(event.getOldValue())));
+			evt.add("newValue", event.getNewValue() == null ? JsonNull.INSTANCE : new JsonPrimitive(hidePasswordValue(event.getNewValue())));
+		}
 		events.add(evt);
 	}
 
@@ -314,4 +326,17 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		return new Gson().toJson(retval);
 	}
 	
+	private static String hidePasswordValue(Object value) {
+		if (value == null) {
+			return "null";
+		}
+		String retval = value.toString();
+		//basically, any variable or attribute in the toString that has password is taken and stripped
+		if (retval.toLowerCase().contains("password")) {
+			Pattern pat = java.util.regex.Pattern.compile("assword([^=]*)=([^,\\\\])*");
+			retval = pat.matcher(retval).replaceAll("assword$1=-----");
+		}
+		return retval;
+	}
 }
+
