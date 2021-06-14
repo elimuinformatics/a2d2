@@ -86,6 +86,7 @@ You will need to install the following:
 
     Then, from Eclipse, click on debug -> Run as -> Remote Java Application -> new, and connect using localhost port 8000
 
+    Also, if you want to debug the rule and process execution of a particular request, add the HTTP header X-Enable-Debug: true to the request for enabling it on the server logs, or X-Output-Debug: true to enable it on the HTTP output 
 
 ### Deploying with Docker 
 
