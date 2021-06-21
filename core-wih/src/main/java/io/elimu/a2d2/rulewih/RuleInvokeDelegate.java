@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.drools.core.common.InternalAgenda;
 import org.kie.api.KieBase;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.WorkItem;
@@ -32,12 +34,23 @@ public class RuleInvokeDelegate implements WorkItemHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RuleInvokeDelegate.class);
 	private final KieBase kbase;
+	private final KieSession ksession;
 	private Environment env;
 
 	public RuleInvokeDelegate(KieSession ksession) {
 		super();
 		this.kbase = ksession.getKieBase();
+		this.ksession = ksession;
 		this.env = ksession.getEnvironment();
+	}
+
+	private Object extractListener(KieSession ksession) {
+		for (AgendaEventListener listener : ksession.getAgendaEventListeners()) {
+			if (listener.getClass().getName().endsWith("GenericDebugListener")) {
+				return listener;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -72,6 +85,15 @@ public class RuleInvokeDelegate implements WorkItemHandler {
 		}
 		
 		KieSession ksession = kbase.newKieSession(null, env);
+		Object listener = extractListener(this.ksession);
+		if (listener != null) {
+			if (listener instanceof AgendaEventListener) {
+				ksession.addEventListener((AgendaEventListener) listener);
+			}
+			if (listener instanceof RuleRuntimeEventListener) {
+				ksession.addEventListener((RuleRuntimeEventListener) listener);
+			}
+		}
 		facts.values().forEach(object -> ksession.insert(object));
 		if (agendaGroup != null) {
 			ksession.getAgenda().getAgendaGroup(agendaGroup).setFocus();

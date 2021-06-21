@@ -10,6 +10,20 @@ import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
 
+/**
+ * This class is used to transform several components from FHIR models DSTU2 and DSTU3 to R4 model. It doesn't work for every 
+ * component of the model. Right now it has been tested for 
+ * <ul>
+ *  <li>Procedure</li>
+ *  <li>MedicationOrder (DSTU2)</li>
+ *  <li>AllergyIntollerance</li>
+ *  <li>Patient</li>
+ *  <li>Observation</li>
+ * </ul>
+ * 
+ * Other components might work, but haven't been tested yet. Please coordinate with your team leader to have unit tests built for 
+ * other cases if you need this helper to be used with other classes.
+ */
 public class FhirTransformHelper {
 
 	private static final Logger log = LoggerFactory.getLogger(FhirTransformHelper.class);
@@ -365,10 +379,20 @@ public class FhirTransformHelper {
 		return retval;
 	}
 
+	/**
+	 * Will transform a DSTU3 resource to an R4 resource.
+	 * @param v3res a DSTU3 resource
+	 * @return an R4 resource representing the same data
+	 */
 	public static org.hl7.fhir.r4.model.Resource transformDstu3Resource(org.hl7.fhir.dstu3.model.Resource v3res) {
 		return VersionConvertor_30_40.convertResource(v3res, true);
 	}
-
+	
+	/**
+	 * Will transform a DSTU2 resource to an R4 resource
+	 * @param v2resource a DSTU2 resource
+	 * @return an R4 resource representing the same data
+	 */
 	public static org.hl7.fhir.r4.model.Resource transformDstu2Resource(ca.uhn.fhir.model.dstu2.resource.BaseResource v2resource) {
 		if (v2resource instanceof ca.uhn.fhir.model.dstu2.resource.AllergyIntolerance) {
 			return transformAllergyIntolerance((ca.uhn.fhir.model.dstu2.resource.AllergyIntolerance) v2resource);

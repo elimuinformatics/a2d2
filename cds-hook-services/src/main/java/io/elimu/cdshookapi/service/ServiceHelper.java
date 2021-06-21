@@ -92,7 +92,13 @@ public class ServiceHelper {
 			executor.execute(() -> {
 				// we now have two types of services: generic services and kie services
 				// then we start every one
+				Iterable<ServiceInfo> allServices = cdsRepo.findAllGeneric();
+				log.info("Starting all services");
+				int index = 1;
+				int count = cdsRepo.countAllGeneric();
 				for (ServiceInfo info : cdsRepo.findAllGeneric()) {
+					log.info("Starting service " + index + " out of " + count);
+					index++;
 					initializeKieService(info.getServiceData(), info.getDefaultCustomer());
 				}
 				RunningServices.getInstance().markStarted();

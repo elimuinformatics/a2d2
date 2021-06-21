@@ -2,8 +2,7 @@ FROM maven:3.6.0-jdk-8-slim as maven
 
 WORKDIR /usr/src
 
-COPY ./services /usr/src/services
-COPY a2d2-settings.xml /usr/src
+COPY . /usr/src
 
 ARG NEXUS_PASSWORD
 ARG NEXUS_USERNAME
@@ -11,16 +10,19 @@ ARG NEXUS_USERNAME
 ENV NEXUS_PASSWORD $NEXUS_PASSWORD
 ENV NEXUS_USERNAME $NEXUS_USERNAME
 
+RUN mvn clean install -DskipTests --settings=./a2d2-settings.xml
 RUN for file in /usr/src/services/*; do mvn clean install -f "$file" --settings=a2d2-settings.xml -Dmaven.repo.local=client_repo;   done 
 
-FROM openjdk:8 as final
+FROM openjdk:8-alpine as final
+
+RUN apk --update --no-cache add curl
 
 WORKDIR /app
 
 ENV HEALTHCHECKURL http://localhost:8080/actuator/health
 ARG JAVA_OPTS
 
-COPY ./a2d2-api/target/a2d2-api.war /app/a2d2-api.war
+COPY --from=maven /usr/src/a2d2-api/target/a2d2-api.war /app/a2d2-api.war
 COPY --from=maven /usr/src/client_repo /root/.m2/repository
 COPY --from=maven /usr/src/services /app/services
 

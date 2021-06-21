@@ -48,6 +48,9 @@ public interface CDSServiceRepository extends CrudRepository<ServiceInfo, Servic
 	@Query("from ServiceInfo c where c.id.version in (select max(c1.id.version) from ServiceInfo c1 where c.id.id = c1.id.id) and c.serviceType = 'generic' and c.status = 'done'")
 	Iterable<ServiceInfo> findAllGeneric();
 
+	@Query("select count(c) from ServiceInfo c where c.id.version in (select max(c1.id.version) from ServiceInfo c1 where c.id.id = c1.id.id) and c.serviceType = 'generic' and c.status = 'done'")
+	Integer countAllGeneric();
+
 	@Modifying
 	@Transactional
 	@Query("delete from ServiceInfo c where c.id.id = ?1")

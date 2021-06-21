@@ -160,34 +160,36 @@ public abstract class AbstractKieService {
 			this.kbaseName = kieBaseName;
 			DeploymentDescriptor deployDescriptor = DeploymentDescriptorIO.fromXml(ServiceUtils.readEntry(jarPath, "META-INF/kie-deployment-descriptor.xml"));
 			this.manager = RuntimeManagerRegistry.get().getManager(dep.getArtifactId());
-			if (manager == null) {
-				boolean persistent = deployDescriptor.getPersistenceMode() == PersistenceMode.JPA;
-				EntityManagerFactory emf = null;
-				Object tm = new NoOpTransactionManager();
-				Object tsr = null;
-				if (persistent) {
-					emf = createEmf(deployDescriptor.getPersistenceUnit());
-					tm = TransactionManagerServices.getTransactionManager();
-					tsr = TransactionManagerServices.getTransactionSynchronizationRegistry();
-				}
-				RuntimeEnvironment renv = RuntimeEnvironmentBuilder.Factory.get().newEmptyBuilder().
-					persistence(persistent).
-					addEnvironmentEntry(EnvironmentName.ENTITY_MANAGER_FACTORY, emf).
-					addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, tm).
-					addEnvironmentEntry(EnvironmentName.TRANSACTION, tm).
-					addEnvironmentEntry(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, tsr).
-					schedulerService(new QuartzSchedulerService()).
-					registerableItemsFactory(new ConfigRegisterableItemsFactory(kContainer, dep.getArtifactId(), deployDescriptor, shouldLogExecution(), getConfig())).
-					knowledgeBase(this.kbase).
-					userGroupCallback(new FreeUserGroupCallback()).
-					classLoader(kContainer.getClassLoader()).
-					entityManagerFactory(emf).
-					get();
-				if (persistent) {
-					((SimpleRuntimeEnvironment) renv).setMapper(new JPAMapper(emf));
-				}
-				this.manager = RuntimeManagerFactory.Factory.get(kContainer.getClassLoader()).newPerProcessInstanceRuntimeManager(renv, dep.getArtifactId());
+			if (manager != null) {
+				manager.close();
+				manager = null;
 			}
+			boolean persistent = deployDescriptor.getPersistenceMode() == PersistenceMode.JPA;
+			EntityManagerFactory emf = null;
+			Object tm = new NoOpTransactionManager();
+			Object tsr = null;
+			if (persistent) {
+				emf = createEmf(deployDescriptor.getPersistenceUnit());
+				tm = TransactionManagerServices.getTransactionManager();
+				tsr = TransactionManagerServices.getTransactionSynchronizationRegistry();
+			}
+			RuntimeEnvironment renv = RuntimeEnvironmentBuilder.Factory.get().newEmptyBuilder().
+				persistence(persistent).
+				addEnvironmentEntry(EnvironmentName.ENTITY_MANAGER_FACTORY, emf).
+				addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, tm).
+				addEnvironmentEntry(EnvironmentName.TRANSACTION, tm).
+				addEnvironmentEntry(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, tsr).
+				schedulerService(new QuartzSchedulerService()).
+				registerableItemsFactory(new ConfigRegisterableItemsFactory(kContainer, dep.getArtifactId(), deployDescriptor, shouldLogExecution(), getConfig())).
+				knowledgeBase(this.kbase).
+				userGroupCallback(new FreeUserGroupCallback()).
+				classLoader(kContainer.getClassLoader()).
+				entityManagerFactory(emf).
+				get();
+			if (persistent) {
+				((SimpleRuntimeEnvironment) renv).setMapper(new JPAMapper(emf));
+			}
+			this.manager = RuntimeManagerFactory.Factory.get(kContainer.getClassLoader()).newPerProcessInstanceRuntimeManager(renv, dep.getArtifactId());
 			status = "STARTED";
 		} catch (IOException e) {
 			throw new GenericServiceConfigException("Problem determining dependencies of service " + getId(), e);

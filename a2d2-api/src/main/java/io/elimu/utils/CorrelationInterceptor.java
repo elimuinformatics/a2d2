@@ -28,7 +28,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 @Component
 public class CorrelationInterceptor extends HandlerInterceptorAdapter {
 
-	private static final String CORRELATION_ID_HEADER_NAME = "ServiceCorrelationID";
+	private static final String CORRELATION_ID_HEADER_NAME = "X-Correlation-ID";
 	private static final String CORRELATION_ID_LOG_VAR_NAME = "correlationId";
 
 	@Override
@@ -36,6 +36,7 @@ public class CorrelationInterceptor extends HandlerInterceptorAdapter {
 			throws Exception {
 		final String correlationId = getCorrelationIdFromHeader(request);
 		MDC.put(CORRELATION_ID_LOG_VAR_NAME, correlationId);
+		response.setHeader(CORRELATION_ID_HEADER_NAME, correlationId);
 		return true;
 	}
 

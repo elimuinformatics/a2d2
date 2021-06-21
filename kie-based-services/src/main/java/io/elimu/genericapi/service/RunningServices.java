@@ -200,7 +200,11 @@ public class RunningServices {
 	}
 
 	public void restartService(Dependency dep) {
-		register(new GenericKieBasedService(dep), true);
+		restartService(dep, true);
+	}
+	
+	public void restartService(Dependency dep, boolean store) {
+		register(new GenericKieBasedService(dep), store);
 		Set<String> services = servicesWithDependency(dep);
 		for (String serviceName : services) {
 			restartService(serviceName);
