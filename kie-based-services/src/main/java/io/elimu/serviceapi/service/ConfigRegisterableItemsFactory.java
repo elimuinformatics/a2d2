@@ -10,7 +10,7 @@ import java.util.Properties;
 import org.drools.core.event.DebugAgendaEventListener;
 import org.drools.core.event.DebugProcessEventListener;
 import org.drools.core.event.DebugRuleRuntimeEventListener;
-import org.drools.core.util.MVELSafeHelper;
+import org.drools.mvel.SafeMVELEvaluator;
 import org.jbpm.runtime.manager.impl.RuntimeEngineImpl;
 import org.jbpm.services.task.wih.LocalHTWorkItemHandler;
 import org.kie.api.KieBase;
@@ -26,6 +26,9 @@ import org.kie.internal.runtime.Closeable;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
+import org.kie.internal.security.KiePolicyHelper;
+import org.kie.soup.project.datamodel.commons.util.MVELEvaluator;
+import org.kie.soup.project.datamodel.commons.util.RawMVELEvaluator;
 import org.mvel2.MVEL;
 import org.mvel2.ParserConfiguration;
 import org.mvel2.ParserContext;
@@ -89,7 +92,14 @@ public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactor
 			}
 		}
 		Object compiledExpression = MVEL.compileExpression(value, ctx);
-		return MVELSafeHelper.getEvaluator().executeExpression( compiledExpression, params );
+		 
+		return MVELEvaluatorHolder.evaluator.executeExpression( compiledExpression, params );
+	}
+	
+	private static class MVELEvaluatorHolder {
+		static MVELEvaluator evaluator = KiePolicyHelper.isPolicyEnabled() ? 
+				new SafeMVELEvaluator() :
+	            new RawMVELEvaluator(); 
 	}
 
 	@Override

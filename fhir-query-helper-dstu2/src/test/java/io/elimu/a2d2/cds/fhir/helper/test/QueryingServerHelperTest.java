@@ -79,6 +79,7 @@ public class QueryingServerHelperTest {
 	@Test
 	public void fhirQueryAsync() {
 		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponseObservation).when(queryingServerHelper).getResourceByIdResponse(any(), any());
 		long from = System.currentTimeMillis();
 		FhirFuture<FhirResponse<List<IBaseResource>>> f = queryingServerHelper.queryResourcesAsync("Observation",
 				patient.getId().getIdPart(), SUBJECT, IDENTIFIER, "test-1");

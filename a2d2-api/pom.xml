@@ -32,7 +32,7 @@
 
 	<properties>
 		<hapi.fhir.version>3.8.0</hapi.fhir.version>
-		<kie.version>7.27.0.Final</kie.version>
+		<kie.version>7.50.0.Final</kie.version>
 		<start-class>io.elimu.a2d2api.A2D2Application</start-class>
 		<jasypt.version>3.0.3</jasypt.version>
 	</properties>

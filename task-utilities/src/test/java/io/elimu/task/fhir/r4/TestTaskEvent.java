@@ -1,6 +1,7 @@
 package io.elimu.task.fhir.r4;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.api.task.TaskContext;
@@ -34,6 +35,11 @@ public class TestTaskEvent implements TaskEvent {
 	@Override
 	public Date getEventDate() {
 		return eventDate;
+	}
+
+	@Override
+	public Map<String, Object> getMetadata() {
+		return new HashMap<>();
 	}
 
 }

@@ -11,7 +11,7 @@
 	<description>Task Utilities</description>
 
 	<properties>
-		<kie.version>7.27.0.Final</kie.version>
+		<kie.version>7.50.0.Final</kie.version>
 		<hapi.version>3.8.0</hapi.version>
 		<freemarker.version>2.3.30</freemarker.version>
 	</properties>
