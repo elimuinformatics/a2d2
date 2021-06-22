@@ -12,15 +12,15 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 
 import io.elimu.a2d2.exception.WorkItemHandlerException;
-import io.elimu.a2d2.fhirresourcewih.OperationOutcomeWorkItemHandler;
+import io.elimu.a2d2.fhirresourcewih.OperationOutcomeDelegate;
 
 public class OpOutcomeWIHTest {
 
 	@Test
 	public void testEmptyMap() {
 		Map<String, Object> params = new HashMap<>();
-		Map<String, Object> a = OperationOutcomeWorkItemHandler.extractIssueDetails(params, "a");
-		Map<String, Object> a1 = OperationOutcomeWorkItemHandler.extractIssueDetails(params, "a1");
+		Map<String, Object> a = OperationOutcomeDelegate.extractIssueDetails(params, "a");
+		Map<String, Object> a1 = OperationOutcomeDelegate.extractIssueDetails(params, "a1");
 		Assert.assertNotNull(a);
 		Assert.assertTrue(a.isEmpty());
 		Assert.assertNotNull(a1);
@@ -37,8 +37,8 @@ public class OpOutcomeWIHTest {
 		params.put("issue_a1_detailsSystem", "abcde");
 		params.put("issue_a1_location0", "somewhere");
 		params.put("issue_a1_location1", "overtherainbow");
-		Map<String, Object> a = OperationOutcomeWorkItemHandler.extractIssueDetails(params, "a");
-		Map<String, Object> a1 = OperationOutcomeWorkItemHandler.extractIssueDetails(params, "a1");
+		Map<String, Object> a = OperationOutcomeDelegate.extractIssueDetails(params, "a");
+		Map<String, Object> a1 = OperationOutcomeDelegate.extractIssueDetails(params, "a1");
 		Assert.assertNotNull(a);
 		Assert.assertTrue(a.containsKey("code"));
 		Assert.assertTrue(a.containsKey("diagnostics"));
@@ -61,7 +61,7 @@ public class OpOutcomeWIHTest {
 		params.put("issue_a_location", "somewhere");;
 		params.put("issue_a1_location0", "somewhere");
 		params.put("issue_a1_location1", "overtherainbow");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();
@@ -85,7 +85,7 @@ public class OpOutcomeWIHTest {
 		Map<String, Object> params = workItem.getParameters();
 		params.put("fhirVersion", "FHIR4");
 		params.put("issue_a_code", "informational");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();
@@ -100,7 +100,7 @@ public class OpOutcomeWIHTest {
 		Map<String, Object> params = workItem.getParameters();
 		params.put("fhirVersion", "R4");
 		params.put("issue_a_code", "informational");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();
@@ -115,7 +115,7 @@ public class OpOutcomeWIHTest {
 		Map<String, Object> params = workItem.getParameters();
 		params.put("fhirVersion", "DSTU3");
 		params.put("issue_a_code", "informational");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();
@@ -138,7 +138,7 @@ public class OpOutcomeWIHTest {
 		params.put("issue_a1_detailsSystem", "abcde");
 		params.put("issue_a1_location0", "somewhere");
 		params.put("issue_a1_location1", "overtherainbow");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();
@@ -163,7 +163,7 @@ public class OpOutcomeWIHTest {
 		WorkItemImpl workItem = new WorkItemImpl();
 		Map<String, Object> params = workItem.getParameters();
 		params.put("fhirVersion", "Fhir9000");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 	}
@@ -182,7 +182,7 @@ public class OpOutcomeWIHTest {
 		params.put("issue_a1_detailsSystem", "abcde");
 		params.put("issue_a1_location0", "somewhere");
 		params.put("issue_a1_location1", "overtherainbow");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();
@@ -206,7 +206,7 @@ public class OpOutcomeWIHTest {
 		Map<String, Object> params = workItem.getParameters();
 		params.put("fhirVersion", "DSTU2");
 		params.put("issue_a_code", "informational");
-		OperationOutcomeWorkItemHandler handler = new OperationOutcomeWorkItemHandler();
+		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
 		WorkItemManager manager = new DoNothingWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Map<String, Object> results = workItem.getResults();

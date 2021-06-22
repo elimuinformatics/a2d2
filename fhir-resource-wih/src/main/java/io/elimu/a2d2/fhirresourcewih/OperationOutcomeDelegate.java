@@ -12,7 +12,7 @@ import ca.uhn.fhir.context.FhirContext;
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 import io.elimu.a2d2.genericmodel.ServiceResponse;
 
-public class OperationOutcomeWorkItemHandler implements WorkItemHandler {
+public class OperationOutcomeDelegate implements WorkItemHandler {
 
 	public static final String ISSUE_PREFIX = "issue_";
 	
