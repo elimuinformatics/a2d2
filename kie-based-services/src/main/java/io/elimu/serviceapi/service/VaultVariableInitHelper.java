@@ -97,23 +97,4 @@ public class VaultVariableInitHelper extends ProcessVariableInitHelper {
 	private boolean notEmpty(String value) {
 		return value != null && !"".equals(value.trim());
 	}
-
-	public static void main(String[] args) {
-		System.setProperty("vault.url", "https://vault-internal.elimuinformatics.com");
-		//System.setProperty("vault.token", "s.gvxxhnUfLUOZ6hHg9mMMnyHZ");
-		  System.setProperty("vault.token", "s.T6qAR63bDeNaQOnAIM6Cg6Pq");
-		System.setProperty("vault.app", "omnibus-api");
-		AppContextUtils.getInstance().testSetEnvironmentName("dev");
-		long start = System.currentTimeMillis();
-		Map<String, Object> values = new VaultVariableInitHelper().initVariables(new Dependency("io.elimu.a2d2:test:1.0"));
-		long length = System.currentTimeMillis() - start;
-		System.out.println("Took " + length + " millis to read these properties: " + values);
-		
-		start = System.currentTimeMillis();
-		values = new VaultVariableInitHelper().initVariables(new Dependency("io.elimu.a2d2:test:1.0"));
-		length = System.currentTimeMillis() - start;
-		System.out.println("Took " + length + " millis to read these properties: " + values);
-		
-		
-	}
 }
