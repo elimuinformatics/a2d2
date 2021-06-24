@@ -18,6 +18,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.3.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-human-task-core</artifactId>
 			<version>${kie.version}</version>

@@ -25,5 +25,4 @@
 	<artifactId>generic-model</artifactId>
 	<name>Base model for the Generic services</name>
 	<description>Representation of ServiceRequest and ServiceResponse</description>
-
 </project>
