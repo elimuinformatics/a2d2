@@ -1,4 +1,4 @@
-FROM maven:3.6.0-jdk-8-slim as maven
+FROM maven:3.8.1-jdk-11-slim as maven
 
 WORKDIR /usr/src
 
@@ -13,9 +13,9 @@ ENV NEXUS_USERNAME $NEXUS_USERNAME
 RUN mvn clean install -DskipTests --settings=./a2d2-settings.xml
 RUN for file in /usr/src/services/*; do mvn clean install -f "$file" --settings=a2d2-settings.xml -Dmaven.repo.local=client_repo;   done 
 
-FROM openjdk:8-alpine as final
+FROM openjdk:11.0.11-jdk-slim as final
 
-RUN apk --update --no-cache add curl
+RUN apt-get update && apt-get -y install curl
 
 WORKDIR /app
 
