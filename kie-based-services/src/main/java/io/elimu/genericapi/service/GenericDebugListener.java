@@ -246,7 +246,9 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("eventType", new JsonPrimitive("beforeNodeTriggered"));
 		evt.add("processId", new JsonPrimitive(event.getProcessInstance().getProcessId()));
 		evt.add("processInstanceId", new JsonPrimitive(event.getProcessInstance().getId()));
-		evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		if (event.getNodeInstance() != null && event.getNodeInstance().getNodeName() != null) {
+			evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		}
 		events.add(evt);
 	}
 
@@ -257,7 +259,9 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("eventType", new JsonPrimitive("afterNodeTriggered"));
 		evt.add("processId", new JsonPrimitive(event.getProcessInstance().getProcessId()));
 		evt.add("processInstanceId", new JsonPrimitive(event.getProcessInstance().getId()));
-		evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		if (event.getNodeInstance() != null && event.getNodeInstance().getNodeName() != null) {
+			evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		}
 		events.add(evt);
 	}
 
@@ -268,7 +272,9 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("eventType", new JsonPrimitive("beforeNodeLeft"));
 		evt.add("processId", new JsonPrimitive(event.getProcessInstance().getProcessId()));
 		evt.add("processInstanceId", new JsonPrimitive(event.getProcessInstance().getId()));
-		evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		if (event.getNodeInstance() != null && event.getNodeInstance().getNodeName() != null) {
+			evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		}
 		events.add(evt);
 	}
 
@@ -279,7 +285,9 @@ public class GenericDebugListener implements ProcessEventListener, RuleRuntimeEv
 		evt.add("eventType", new JsonPrimitive("afterNodeLeft"));
 		evt.add("processId", new JsonPrimitive(event.getProcessInstance().getProcessId()));
 		evt.add("processInstanceId", new JsonPrimitive(event.getProcessInstance().getId()));
-		evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		if (event.getNodeInstance() != null && event.getNodeInstance().getNodeName() != null) {
+			evt.add("nodeName", new JsonPrimitive(event.getNodeInstance().getNodeName()));
+		}
 		events.add(evt);
 	}
 
