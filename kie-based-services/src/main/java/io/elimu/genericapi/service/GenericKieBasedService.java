@@ -42,6 +42,7 @@ import io.elimu.genericapi.scrubbers.ScrubberLocator;
 import io.elimu.serviceapi.service.AbstractKieService;
 import io.elimu.serviceapi.service.AppContextUtils;
 import io.elimu.serviceapi.service.ProcessVariableInitHelper;
+import io.elimu.serviceapi.service.VaultVariableInitHelper;
 
 public class GenericKieBasedService extends AbstractKieService implements GenericService {
 
@@ -97,7 +98,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		} catch (IOException e) {
 			throw new GenericServiceConfigException("File " + appConfigFile + " found, but couldn't be read. Service " + getId() + " not loaded.", e);
 		}
-		processVariableHelper = new ProcessVariableInitHelper();
+		processVariableHelper = new VaultVariableInitHelper();
 		URL jarPath = ServiceUtils.toJarPath(getDependency());
 		//priority 1: localized service properties file
 		//configure a system property pointing to the server's config folder
