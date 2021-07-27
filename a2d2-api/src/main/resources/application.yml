@@ -89,7 +89,7 @@ logging:
 spring: 
   profiles: local
   datasource:
-     driverClassName: com.mysql.jdbc.Driver
+     driverClassName: com.mysql.cj.jdbc.Driver
      url: jdbc:mysql://mydatabase:3306/fhir_420_dev
      username: root
      password: ENC(jfJpEylxzIDVqvMel1B2ig==)
