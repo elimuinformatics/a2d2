@@ -13,9 +13,7 @@ ENV NEXUS_USERNAME $NEXUS_USERNAME
 RUN mvn clean install -DskipTests --settings=./a2d2-settings.xml
 RUN for file in /usr/src/services/*; do mvn clean install -f "$file" --settings=a2d2-settings.xml -Dmaven.repo.local=client_repo;   done 
 
-FROM openjdk:11.0.11-jdk-slim as final
-
-RUN apt-get update && apt-get -y install curl
+FROM openjdk:11.0-jdk-stretch  as final
 
 WORKDIR /app
 
