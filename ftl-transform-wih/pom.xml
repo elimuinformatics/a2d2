@@ -98,10 +98,6 @@
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
-			<artifactId>cds-hook-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>kie-based-services</artifactId>
 			<exclusions>
 				<exclusion>
