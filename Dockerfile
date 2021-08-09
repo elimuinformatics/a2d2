@@ -13,7 +13,7 @@ ENV NEXUS_USERNAME $NEXUS_USERNAME
 RUN mvn clean install -DskipTests --settings=./a2d2-settings.xml
 RUN for file in /usr/src/services/*; do mvn clean install -f "$file" --settings=a2d2-settings.xml -Dmaven.repo.local=client_repo;   done 
 
-FROM openjdk:11.0-jdk-stretch  as final
+FROM adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim as final
 
 WORKDIR /app
 
