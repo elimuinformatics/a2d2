@@ -39,6 +39,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.owasp.encoder</groupId>
+			<artifactId>encoder</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>task-utilities</artifactId>
 			<version>1.0.0</version>
