@@ -32,7 +32,7 @@
 
 	<properties>
 		<hapi.fhir.version>3.8.0</hapi.fhir.version>
-		<kie.version>7.50.0.Final</kie.version>
+		<!-- <kie.version>7.50.0.Final</kie.version> -->
 		<start-class>io.elimu.a2d2api.A2D2Application</start-class>
 		<jasypt.version>3.0.3</jasypt.version>
 	</properties>
@@ -150,7 +150,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-helpers</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- web development, including Tomcat and spring-webmvc -->

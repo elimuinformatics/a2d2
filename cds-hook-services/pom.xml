@@ -96,6 +96,10 @@
 			<artifactId>kie-server-services-common</artifactId>
 			<exclusions>
 				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-core</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-annotations</artifactId>
 				</exclusion>
@@ -174,6 +178,10 @@
 				<exclusion>
 					<groupId>org.apache.commons</groupId>
 					<artifactId>commons-math3</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-compress</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
