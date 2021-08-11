@@ -24,6 +24,7 @@ COPY --from=maven /usr/src/a2d2-api/target/a2d2-api.war /app/a2d2-api.war
 COPY --from=maven /usr/src/client_repo /root/.m2/repository
 COPY --from=maven /usr/src/services /app/services
 
+RUN apk --no-cache add curl
 HEALTHCHECK --interval=60s --timeout=30s --start-period=30s --retries=3 CMD curl -f $HEALTHCHECKURL 2>&1 | grep UP || exit 1
 
 EXPOSE 8080
