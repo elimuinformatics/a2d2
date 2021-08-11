@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.owasp.encoder.Encode;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -34,7 +35,7 @@ public class CorrelationInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
 			throws Exception {
-		final String correlationId = getCorrelationIdFromHeader(request);
+		final String correlationId = Encode.forJava(getCorrelationIdFromHeader(request));
 		MDC.put(CORRELATION_ID_LOG_VAR_NAME, correlationId);
 		response.setHeader(CORRELATION_ID_HEADER_NAME, correlationId);
 		return true;

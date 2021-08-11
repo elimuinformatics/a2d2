@@ -10,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.owasp.encoder.Encode;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -25,7 +26,7 @@ public class RequestInterceptor implements Filter {
 	public void doFilter(ServletRequest request, javax.servlet.ServletResponse servletResponse, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
-		String headers = req.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
+		String headers = Encode.forJava(req.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS));
 		String methods = req.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
 		String httpMethod = req.getMethod();
 		if (HttpMethod.OPTIONS.name().equals(httpMethod) && headers != null && methods != null) {

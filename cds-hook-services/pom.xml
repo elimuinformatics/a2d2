@@ -92,6 +92,11 @@
 			<version>2.3.3</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.21</version>
+		</dependency>
+		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-services-common</artifactId>
 			<exclusions>

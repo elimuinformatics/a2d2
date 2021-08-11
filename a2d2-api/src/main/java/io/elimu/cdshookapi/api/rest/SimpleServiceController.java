@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +39,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.elimu.a2d2.genericmodel.ServiceRequest;
 import io.elimu.a2d2.genericmodel.ServiceResponse;
+import io.elimu.a2d2.serviceapi.performance.PerformanceHelper;
 import io.elimu.a2d2.web.WebUtils;
 import io.elimu.cdshookapi.entity.CDSService;
 import io.elimu.cdshookapi.service.ServiceHelper;
 import io.elimu.genericapi.service.GenericService;
 import io.elimu.genericapi.service.GenericServiceException;
 import io.elimu.genericapi.service.RunningServices;
-import io.elimu.a2d2.serviceapi.performance.PerformanceHelper;
 import io.elimu.service.dao.jpa.CDSServiceRepository;
 import io.elimu.service.models.ServiceInfo;
 import io.swagger.annotations.Api;
@@ -87,7 +88,7 @@ public class SimpleServiceController {
 			if (service == null) {
 				response.setStatus(404);
 				try {
-					response.getWriter().println("Service " + serviceId + " not found.");
+					response.getWriter().println("Service " + Encode.forJava(serviceId) + " not found.");
 				} catch (Exception ignore) {
 					//no-op
 				}
