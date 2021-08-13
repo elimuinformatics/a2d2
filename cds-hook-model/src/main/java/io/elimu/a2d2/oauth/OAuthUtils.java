@@ -191,8 +191,9 @@ public class OAuthUtils {
             connection.setDoOutput(true);
             connection.setRequestProperty("Accept", "*/*");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            //WorkItem handler needs to support the use case of Basic Authorization. It is a feature we need to support, not a vulnerability of a2d2
             connection.setRequestProperty("Authorization", 
-                    "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + (clientSecret == null ? "" : clientSecret)).getBytes()));
+                    "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + (clientSecret == null ? "" : clientSecret)).getBytes()));  //NOSONAR
             PrintStream os = new PrintStream(connection.getOutputStream());
             os.print(body);
             os.close();
