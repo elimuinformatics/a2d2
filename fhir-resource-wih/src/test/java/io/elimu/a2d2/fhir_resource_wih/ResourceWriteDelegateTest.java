@@ -17,6 +17,7 @@ package io.elimu.a2d2.fhir_resource_wih;
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
@@ -30,6 +31,7 @@ import ca.uhn.fhir.rest.client.impl.BaseClient;
 import io.elimu.a2d2.exception.FhirServerException;
 import io.elimu.a2d2.fhirresourcewih.ResourceWriteDelegate;
 
+@Ignore ("disable for now as the test is based on public testing server")
 public class ResourceWriteDelegateTest {
 
 	private static WorkItemManager workItemManager;
