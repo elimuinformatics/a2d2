@@ -16,6 +16,8 @@ package io.elimu.a2d2.helpers;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
+import java.time.ZoneId;
 import java.util.Calendar;
 
 /**
@@ -77,5 +79,51 @@ public class DateUtil {
 	    cal.clear(Calendar.MILLISECOND);
 	    cal.add(Calendar.MILLISECOND, cal.getTimeZone().getRawOffset());
 	    return cal.getTime();
+	}
+	
+	public static int millisDiffFromTimeZoneToLocal(String timezone) {
+		boolean dst = ZoneId.of(timezone).getRules().isDaylightSavings(new Date().toInstant());
+		int tzoffset = TimeZone.getTimeZone(timezone).getRawOffset() + (dst ? 3600000 : 0);
+		dst = ZoneId.systemDefault().getRules().isDaylightSavings(new Date().toInstant());
+		int localoffset = TimeZone.getDefault().getRawOffset() + (dst ? 360000 : 0);
+		return tzoffset - localoffset;
+	}
+	
+	public static Date adjustDateByTimezone(Date date, String timezone) {
+		return new Date(date.getTime() + millisDiffFromTimeZoneToLocal(timezone));
+	}
+	
+	public static String adjustCronStringByTimezone(String cronExpression, String timezone) {
+		int offset = millisDiffFromTimeZoneToLocal(timezone);
+		int offsetSeconds = (offset / 1000) % 60;
+		int offsetMinutes = (offset / 60000) % 60;
+		int offsetHours = (offset / 3600000) % 24;
+		try {
+			String[] parts = cronExpression.split(" ");
+			StringBuilder sb = new StringBuilder();
+			appendData(sb, parts[0], offsetSeconds);
+			appendData(sb, parts[1], offsetMinutes);
+			appendData(sb, parts[2], offsetHours);
+			for (int index = 3; index < parts.length; index++) {
+				sb.append(parts[index]).append(' ');
+			}
+			return sb.toString().trim();
+		} catch (Exception e) {
+			return cronExpression;
+		}
+	}
+	
+	private static void appendData(StringBuilder sb, String string, int offset) {
+		try {
+			int value = Integer.parseInt(string) + offset;
+			sb.append(value).append(' ');
+		} catch (Throwable e2) {
+			sb.append(string).append(' ');
+		}
+	}
+
+	public static void main(String[] args) {
+		String cronExpression = "0 0 8 ? * * *";
+		System.out.println("Adjusted cron expression = " + adjustCronStringByTimezone(cronExpression, "America/New_York"));
 	}
 }
