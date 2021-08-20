@@ -121,9 +121,4 @@ public class DateUtil {
 			sb.append(string).append(' ');
 		}
 	}
-
-	public static void main(String[] args) {
-		String cronExpression = "0 0 8 ? * * *";
-		System.out.println("Adjusted cron expression = " + adjustCronStringByTimezone(cronExpression, "America/New_York"));
-	}
 }
