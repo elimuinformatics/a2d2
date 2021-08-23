@@ -82,11 +82,15 @@ public class DateUtil {
 	}
 	
 	public static int millisDiffFromTimeZoneToLocal(String timezone) {
-		boolean dst = ZoneId.of(timezone).getRules().isDaylightSavings(new Date().toInstant());
-		int tzoffset = TimeZone.getTimeZone(timezone).getRawOffset() + (dst ? 3600000 : 0);
-		dst = ZoneId.systemDefault().getRules().isDaylightSavings(new Date().toInstant());
-		int localoffset = TimeZone.getDefault().getRawOffset() + (dst ? 360000 : 0);
-		return tzoffset - localoffset;
+		try {
+			boolean dst = ZoneId.of(timezone).getRules().isDaylightSavings(new Date().toInstant());
+			int tzoffset = TimeZone.getTimeZone(timezone).getRawOffset() + (dst ? 3600000 : 0);
+			dst = ZoneId.systemDefault().getRules().isDaylightSavings(new Date().toInstant());
+			int localoffset = TimeZone.getDefault().getRawOffset() + (dst ? 360000 : 0);
+			return tzoffset - localoffset;
+		} catch (Exception e) {
+			return 0;
+		}
 	}
 	
 	public static Date adjustDateByTimezone(Date date, String timezone) {
