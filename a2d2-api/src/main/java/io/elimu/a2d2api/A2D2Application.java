@@ -35,7 +35,27 @@ public class A2D2Application extends SpringBootServletInitializer {
     private static final Class<A2D2Application> applicationClass = A2D2Application.class;
 
 	public static void main(String[] args) {
+		enableBtxUniqueProps();
 		SpringApplication.run(applicationClass, args);
+	}
+
+	private static void enableBtxUniqueProps() {
+		String nodeId = System.getenv("PID");
+		if (nodeId == null) {
+			nodeId = String.valueOf(new java.util.Random(System.currentTimeMillis()).nextInt(10000));
+		}
+		String tlog1 = System.getProperty("bitronix.tm.journal.disk.logPart1Filename");
+		if (tlog1 == null) {
+			tlog1 = System.getProperty("user.home") + "/btm1/btm1.tlog";
+		}
+		tlog1 = tlog1.replace(".tlog", "-" + nodeId + ".tlog");
+		System.setProperty("bitronix.tm.jorunal.disk.logPart1Filename", tlog1);
+		String tlog2 = System.getProperty("bitronix.tm.journal.disk.logPart2Filename");
+		if (tlog2 == null) {
+			tlog2 = System.getProperty("user.home") + "/btm2/btm2.tlog";
+		}
+		tlog2 = tlog2.replace(".tlog", "-" + nodeId + ".tlog");
+		System.setProperty("bitronix.tm.journal.disk.logPart2Filename", tlog2);	
 	}
 
     @Override
