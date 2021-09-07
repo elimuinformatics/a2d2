@@ -16,9 +16,14 @@ public class DateUtilTest {
 	}
 
 	private String differentTz() {
-		String anytz = TimeZone.getAvailableIDs()[0];
-		if (TimeZone.getDefault().getID().equalsIgnoreCase(anytz)) {
-			anytz = TimeZone.getAvailableIDs()[TimeZone.getAvailableIDs().length - 1];
+		int myOffset = TimeZone.getDefault().getRawOffset();
+		String anytz = null;
+		for (String id : TimeZone.getAvailableIDs()) {
+			TimeZone tz = TimeZone.getTimeZone(id);
+			if (tz.getRawOffset() != myOffset) {
+				anytz = id;
+				break;
+			}
 		}
 		return anytz;
 	}
