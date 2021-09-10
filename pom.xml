@@ -314,7 +314,7 @@
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<version>1.4.17</version>
+				<version>1.4.18</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -428,8 +428,11 @@
 				<artifactId>dependency-check-maven</artifactId>
 				<version>6.2.2</version>
 				<configuration>
-				<skipProvidedScope>true</skipProvidedScope>
-				<skipRuntimeScope>true</skipRuntimeScope>
+					<skipProvidedScope>true</skipProvidedScope>
+					<skipRuntimeScope>true</skipRuntimeScope>
+					<suppressionFiles> 
+          				owasp-dependency-check-suppressions.xml
+       				 </suppressionFiles>
 				</configuration>
 				<reportSets>
 					<reportSet>
