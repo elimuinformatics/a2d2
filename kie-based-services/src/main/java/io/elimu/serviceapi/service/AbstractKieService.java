@@ -1,6 +1,6 @@
 package io.elimu.serviceapi.service;
 
-import java.io.IOException; 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -62,7 +61,6 @@ public abstract class AbstractKieService {
 	private static PoolingDataSource pds = null;
 	private static final Object lock = new Object();
 	private static final int TRANSACTION_TIMEOUT = Integer.parseInt(System.getProperty("bitronix.tm.timer.defaultTransactionTimeout", "600"));
-	private static final int THREADPOOL_COUNT = Integer.parseInt(System.getProperty("elimu.async.threadpool.count", "3"));
 	
 	private RuntimeManager manager;
 	private KieBase kbase;
@@ -181,7 +179,7 @@ public abstract class AbstractKieService {
 				addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, tm).
 				addEnvironmentEntry(EnvironmentName.TRANSACTION, tm).
 				addEnvironmentEntry(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, tsr).
-				addEnvironmentEntry("ExecutorService", Executors.newFixedThreadPool(THREADPOOL_COUNT)).
+				addEnvironmentEntry("ExecutorService", new InMemoryExecutorService(dep.getArtifactId())).
 				schedulerService(new QuartzSchedulerService()).
 				registerableItemsFactory(new ConfigRegisterableItemsFactory(kContainer, dep.getArtifactId(), deployDescriptor, shouldLogExecution(), getConfig())).
 				knowledgeBase(this.kbase).
