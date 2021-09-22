@@ -14,8 +14,6 @@
 
 package io.elimu.a2d2.processtest;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,12 +26,11 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Base64;
 import java.util.Properties;
+import java.util.Random;
 import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-import org.drools.core.io.impl.BaseResource;
 import org.drools.core.io.impl.ByteArrayResource;
 import org.drools.core.io.impl.ClassPathResource;
 import org.junit.Assert;
@@ -83,7 +80,6 @@ public class GenericServiceTest {
 		GenericTestUtils.deployKjar("generic-example-db-service.dsl", "2");
 	}
 
-	
 	@Test
 	public void testKieServiceDef() throws Exception {
 		String releaseId = System.getProperty("test.service.release") + ".test1";
@@ -121,6 +117,63 @@ public class GenericServiceTest {
 		} finally {
 			f.delete();
 		}
+	}
+	
+	@Test
+	public void testAsyncTaskService() throws Exception {
+		KieServices ks = KieServices.get();
+		String releaseId = "com.elimu.test:timer-process:1.0.0." + new Random().nextInt(500);
+		Dependency dep = new Dependency(releaseId);
+		ClassPathResource bpmn = (ClassPathResource) ks.getResources().newClassPathResource("timer-process-2.bpmn");
+		ByteArrayResource dsl = (ByteArrayResource) ks.getResources().newByteArrayResource(("kie.project.processId=timer-process-2\n"
+		+ "packages=testing\n"
+		+ "serviceCategory=test\n"
+		+ "kie.project.logexec=true\n"
+		+ "kie.project.space=elimu\n"
+		+ "proc.var.sleepTime.value=2000\n"
+		+ "proc.var.sleepTime.type=int\n").getBytes());
+		ByteArrayResource kmod = (ByteArrayResource) ks.getResources().newByteArrayResource(ks.newKieModuleModel().toXML().getBytes());
+		ByteArrayResource pom = (ByteArrayResource) ks.getResources().newByteArrayResource(
+				("<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+				"        xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" + 
+				"        <modelVersion>4.0.0</modelVersion>\n" + 
+				"        <groupId>" + dep.getGroupId() + "</groupId>\n" + 
+				"        <artifactId>" + dep.getArtifactId() + "</artifactId>\n" + 
+				"        <version>" + dep.getVersion() + "</version>\n" + 
+				"        <packaging>jar</packaging>\n" + 
+				"</project>\n").getBytes());
+		ByteArrayResource desc = (ByteArrayResource) ks.getResources().newByteArrayResource(
+				("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" + 
+						"<deployment-descriptor xsi:schemaLocation=\"http://www.jboss.org/jbpm deployment-descriptor.xsd\"" +
+						"                       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" + 
+						"    <persistence-unit></persistence-unit>\n" + 
+						"    <audit-persistence-unit></audit-persistence-unit>\n" + 
+						"    <audit-mode>NONE</audit-mode>\n" + 
+						"    <persistence-mode>NONE</persistence-mode>\n" + 
+						"    <runtime-strategy>PER_PROCESS_INSTANCE</runtime-strategy>\n" + 
+						"    <marshalling-strategies/>\n    <event-listeners/>\n    <task-event-listeners/>\n" + 
+						"    <globals/>\n    <work-item-handlers/>\n    <environment-entries/>\n" + 
+						"    <configurations/>\n    <required-roles/>\n    <remoteable-classes/>\n" + 
+						"    <limit-serialization-classes>true</limit-serialization-classes>\n" + 
+						"</deployment-descriptor>\n").getBytes());
+		URL path = ServiceUtils.toJarPath(dep, false);
+		Manifest manifest = new Manifest();
+		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		File f = new File(path.getFile());
+		f.getParentFile().mkdirs();
+		JarOutputStream target = new JarOutputStream(new FileOutputStream(f), manifest);
+		GenericTestUtils.add("META-INF/kie-deployment-descriptor.xml", desc, target);
+		GenericTestUtils.add("META-INF/maven/" + dep.getGroupId() + "/" + dep.getArtifactId() + "/pom.xml", pom, target);
+		GenericTestUtils.add("io/elimu/generic/example.bpmn2", bpmn, target);
+		GenericTestUtils.add("service.dsl", dsl, target);
+		GenericTestUtils.add("META-INF/kmodule.xml", kmod, target);
+		target.close();
+		
+		RunningServices.getInstance().register(new GenericKieBasedService(dep));
+		ServiceResponse resp = RunningServices.getInstance().get(dep.getArtifactId()).execute(new ServiceRequest());
+		Assert.assertNotNull(resp);
+		System.err.println(resp.getBody());
+		Thread.sleep(4000);
 	}
 	
 	@Test

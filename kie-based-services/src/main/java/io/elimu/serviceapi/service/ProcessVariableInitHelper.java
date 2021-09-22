@@ -115,7 +115,7 @@ public class ProcessVariableInitHelper {
 
 	private Object castValueforKeyType(Properties cds, String key, String value) throws ParseException{
 
-		String searchString = key.replace(".value", ".type");
+		String searchString = key.toLowerCase().replace(".value", ".type");
 
 		for (String iterKey : cds.stringPropertyNames()) {
 			if(iterKey.toLowerCase().contains(searchString)) {

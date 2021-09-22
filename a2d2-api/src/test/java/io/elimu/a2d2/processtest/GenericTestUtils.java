@@ -139,7 +139,7 @@ public class GenericTestUtils {
 		target.close();
 	}
 	
-	private static void add(String path, BaseResource resource, JarOutputStream target) throws IOException {
+	static void add(String path, BaseResource resource, JarOutputStream target) throws IOException {
 		  BufferedInputStream in = null;
 		  try {
 			  byte[] content = resource.getBytes();
