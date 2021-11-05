@@ -24,6 +24,8 @@ import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twilio.Twilio;
 import com.twilio.exception.ApiException;
 import com.twilio.rest.lookups.v1.PhoneNumber;
@@ -85,9 +87,14 @@ public class PhoneValidationWorkItemHandler implements WorkItemHandler {
 				.setType(Arrays.asList("carrier")).fetch();
 			//here, the phone number is valid
 			//based on country code we can determine nationality
-			workItemResult.put("isValid", Boolean.TRUE);
-			workItemResult.put("isUSANumber", "US".equalsIgnoreCase(phoneNumber.getCountryCode()));
-			workItemResult.put("countryCode", phoneNumber.getCountryCode());
+			workItemResult.put("isValid", phoneNumber.getCarrier().get("error_code") == null);
+			if (phoneNumber.getCarrier().get("error_code") == null) {
+				workItemResult.put("isUSANumber", "US".equalsIgnoreCase(phoneNumber.getCountryCode()));
+				workItemResult.put("countryCode", phoneNumber.getCountryCode());
+			} else {
+				workItemResult.put("errorCode", phoneNumber.getCarrier().get("error_code"));
+				workItemResult.put("errorMessage", parseErrorMessage(phoneNumber.getCarrier().get("error_code")));
+			}
 			manager.completeWorkItem(workItem.getId(), workItemResult);
 		} catch (ApiException goodError) {
 			if (goodError.getCode() == 20404) {
@@ -106,6 +113,29 @@ public class PhoneValidationWorkItemHandler implements WorkItemHandler {
 			throw new WorkItemHandlerException("Twilio Lookup API found a problem", badError);
 		}
 
+	}
+
+	String parseErrorMessage(String code) {
+		try {
+			int theCode = Integer.valueOf(code);
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode node = mapper.readTree(getClass().getResourceAsStream("/error-msgs.json"));
+			for (int index = 0; index < node.size(); index++) {
+				int thisCode = node.get(index).get("code").asInt();
+				if (thisCode == theCode) {
+					JsonNode msg = node.get(index).get("secondary_message");
+					if (msg == null || msg.isNull()) {
+						msg = node.get(index).get("message");
+					}
+					if (msg != null && msg.isTextual()) {
+						return msg.asText();
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error("Couldn't read error-msgs.json");
+		}
+		return "Undetermined error code validating phone: " + code;
 	}
 
 	@Override
