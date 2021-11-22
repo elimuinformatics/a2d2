@@ -33,6 +33,17 @@ public class ValidationTest {
 		Assert.assertEquals("Unprovisioned or out of coverage", workItem.getResult("errorMessage"));
 		Assert.assertEquals("60600", workItem.getResult("errorCode"));
 		System.out.println("Phone 2 is invalid");
+		
+		//workItem.setParameter("phone", "12035024615");
+		workItem.setParameter("phone", "18042221111");
+		handler.executeWorkItem(workItem, new NoOpWorkItemManager());
+		Assert.assertNotNull(workItem.getResult("isValid"));
+		Assert.assertEquals(Boolean.FALSE, workItem.getResult("isValid"));
+		Assert.assertNotNull(workItem.getResult("errorMessage"));
+		Assert.assertNotNull(workItem.getResult("errorCode"));
+		Assert.assertEquals("-1", workItem.getResult("errorCode"));
+		Assert.assertEquals("Phone is a landline, and not SMS enabled", workItem.getResult("errorMessage"));
+		System.out.println("Phone 3 is not landline");
 	}
 
 	@Test
