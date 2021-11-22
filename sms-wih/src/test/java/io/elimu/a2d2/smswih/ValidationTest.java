@@ -43,7 +43,7 @@ public class ValidationTest {
 		Assert.assertNotNull(workItem.getResult("errorCode"));
 		Assert.assertEquals("-1", workItem.getResult("errorCode"));
 		Assert.assertEquals("Phone is a landline, and not SMS enabled", workItem.getResult("errorMessage"));
-		System.out.println("Phone 3 is not landline");
+		System.out.println("Phone 3 is not SMS enabled");
 	}
 
 	@Test
