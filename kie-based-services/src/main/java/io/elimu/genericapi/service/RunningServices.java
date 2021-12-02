@@ -142,7 +142,8 @@ public class RunningServices {
 	}
 
 	public void downloadDependency(Dependency dep) {
-		if ("true".equalsIgnoreCase(String.valueOf(System.getProperty("kie.maven.offline.force")))) {
+		//if ("true".equalsIgnoreCase(String.valueOf(System.getProperty("kie.maven.offline.force")))) {
+		if (true) {
 			LOG.debug("Running in offline read mode");
 			return;
 		}
