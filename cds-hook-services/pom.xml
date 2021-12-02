@@ -24,9 +24,7 @@
 	</parent>
 	<artifactId>cds-hook-services</artifactId>
 	<description>A2D2 CDSHook Services</description>
-	<properties>
-		<ant.version>1.10.11</ant.version>
-	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -38,6 +36,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -94,7 +93,7 @@
 		<dependency>
 		    <groupId>org.apache.ant</groupId>
 		    <artifactId>ant</artifactId>
-		    <version>${ant.version}</version>
+		    <version>1.10.11</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
