@@ -35,6 +35,7 @@
 		<!-- <kie.version>7.50.0.Final</kie.version> -->
 		<start-class>io.elimu.a2d2api.A2D2Application</start-class>
 		<jasypt.version>3.0.3</jasypt.version>
+		<resteasy-core-version>4.7.3.Final</resteasy-core-version>
 	</properties>
 
 	<dependencies>
@@ -95,6 +96,15 @@
 				<exclusion>
 					<groupId>org.jboss.spec.javax.servlet</groupId>
 					<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.spec.javax.xml.bind</groupId>
+					<artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+				</exclusion>
+				
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core-spi</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -228,7 +238,25 @@
 					<groupId>commons-io</groupId>
 					<artifactId>commons-io</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.spec.javax.xml.bind</groupId>
+					<artifactId>jboss-jaxb-api_2.3_spec:1.0.1.Final</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core-spi</artifactId>
+				</exclusion>
+				
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.jboss.resteasy</groupId>
+		    <artifactId>resteasy-core</artifactId>
+		    <version>${resteasy-core-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
