@@ -27,15 +27,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.8</version>
+		<version>2.5.4</version>
 	</parent>
 
 	<properties>
 		<hapi.fhir.version>3.8.0</hapi.fhir.version>
-		<!-- <kie.version>7.50.0.Final</kie.version> -->
 		<start-class>io.elimu.a2d2api.A2D2Application</start-class>
 		<jasypt.version>3.0.3</jasypt.version>
-		<resteasy-core-version>4.7.3.Final</resteasy-core-version>
 	</properties>
 
 	<dependencies>
@@ -55,11 +53,6 @@
 			<version>1.4.18</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.11.4</version>
-		</dependency>	
-		<dependency> 
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
 			<version>0.9.5.4</version>
@@ -97,15 +90,6 @@
 					<groupId>org.jboss.spec.javax.servlet</groupId>
 					<artifactId>jboss-servlet-api_3.1_spec</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.spec.javax.xml.bind</groupId>
-					<artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-				</exclusion>
-				
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-core-spi</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -131,20 +115,20 @@
 		</dependency>
 		<!-- Added for phq9-registry converters to work -->
 		<dependency>
-                        <groupId>ca.uhn.hapi.fhir</groupId>
-                        <artifactId>hapi-fhir-utilities</artifactId>
-                        <version>${hapi.fhir.version}</version>
-                </dependency>
-                <dependency>
-                        <groupId>ca.uhn.hapi.fhir</groupId>
-                        <artifactId>hapi-fhir-converter</artifactId>
-                        <version>${hapi.fhir.version}</version>
-                </dependency>
-                <dependency>
-                        <groupId>ca.uhn.hapi.fhir</groupId>
-                        <artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
-                        <version>${hapi.fhir.version}</version>
-                </dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-utilities</artifactId>
+			<version>${hapi.fhir.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-converter</artifactId>
+			<version>${hapi.fhir.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
+			<version>${hapi.fhir.version}</version>
+		</dependency>
 		<!-- END added for phq9-registry converters -->
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -239,24 +223,10 @@
 					<artifactId>commons-io</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-core</artifactId>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.spec.javax.xml.bind</groupId>
-					<artifactId>jboss-jaxb-api_2.3_spec:1.0.1.Final</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-core-spi</artifactId>
-				</exclusion>
-				
 			</exclusions>
-		</dependency>
-		<dependency>
-		    <groupId>org.jboss.resteasy</groupId>
-		    <artifactId>resteasy-core</artifactId>
-		    <version>${resteasy-core-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -280,17 +250,6 @@
 			<version>1.9.13</version>
 		</dependency>
 		<!-- attribute level json comparisons -->
-		<dependency>
-			<groupId>com.jayway.jsonpath</groupId>
-			<artifactId>json-path</artifactId>
-			<version>2.4.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.ow2.asm</groupId>
-					<artifactId>asm</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path-assert</artifactId>
@@ -365,16 +324,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.2.3</version>
-		</dependency>
-		<dependency>
 			<groupId>com.j256.cloudwatchlogbackappender</groupId>
 			<artifactId>cloudwatchlogbackappender</artifactId>
 			<version>1.11</version>
@@ -385,8 +334,9 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
-		<!--leave this for now as backward compatibility concerns, remove after fixing omnibus A2D2-584 -->
+
+		<!--leave this for now as backward compatibility concerns, remove after 
+			fixing omnibus A2D2-584 -->
 		<dependency>
 			<groupId>org.jasypt</groupId>
 			<artifactId>jasypt</artifactId>
@@ -397,11 +347,11 @@
 			<artifactId>jasypt-spring-boot-starter</artifactId>
 			<version>${jasypt.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-        </dependency>
-        <dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>sms-wih</artifactId>
 			<version>${project.version}</version>
@@ -411,14 +361,14 @@
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
 			<id>nexus-repo-releases</id>
-		  	<name>Nexus Repository</name>
+			<name>Nexus Repository</name>
 			<url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
 			<layout>default</layout>
 		</repository>
 		<snapshotRepository>
 			<uniqueVersion>true</uniqueVersion>
-		  	<id>nexus-repo-snapshots</id>
-		  	<name>Nexus Repository</name>
+			<id>nexus-repo-snapshots</id>
+			<name>Nexus Repository</name>
 			<url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
 			<layout>default</layout>
 		</snapshotRepository>
