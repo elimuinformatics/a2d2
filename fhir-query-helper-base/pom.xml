@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>fhir-query-helper-base</artifactId>
-	<version>0.0.6</version>
+	<version>0.0.7</version>
 	<description>CDS Helper base</description>
 
 	<properties>

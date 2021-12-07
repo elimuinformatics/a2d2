@@ -20,7 +20,7 @@
 		<jackson.version>2.12.3</jackson.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>3.2.0</jedis.version>
-		<cds.helper.version>0.0.6</cds.helper.version>
+		<cds.helper.version>0.0.7</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
 		<jacoco.version>0.8.3</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
@@ -90,7 +90,7 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-helpers</artifactId>
-				<version>0.0.3</version>
+				<version>0.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
