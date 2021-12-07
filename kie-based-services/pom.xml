@@ -21,7 +21,6 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
-			<version>3.8.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -283,7 +282,7 @@
 			<groupId>org.drools</groupId>
 			<artifactId>drools-decisiontables</artifactId>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu2</artifactId>
 		</dependency>
@@ -328,7 +327,7 @@
    			 		<artifactId>commons-codec</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

@@ -101,7 +101,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-utilities</artifactId>
 			<exclusions>
@@ -110,7 +110,7 @@
    			 		<artifactId>commons-codec</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>
