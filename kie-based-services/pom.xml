@@ -14,7 +14,7 @@
 	<description>Kie Based Services</description>
 
 	<properties>
-		<cxf.version>3.4.4</cxf.version>
+		<cxf.version>3.4.5</cxf.version>
 	</properties>
 
 	<dependencies>
@@ -41,6 +41,10 @@
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-kie-services</artifactId>
 			<exclusions>
+				<exclusion>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-core</artifactId>
+				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-annotations</artifactId>
