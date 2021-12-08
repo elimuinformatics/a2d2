@@ -36,6 +36,7 @@
 		<!-- <kie.version>7.50.0.Final</kie.version> -->
 		<start-class>io.elimu.a2d2api.A2D2Application</start-class>
 		<jasypt.version>3.0.3</jasypt.version>
+		<commons-io.version>2.11.0</commons-io.version>
 	</properties>
 
 	<dependencyManagement>
@@ -62,6 +63,12 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>task-utilities</artifactId>
 			<version>1.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
@@ -105,6 +112,10 @@
 				<exclusion>
 					<groupId>org.jboss.spec.javax.servlet</groupId>
 					<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -343,6 +354,11 @@
 					<artifactId>commons-io</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>${commons-io.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
