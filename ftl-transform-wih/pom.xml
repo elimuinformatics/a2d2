@@ -67,16 +67,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!--dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-utilities</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-   			 		<artifactId>commons-codec</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency-->
 		<dependency>
 			<groupId>org.kie</groupId>
 			<artifactId>kie-dmn-core</artifactId>
