@@ -2,9 +2,9 @@ package io.elimu.a2d2.fhir;
 
 import java.text.SimpleDateFormat;
 
-import org.hl7.fhir.convertors.NullVersionConverterAdvisor40;
-import org.hl7.fhir.convertors.VersionConvertor_10_40;
-import org.hl7.fhir.convertors.VersionConvertor_30_40;
+import org.hl7.fhir.converter.NullVersionConverterAdvisor10_40;
+import org.hl7.fhir.convertors.factory.VersionConvertorFactory_10_40;
+import org.hl7.fhir.convertors.factory.VersionConvertorFactory_30_40;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -385,7 +385,7 @@ public class FhirTransformHelper {
 	 * @return an R4 resource representing the same data
 	 */
 	public static org.hl7.fhir.r4.model.Resource transformDstu3Resource(org.hl7.fhir.dstu3.model.Resource v3res) {
-		return VersionConvertor_30_40.convertResource(v3res, true);
+		return VersionConvertorFactory_30_40.convertResource(v3res);
 	}
 	
 	/**
@@ -407,8 +407,8 @@ public class FhirTransformHelper {
 		dstu2json = dstu2json.replaceAll("\"Female\"", "\"female\"");
 		dstu2json = dstu2json.replaceAll("\"Male\"", "\"male\"");
 		//For Mer
-		org.hl7.fhir.instance.model.Resource v2hl7resource = (org.hl7.fhir.instance.model.Resource) FhirContext.forDstu2Hl7Org().newJsonParser().parseResource(dstu2json);
-		org.hl7.fhir.r4.model.Resource v4resource = new VersionConvertor_10_40(new NullVersionConverterAdvisor40()).convertResource(v2hl7resource);
+		org.hl7.fhir.dstu2.model.Resource v2hl7resource = (org.hl7.fhir.dstu2.model.Resource) FhirContext.forDstu2Hl7Org().newJsonParser().parseResource(dstu2json);
+		org.hl7.fhir.r4.model.Resource v4resource = VersionConvertorFactory_10_40.convertResource(v2hl7resource, new NullVersionConverterAdvisor10_40());
 		return v4resource;
 	}
 }
