@@ -11,15 +11,16 @@
 		<kie.version>7.50.0.Final</kie.version>
 		<wb.kie.version>7.50.0.Final</wb.kie.version>
 		<junit.version>4.13.2</junit.version>
-		<hapi.fhir.version>3.8.0</hapi.fhir.version>
+		<hapi.fhir.version>5.6.0</hapi.fhir.version>
+		<hapi.fhir.utilities.version>5.5.7</hapi.fhir.utilities.version>
 		<json-simple.version>1.1.1</json-simple.version>
 		<h2.version>1.4.193</h2.version>
 		<hibernate.version>5.4.24.Final</hibernate.version>
 		<spring.boot.starter.version>2.4.8</spring.boot.starter.version>
-		<jackson.version>2.9.10.8</jackson.version>
+		<jackson.version>2.12.3</jackson.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>3.2.0</jedis.version>
-		<cds.helper.version>0.0.6</cds.helper.version>
+		<cds.helper.version>0.0.7</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
 		<jacoco.version>0.8.3</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
@@ -27,7 +28,7 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<httpclient.version>4.5.13</httpclient.version>
 		<httpcore.version>4.4.13</httpcore.version>
-		<jackson.databind>2.12.5</jackson.databind>
+		<gson.version>2.8.5</gson.version>
 	</properties>
 
 	<modules>
@@ -89,7 +90,7 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-helpers</artifactId>
-				<version>0.0.3</version>
+				<version>0.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
@@ -171,7 +172,7 @@
 				<groupId>org.jbpm</groupId>
 				<artifactId>jbpm-kie-services</artifactId>
 				<version>${kie.version}</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.jbpm</groupId>
 				<artifactId>jbpm-workitems-email</artifactId>
@@ -196,7 +197,7 @@
 				<groupId>org.jbpm</groupId>
 				<artifactId>jbpm-test</artifactId>
 				<version>${kie.version}</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.kie.server</groupId>
 				<artifactId>kie-server-api</artifactId>
@@ -218,9 +219,29 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-jsr310</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.googlecode.json-simple</groupId>
 				<artifactId>json-simple</artifactId>
 				<version>${json-simple.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${gson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -267,7 +288,7 @@
 			<dependency>
 				<groupId>ca.uhn.hapi.fhir</groupId>
 				<artifactId>hapi-fhir-utilities</artifactId>
-				<version>${hapi.fhir.version}</version>
+				<version>${hapi.fhir.utilities.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -308,6 +329,16 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>3.6</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.8.0</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>org.quartz-scheduler</groupId>
@@ -438,7 +469,7 @@
 				<configuration>
 					<skipProvidedScope>true</skipProvidedScope>
 					<skipRuntimeScope>true</skipRuntimeScope>
-					<suppressionFiles> 
+					<suppressionFiles>
           				owasp-dependency-check-suppressions.xml
        				 </suppressionFiles>
 				</configuration>
