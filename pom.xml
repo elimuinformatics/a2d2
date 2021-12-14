@@ -469,9 +469,9 @@
 				<configuration>
 					<skipProvidedScope>true</skipProvidedScope>
 					<skipRuntimeScope>true</skipRuntimeScope>
-					<suppressionFiles>
+				<suppressionFiles>
           				owasp-dependency-check-suppressions.xml
-       				 </suppressionFiles>
+       				</suppressionFiles>
 				</configuration>
 				<reportSets>
 					<reportSet>
