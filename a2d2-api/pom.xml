@@ -37,6 +37,7 @@
 		<start-class>io.elimu.a2d2api.A2D2Application</start-class>
 		<jasypt.version>3.0.3</jasypt.version>
 		<commons-io.version>2.11.0</commons-io.version>
+		<tomcat-embed-websocket.version>9.0.55</tomcat-embed-websocket.version>
 	</properties>
 
 	<dependencyManagement>
@@ -88,6 +89,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-websocket</artifactId>
+			<version>${tomcat-embed-websocket.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -252,6 +254,15 @@
 				<exclusion>
 					<groupId>org.ow2.asm</groupId>
 					<artifactId>asm</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core</artifactId>
+				</exclusion>
+				
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core-spi</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
