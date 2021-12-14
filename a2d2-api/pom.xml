@@ -255,6 +255,15 @@
 					<groupId>org.ow2.asm</groupId>
 					<artifactId>asm</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core</artifactId>
+				</exclusion>
+				
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core-spi</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
