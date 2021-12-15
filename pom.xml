@@ -172,7 +172,7 @@
 				<groupId>org.jbpm</groupId>
 				<artifactId>jbpm-kie-services</artifactId>
 				<version>${kie.version}</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.jbpm</groupId>
 				<artifactId>jbpm-workitems-email</artifactId>
@@ -197,7 +197,7 @@
 				<groupId>org.jbpm</groupId>
 				<artifactId>jbpm-test</artifactId>
 				<version>${kie.version}</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.kie.server</groupId>
 				<artifactId>kie-server-api</artifactId>
@@ -469,9 +469,9 @@
 				<configuration>
 					<skipProvidedScope>true</skipProvidedScope>
 					<skipRuntimeScope>true</skipRuntimeScope>
-					<suppressionFiles> 
-          				owasp-dependency-check-suppressions.xml
-       				 </suppressionFiles>
+					<suppressionFiles>
+          					owasp-dependency-check-suppressions.xml
+       					</suppressionFiles>
 				</configuration>
 				<reportSets>
 					<reportSet>

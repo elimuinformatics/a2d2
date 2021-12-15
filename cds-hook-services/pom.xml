@@ -218,7 +218,16 @@
 					<groupId>org.apache.ant</groupId>
 					<artifactId>ant</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -361,8 +370,8 @@
 			<artifactId>kie-based-services</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>org.jboss.spec.javax.xml.bind</groupId>
-					<artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId> 
 				</exclusion>
 			</exclusions>
 		</dependency>
