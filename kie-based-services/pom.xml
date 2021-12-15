@@ -37,9 +37,30 @@
 			<version>${kie.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.sisu</groupId>
+			<artifactId>org.eclipse.sisu.inject</artifactId>
+			<version>0.3.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-kie-services</artifactId>
 			<exclusions>
+				<exclusion>
+					<groupId>org.sonatype.plexus</groupId>
+					<artifactId>plexus-sec-dispatcher</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.sisu</groupId>
+					<artifactId>org.eclipse.sisu.inject</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-aether-provider</artifactId>
+				</exclusion>
 				<exclusion>
 					<groupId>org.apache.cxf</groupId>
 					<artifactId>cxf-core</artifactId>
@@ -63,18 +84,6 @@
 				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-utils</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.aether</groupId>
-    					<artifactId>aether-spi</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.aether</groupId>
-    					<artifactId>aether-util</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.aether</groupId>
-    					<artifactId>aether-api</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>commons-io</groupId>
@@ -105,24 +114,43 @@
     					<artifactId>jcl-over-slf4j</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.eclipse.aether</groupId>
-    					<artifactId>aether-impl</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>commons-codec</groupId>
     					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.aether</groupId>
+					<artifactId>aether-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.aether</groupId>
+					<artifactId>aether-impl</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.aether</groupId>
-    			<artifactId>aether-impl</artifactId>
-    			<version>1.1.0</version>
-			</dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>4.2.2</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.wagon</groupId>
     			<artifactId>wagon-provider-api</artifactId>
     			<version>3.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-utils</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.plexus</groupId>
@@ -132,22 +160,11 @@
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
     			<artifactId>plexus-component-annotations</artifactId>
-    			<version>1.6</version>
 		</dependency>
 		<dependency>
-    			<groupId>org.eclipse.aether</groupId>
-    			<artifactId>aether-spi</artifactId>
-    			<version>1.1.0</version>
-		</dependency>
-		<dependency>
-    			<groupId>org.eclipse.aether</groupId>
-    			<artifactId>aether-util</artifactId>
-    			<version>1.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.aether</groupId>
-    			<artifactId>aether-api</artifactId>		
-    			<version>1.1.0</version>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jbpm</groupId>
