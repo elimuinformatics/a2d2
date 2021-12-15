@@ -66,6 +66,14 @@
 			<artifactId>kie-server-api</artifactId>
 			<exclusions>
 				<exclusion>
+					<groupId>org.jboss.spec.javax.xml.bind</groupId>
+					<artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.spec.javax.xml.bind</groupId>
+					<artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-annotations</artifactId>
 				</exclusion>
@@ -115,6 +123,11 @@
 			<version>1.21</version>
 		</dependency>
 		<dependency>
+		    <groupId>org.jboss.resteasy</groupId>
+		    <artifactId>resteasy-core</artifactId>
+		    <version>5.0.1.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-services-common</artifactId>
 			<exclusions>
@@ -129,6 +142,10 @@
 				<exclusion>
 					<groupId>org.apache.maven</groupId>
 					<artifactId>maven-aether-provider</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-jaxrs</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
@@ -214,7 +231,16 @@
 					<groupId>com.google.inject</groupId>
 					<artifactId>guice</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -344,6 +370,10 @@
 				<exclusion>
 					<groupId>com.google.inject</groupId>
 					<artifactId>guice</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId> 
 				</exclusion>
 			</exclusions>
 		</dependency>

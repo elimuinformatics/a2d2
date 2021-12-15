@@ -38,6 +38,7 @@
 		<jasypt.version>3.0.3</jasypt.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<maven.version>3.8.4</maven.version>
+		<tomcat-embed-websocket.version>9.0.55</tomcat-embed-websocket.version>
 	</properties>
 
 	<dependencyManagement>
@@ -159,6 +160,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-websocket</artifactId>
+			<version>${tomcat-embed-websocket.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -254,6 +256,30 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-to-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>2.16.0</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-to-slf4j</artifactId>
+		    <version>2.16.0</version>
+			<exclusions>	   
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Spring security -->
 		<dependency>
@@ -323,6 +349,15 @@
 				<exclusion>
 					<groupId>org.ow2.asm</groupId>
 					<artifactId>asm</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core</artifactId>
+				</exclusion>
+				
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-core-spi</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
