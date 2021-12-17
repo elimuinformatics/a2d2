@@ -42,7 +42,6 @@
 		<spring.version>5.3.13</spring.version>
 		<resteasy-client.version>4.7.2.Final</resteasy-client.version>
 		<tomcat-embed-core.version>9.0.54</tomcat-embed-core.version>
-		<spring.version>5.3.13</spring.version>
 	</properties>
 
 	<dependencyManagement>
