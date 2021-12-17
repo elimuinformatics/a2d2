@@ -39,8 +39,9 @@
 		<commons-io.version>2.11.0</commons-io.version>
 		<maven.version>3.8.4</maven.version>
 		<tomcat-embed-websocket.version>9.0.55</tomcat-embed-websocket.version>
+		<spring.version>5.3.13</spring.version>
+		<resteasy-client.version>4.7.2.Final</resteasy-client.version>
 		<tomcat-embed-core.version>9.0.54</tomcat-embed-core.version>
-		<spring.version>5.3.13</spring.version>			
 	</properties>
 
 	<dependencyManagement>
@@ -638,7 +639,7 @@
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-client</artifactId>
-			<version>4.6.0.Final</version>
+			<version>${resteasy-client.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-io</groupId>
