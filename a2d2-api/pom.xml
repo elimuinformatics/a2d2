@@ -43,6 +43,8 @@
 		<resteasy-client.version>4.7.2.Final</resteasy-client.version>
 		<tomcat-embed-core.version>9.0.54</tomcat-embed-core.version>
 		<log4j.version>2.17.1</log4j.version>
+		<logback-classic.version>1.2.10</logback-classic.version>
+		<logback-core.version>1.2.9</logback-core.version>
 	</properties>
 
 	<dependencyManagement>
@@ -348,7 +350,27 @@
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-context</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback-classic.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
