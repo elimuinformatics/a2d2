@@ -23,7 +23,7 @@
 		<jedis.version>4.0.1</jedis.version>
 		<cds.helper.version>0.0.7</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
-		<jacoco.version>0.8.3</jacoco.version>
+		<jacoco.version>0.8.7</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
   		<sonar.organization>elimugithub</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -35,6 +35,8 @@
 		<junit-platform-commons.version>1.8.1</junit-platform-commons.version>
 		<apiguardian.version>1.1.2</apiguardian.version>
 		<netty.version>4.1.73.Final</netty.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<modules>
@@ -499,7 +501,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -564,6 +566,11 @@
 	<reporting>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>3.1.2</version>
+			</plugin>
+			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
 				<version>6.2.2</version>
@@ -571,8 +578,8 @@
 					<skipProvidedScope>true</skipProvidedScope>
 					<skipRuntimeScope>true</skipRuntimeScope>
 					<suppressionFiles>
-          					owasp-dependency-check-suppressions.xml
-       					</suppressionFiles>
+						owasp-dependency-check-suppressions.xml
+					</suppressionFiles>
 				</configuration>
 				<reportSets>
 					<reportSet>
