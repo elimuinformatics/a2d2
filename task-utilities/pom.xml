@@ -121,7 +121,16 @@
 					<groupId>org.eclipse.aether</groupId>
 					<artifactId>aether-transport-wagon</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.jsoup</groupId>
+					<artifactId>jsoup</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.jsoup</groupId>
+		    <artifactId>jsoup</artifactId>
+		    <version>1.14.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
