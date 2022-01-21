@@ -221,10 +221,6 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>org.mvel</groupId>
-					<artifactId>mvel2</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>com.thoughtworks.xstream</groupId>
 					<artifactId>xstream</artifactId>
 				</exclusion>
@@ -277,12 +273,6 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>fhir-resource-wih</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mvel</groupId>
-					<artifactId>mvel2</artifactId>
-				</exclusion>
-		   	</exclusions>
 		</dependency>
 		<!-- Added for phq9-registry converters to work -->
 		<dependency>
@@ -895,12 +885,6 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>sms-wih</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mvel</groupId>
-					<artifactId>mvel2</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

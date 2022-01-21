@@ -46,22 +46,9 @@
 			<artifactId>maven-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.inject</groupId>
-			<artifactId>jakarta.inject-api</artifactId>
-			<version>1.0.3</version>
-		</dependency>
-		<dependency>
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-kie-services</artifactId>
 			<exclusions>
-				<exclusion>
-					<groupId>jakarta.inject</groupId>
-					<artifactId>jakarta.inject-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jakarta.transaction</groupId>
-					<artifactId>jakarta.transaction-api</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>org.sonatype.plexus</groupId>
 					<artifactId>plexus-sec-dispatcher</artifactId>
