@@ -50,8 +50,8 @@ public class CacheUtil {
 		MEMORY, JEDIS, NO_CACHE
 	}
 
-	public static CacheService<ResponseEvent<FhirResponse>> getCacheService() {
-		CacheService<ResponseEvent<FhirResponse>> cacheService = null;
+	public static CacheService<ResponseEvent<FhirResponse<?>>> getCacheService() {
+		CacheService<ResponseEvent<FhirResponse<?>>> cacheService = null;
 		CACHE_TYPE type = CACHE_TYPE.valueOf(CACHE_TYPE_PROPERTY);
 		try {
 			switch (type) {

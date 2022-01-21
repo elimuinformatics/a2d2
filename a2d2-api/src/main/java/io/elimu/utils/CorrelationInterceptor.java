@@ -24,10 +24,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.owasp.encoder.Encode;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 @Component
-public class CorrelationInterceptor extends HandlerInterceptorAdapter {
+public class CorrelationInterceptor implements AsyncHandlerInterceptor {
 
 	private static final String CORRELATION_ID_HEADER_NAME = "X-Correlation-ID";
 	private static final String CORRELATION_ID_LOG_VAR_NAME = "correlationId";
@@ -46,7 +46,7 @@ public class CorrelationInterceptor extends HandlerInterceptorAdapter {
 			final Object handler, final Exception ex) throws Exception {
 		MDC.remove(CORRELATION_ID_LOG_VAR_NAME);
 	}
-
+	
 	private String getCorrelationIdFromHeader(final HttpServletRequest request) {
 		String correlationId = request.getHeader(CORRELATION_ID_HEADER_NAME);
 		if (StringUtils.isBlank(correlationId)) {

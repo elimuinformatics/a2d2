@@ -82,7 +82,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	protected final Rotator<FhirClientWrapper> clients;
 	private static final Map<String, Rotator<FhirClientWrapper>> FHIR_CLIENTS = new ConcurrentHashMap<>();
 
-	protected static CacheService<ResponseEvent<FhirResponse>> cacheService = CacheUtil.getCacheService();
+	protected static CacheService<ResponseEvent<FhirResponse<?>>> cacheService = CacheUtil.getCacheService();
 
 	public static final String BEARER = "Bearer";
 	protected static final String BASIC = "Basic";
@@ -285,7 +285,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		interceptors.clear();
 	}
 
-	public static CacheService<ResponseEvent<FhirResponse>> getCacheService() {
+	public static CacheService<ResponseEvent<FhirResponse<?>>> getCacheService() {
 		return cacheService;
 	}
 

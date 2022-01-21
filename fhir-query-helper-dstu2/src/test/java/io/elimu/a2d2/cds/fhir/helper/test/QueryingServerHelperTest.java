@@ -33,7 +33,6 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import io.elimu.a2d2.cds.fhir.helper.FhirFuture;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelper;
@@ -47,10 +46,6 @@ public class QueryingServerHelperTest {
 	private static Patient patient;
 
 	private static Observation observation;
-
-	private static transient FhirContext ctx = FhirContext.forDstu2();
-
-	private static IGenericClient client;
 
 	private static final String IDENTIFIER = "identifier=urn:oid:0.1.2.3.4.5.6.7|123456";
 
@@ -66,6 +61,7 @@ public class QueryingServerHelperTest {
 
 	@BeforeClass
 	public static void setup() {
+		FhirContext.forDstu2();
 		queryingServerHelper.setFhirUrl(FHIR2_URL);
 		patient = returnFHIR2TestPatient();
 		observation = returnFHIR2TestObservation();
@@ -101,6 +97,7 @@ public class QueryingServerHelperTest {
 	public void fhirQueryNoAuth() {
 		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
 		QueryingServerHelper qshNoAuth = new QueryingServerHelper("http://testURL/baseDstu2");
+		Assert.assertNotNull(qshNoAuth);
 		FhirResponse<List<IBaseResource>> iResourceList = queryingServerHelper.queryResourcesResponse("Observation",
 				patient.getId().getIdPart(), SUBJECT, IDENTIFIER);
 		Assert.assertNotNull(iResourceList);
@@ -144,7 +141,7 @@ public class QueryingServerHelperTest {
 
 	@Test
 	public void testCernerQueryNoAuth() {
-		FhirResponse fhirResponseCerner = new FhirResponse( null , 401, "Unauthorized");
+		FhirResponse<?> fhirResponseCerner = new FhirResponse<Object>( null , 401, "Unauthorized");
 		doReturn(fhirResponseCerner).when(queryingServerHelper).getResourceByIdResponse(any(), any());
 		FhirResponse<IBaseResource> ires = queryingServerHelper.getResourceByIdResponse("Patient", "4342012");
 		Assert.assertNotNull(ires);
@@ -154,7 +151,7 @@ public class QueryingServerHelperTest {
 
 	@Test
 	public void testCernerQuery2NoAuth() {
-		FhirResponse fhirResponseCerner = new FhirResponse( null , 401, "Unauthorized");
+		FhirResponse<?> fhirResponseCerner = new FhirResponse<Object>( null , 401, "Unauthorized");
 		doReturn(fhirResponseCerner).when(queryingServerHelper).queryResourcesResponse(any(), any(),any(),any());
 		FhirResponse<List<IBaseResource>> ires = queryingServerHelper.queryResourcesResponse("MedicationAdministration",
 				null, SUBJECT, "patient=4342012");

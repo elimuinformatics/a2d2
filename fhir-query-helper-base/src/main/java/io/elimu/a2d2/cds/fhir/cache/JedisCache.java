@@ -23,7 +23,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class JedisCache implements CacheService<ResponseEvent<FhirResponse>> {
+public class JedisCache implements CacheService<ResponseEvent<FhirResponse<?>>> {
 
 	private CACHE_TYPE cacheType = null;
 
@@ -64,20 +64,21 @@ public class JedisCache implements CacheService<ResponseEvent<FhirResponse>> {
 	    poolConfig.setTestOnBorrow(true);
 	    poolConfig.setTestOnReturn(true);
 	    poolConfig.setTestWhileIdle(true);
-	    poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(60).toMillis());
-	    poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(30).toMillis());
+	    poolConfig.setMinEvictableIdleTime(Duration.ofSeconds(60));
+	    poolConfig.setTimeBetweenEvictionRuns(Duration.ofSeconds(30));
 	    poolConfig.setNumTestsPerEvictionRun(3);
 	    poolConfig.setBlockWhenExhausted(true);
 	    return poolConfig;
 	}
 
 	@Override
-	public ResponseEvent<FhirResponse> get(String key) {
-		return (jedis.exists(key.getBytes())) ? (ResponseEvent<FhirResponse>) CacheUtil.getObjectFromByte(jedis.get(key.getBytes())) : null;
+	@SuppressWarnings("unchecked")
+	public ResponseEvent<FhirResponse<?>> get(String key) {
+		return (jedis.exists(key.getBytes())) ? (ResponseEvent<FhirResponse<?>>) CacheUtil.getObjectFromByte(jedis.get(key.getBytes())) : null;
 	}
 
 	@Override
-	public void put(String key, ResponseEvent<FhirResponse> value) {
+	public void put(String key, ResponseEvent<FhirResponse<?>> value) {
 		jedis.setex(key.getBytes(), JEDIS_TIMEOUT_KEY_SECONDS, CacheUtil.getByteFromObject(value));
 	}
 

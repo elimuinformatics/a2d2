@@ -101,6 +101,7 @@ public class TaskServiceHelper {
 		return taskEntityList;
 	}
 
+	@SuppressWarnings("unchecked")
 	public TaskEntity buildTaskEntity(Long taskId) {
 
 		TaskEntity taskEntity = new TaskEntity();

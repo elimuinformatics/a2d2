@@ -1,12 +1,12 @@
 package io.elimu.task.fhir.r4;
 
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 
-import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r4.model.Task;
 import org.jbpm.runtime.manager.impl.RuntimeEngineImpl;
@@ -37,6 +37,7 @@ import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.internal.task.api.model.InternalTask;
 import org.kie.internal.task.api.model.InternalTaskData;
 
+import ca.uhn.fhir.context.FhirContext;
 import io.elimu.task.xml.JaxbTaskWrapper;
 
 public class R4FhirTaskTest {
@@ -96,7 +97,7 @@ public class R4FhirTaskTest {
 	public void testJbpmTaskParsing() throws Exception {
 		RuntimeManager manager = createRuntimeManager();
 		R4FhirTaskEventListener listener = new R4FhirTaskEventListener(manager, "", "", "");
-		String json = IOUtils.toString(getClass().getResourceAsStream("/r4task-output-example.json"));
+		String json = IOUtils.toString(getClass().getResourceAsStream("/r4task-output-example.json"), StandardCharsets.UTF_8);
 		Task r4task = FhirContext.forR4().newJsonParser().parseResource(Task.class, json);
 		final TaskModelFactory tmf = TaskModelProvider.getFactory();
 		InternalTask origTask = (InternalTask) tmf.newTask();
