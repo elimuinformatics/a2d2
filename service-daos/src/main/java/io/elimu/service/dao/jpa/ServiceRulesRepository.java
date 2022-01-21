@@ -26,7 +26,7 @@ public interface ServiceRulesRepository extends CrudRepository<ServiceResources,
 
 	ServiceResources findByServiceName(String serviceName);
 
-	ServiceResources save(ServiceResources serviceRules);
+	<S extends ServiceResources> S save(S serviceRules);
 
 	ServiceResources findById(int id);
 

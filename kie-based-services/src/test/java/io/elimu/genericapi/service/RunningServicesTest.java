@@ -20,7 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
-import org.mockito.runners.MockitoJUnit44Runner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import io.elimu.a2d2.cdsmodel.Dependency;
 import io.elimu.a2d2.process.ServiceUtils;
@@ -28,7 +28,7 @@ import io.elimu.service.models.ServiceInfo;
 import io.elimu.serviceapi.service.AppContextUtils;
 import io.jsonwebtoken.lang.Assert;
 
-@RunWith(MockitoJUnit44Runner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RunningServicesTest {
 	
 	ServiceInfo serviceInfo = new ServiceInfo("example-service", 5L, "io.elimu.generic:example-service:1.0.1",

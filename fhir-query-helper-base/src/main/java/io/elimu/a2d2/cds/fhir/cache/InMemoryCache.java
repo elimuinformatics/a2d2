@@ -20,9 +20,9 @@ import io.elimu.a2d2.cds.fhir.cache.CacheUtil.CACHE_TYPE;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.ResponseEvent;
 
-public class InMemoryCache implements CacheService<ResponseEvent<FhirResponse>> {
+public class InMemoryCache implements CacheService<ResponseEvent<FhirResponse<?>>> {
 
-	private Map<String, ResponseEvent<FhirResponse>> responsesCache = null;
+	private Map<String, ResponseEvent<FhirResponse<?>>> responsesCache = null;
 	private CACHE_TYPE cacheType = null;
 
 	public InMemoryCache() {
@@ -38,12 +38,12 @@ public class InMemoryCache implements CacheService<ResponseEvent<FhirResponse>> 
 	}
 
 	@Override
-	public ResponseEvent<FhirResponse> get(String key) {
+	public ResponseEvent<FhirResponse<?>> get(String key) {
 		return responsesCache.get(key);
 	}
 
 	@Override
-	public void put(String key, ResponseEvent<FhirResponse> value) {
+	public void put(String key, ResponseEvent<FhirResponse<?>> value) {
 		responsesCache.put(key, value);
 
 	}

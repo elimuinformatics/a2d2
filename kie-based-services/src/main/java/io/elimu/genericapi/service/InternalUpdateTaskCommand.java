@@ -35,6 +35,7 @@ public class InternalUpdateTaskCommand extends TaskCommand<Void> {
 		this.taskId = task.getId();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Void execute(Context cntxt) {
 		TaskContext context = (TaskContext) cntxt;

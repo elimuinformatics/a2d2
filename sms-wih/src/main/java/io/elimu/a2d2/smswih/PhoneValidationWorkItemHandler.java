@@ -87,16 +87,16 @@ public class PhoneValidationWorkItemHandler implements WorkItemHandler {
 				.setType(Arrays.asList("carrier", "type")).fetch();
 			//here, the phone number is valid
 			//based on country code we can determine nationality
-			workItemResult.put("isValid", phoneNumber.getCarrier().get("error_code") == null && !"landline".equalsIgnoreCase(phoneNumber.getCarrier().get("type")));
-			if (phoneNumber.getCarrier().get("error_code") == null && !"landline".equalsIgnoreCase(phoneNumber.getCarrier().get("type"))) {
+			workItemResult.put("isValid", phoneNumber.getCarrier().get("error_code") == null && !"landline".equalsIgnoreCase(String.valueOf(phoneNumber.getCarrier().get("type"))));
+			if (phoneNumber.getCarrier().get("error_code") == null && !"landline".equalsIgnoreCase(String.valueOf(phoneNumber.getCarrier().get("type")))) {
 				workItemResult.put("isUSANumber", "US".equalsIgnoreCase(phoneNumber.getCountryCode()));
 				workItemResult.put("countryCode", phoneNumber.getCountryCode());
-			} else if ("landline".equalsIgnoreCase(phoneNumber.getCarrier().get("type"))) {
+			} else if ("landline".equalsIgnoreCase(String.valueOf(phoneNumber.getCarrier().get("type")))) {
 				workItemResult.put("errorCode", "-1");
 				workItemResult.put("errorMessage", "Phone is a landline, and not SMS enabled");
 			} else {
 				workItemResult.put("errorCode", phoneNumber.getCarrier().get("error_code"));
-				workItemResult.put("errorMessage", parseErrorMessage(phoneNumber.getCarrier().get("error_code")));
+				workItemResult.put("errorMessage", parseErrorMessage(String.valueOf(phoneNumber.getCarrier().get("error_code"))));
 			}
 			manager.completeWorkItem(workItem.getId(), workItemResult);
 		} catch (ApiException goodError) {

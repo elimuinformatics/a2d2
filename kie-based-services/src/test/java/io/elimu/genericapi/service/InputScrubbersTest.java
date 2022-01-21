@@ -20,7 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
-import org.mockito.runners.MockitoJUnit44Runner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import io.elimu.a2d2.cdsmodel.Dependency;
 import io.elimu.a2d2.genericmodel.ServiceRequest;
@@ -28,7 +28,7 @@ import io.elimu.a2d2.process.ServiceUtils;
 import io.elimu.service.models.ServiceInfo;
 import io.jsonwebtoken.lang.Assert;
 
-@RunWith(MockitoJUnit44Runner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class InputScrubbersTest {
 
 	ServiceInfo serviceInfo = new ServiceInfo("input-show-service", 5L, "io.elimu.generic:input-show-service:1.0.1",

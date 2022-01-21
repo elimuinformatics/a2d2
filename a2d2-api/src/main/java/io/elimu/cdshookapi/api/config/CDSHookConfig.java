@@ -31,7 +31,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaSessionFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 
@@ -90,10 +89,8 @@ public class CDSHookConfig {
     
     
    @Bean
-   public HibernateJpaSessionFactoryBean sessionFactory(EntityManagerFactory emf) {
-       HibernateJpaSessionFactoryBean fact = new HibernateJpaSessionFactoryBean();
-       fact.setEntityManagerFactory(emf);
-       return fact;
+   public SessionFactory sessionFactory(EntityManagerFactory emf) {
+	   return emf.unwrap(SessionFactory.class);
     }
    
    @Bean

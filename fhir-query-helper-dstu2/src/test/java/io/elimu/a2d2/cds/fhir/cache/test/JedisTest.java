@@ -30,6 +30,7 @@ import io.elimu.a2d2.cds.fhir.helper.ResponseEvent;
  * - default config => 127.0.0.1:6379
  *
  */
+@SuppressWarnings("unchecked")
 public class JedisTest {
 
 	private static final String CACHE_KEY1 = CacheUtil.PREFIX_KEY.concat("cacheKey1");
@@ -39,7 +40,7 @@ public class JedisTest {
 
 	public static final long RESPONSE_EVENT_TIMEOUT = 300_000; // 5 minutes
 
-	private static CacheService<ResponseEvent<FhirResponse>> cacheService;
+	private static CacheService<ResponseEvent<FhirResponse<?>>> cacheService;
 
 	public static void main(String[] args) throws Exception {
 	    redisConnection();
@@ -54,7 +55,6 @@ public class JedisTest {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void jedisTest() {
 		// implements java.util.concurrent.ConcurrentMap
 		cacheService.put(CACHE_KEY1, new ResponseEvent<>(retval_1, RESPONSE_EVENT_TIMEOUT));

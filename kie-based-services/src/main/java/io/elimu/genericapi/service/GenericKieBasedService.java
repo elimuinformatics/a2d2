@@ -138,6 +138,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				Map<String, Object> params = new HashMap<>();
 				params.put("serviceRequest", request);
 				params.put("serviceResponse", defaultResponse());
+				params.put("defaultCustomer", getDefaultCustomer());
 				params.putAll(processVariableHelper.initVariables(getDependency()));
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
