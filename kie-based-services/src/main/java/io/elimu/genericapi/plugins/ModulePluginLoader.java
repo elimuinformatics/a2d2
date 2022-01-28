@@ -15,7 +15,7 @@ public interface ModulePluginLoader {
 			+ type + "PluginLoader";
 		try {
 			Class<?> clz = cloader.loadClass(className);
-			Object obj = clz.newInstance();
+			Object obj = clz.getDeclaredConstructor().newInstance();
 			getDeclaredMethod(type, className, clz);
 			return (ModulePluginLoader) obj;
 		} catch (Exception e) {
