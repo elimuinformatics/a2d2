@@ -63,7 +63,7 @@ public class SimpleServiceController {
 	private ServiceHelper serviceHelper;
 
 	public static final String BASE_REST_URL = "/api/v2";
-	public static final String SERVICE_PARAM = "service.id";
+	public static final String SERVICE_PARAM = "serviceId";
 	public static final String BASE_SERVICE_URL = "/services/";
 	public static final String REST_SERVICE_URL = BASE_SERVICE_URL + "{" + SERVICE_PARAM + "}";
 	public static final String FULL_SERVICE_BASEURL = BASE_REST_URL + BASE_SERVICE_URL;
