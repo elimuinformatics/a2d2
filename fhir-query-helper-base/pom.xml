@@ -24,6 +24,7 @@
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
+		<relativePath/>
 	</parent>
 
 	<artifactId>fhir-query-helper-base</artifactId>
