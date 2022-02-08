@@ -20,6 +20,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.mixpanel</groupId>
+			<artifactId>mixpanel-java</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
 			<scope>test</scope>

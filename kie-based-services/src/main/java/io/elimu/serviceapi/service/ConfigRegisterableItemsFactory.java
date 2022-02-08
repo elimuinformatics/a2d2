@@ -35,6 +35,8 @@ import org.mvel2.ParserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.elimu.genericapi.service.MixPanelEventListener;
+
 public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ConfigRegisterableItemsFactory.class);
@@ -42,12 +44,14 @@ public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactor
 	private final Properties config;
 	private final String serviceId;
 	private final KieContainer kcontainer;
+	private MixPanelEventListener mixpanel;
 	
 	public ConfigRegisterableItemsFactory(KieContainer kcontainer, String serviceId, DeploymentDescriptor descriptor, boolean logExecution, Properties props) {
 		super(descriptor, logExecution);
 		this.kcontainer = kcontainer;
 		this.serviceId = serviceId;
 		this.config = props;
+		this.mixpanel = new MixPanelEventListener(props);
 	}
 
 	
@@ -108,6 +112,7 @@ public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactor
 		if (logExecution) {
 			listeners.add(new DebugProcessEventListener());
 		}
+		listeners.add(mixpanel);
 		return listeners;
 	}
 	
@@ -178,6 +183,7 @@ public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactor
 		if (logExecution) {
 			listeners.add(new DebugAgendaEventListener());
 		}
+		listeners.add(mixpanel);
 		return listeners;
 	}
 
@@ -187,6 +193,7 @@ public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactor
 		if (logExecution) {
 			listeners.add(new DebugRuleRuntimeEventListener());
 		}
+		listeners.add(mixpanel);
 		return listeners;
 	}
 
