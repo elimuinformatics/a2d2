@@ -5,6 +5,7 @@ import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,16 +68,35 @@ public class MixPanelStack implements Runnable {
 			}
 			ClientDelivery delivery = new ClientDelivery();
 			MessageBuilder messageBuilder = new MessageBuilder(token);
+			int count = 0;
 			while (!events.empty()) {
-				JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), "omnibusEvent", events.pop());
+				JSONObject evt = events.pop();
+				JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), evt.getString("eventDescription"), evt);
 				delivery.addMessage(omnibusEvent);
+				count++;
 			}
-			MixpanelAPI mixpanel = new MixpanelAPI();
-			try {
-				mixpanel.deliver(delivery);
-			} catch (IOException e) {
-				LOG.error("Could not send events to mixpanel", e);
+			if (count > 0) {
+				MixpanelAPI mixpanel = new MixpanelAPI();
+				try {
+					mixpanel.deliver(delivery);
+					LOG.debug("Sending " + count + " events");
+				} catch (IOException e) {
+					LOG.error("Could not send events to mixpanel", e);
+				}
 			}
+		}
+	}
+
+	public void registerTime(long timeInMillis, String serviceId) {
+		try {
+			JSONObject evt = new JSONObject();
+			evt.put("eventDescription", "Service " + serviceId + " invoked");
+			evt.put("eventType", ("Service Executed"));
+			evt.put("serviceName", serviceId);
+			evt.put("executionTime", timeInMillis);
+			add(evt);
+		} catch (JSONException e) {
+			LOG.warn("problem creating MixPanel event data", e);
 		}
 	}
 }

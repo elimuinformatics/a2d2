@@ -36,6 +36,7 @@
 		<apiguardian.version>1.1.2</apiguardian.version>
 		<netty.version>4.1.73.Final</netty.version>
 		<mixpanel.version>1.4.4</mixpanel.version>
+		<org.json.version>20211205</org.json.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -70,6 +71,11 @@
 				<groupId>com.mixpanel</groupId>
 				<artifactId>mixpanel-java</artifactId>
 				<version>${mixpanel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${org.json.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>

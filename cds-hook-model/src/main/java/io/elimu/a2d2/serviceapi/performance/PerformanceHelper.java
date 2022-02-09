@@ -44,7 +44,8 @@ public class PerformanceHelper {
     	} catch (Throwable e) { /* make sure nothing fails because of Performance measurements*/ }
     }
 
-    public void endClock(String moduleName, String methodCalled) {
+    public long endClock(String moduleName, String methodCalled) {
+    	long delta = -1;
     	try {
     		if(perfomanceDebugEnabled){
     			long end = System.currentTimeMillis();
@@ -58,7 +59,7 @@ public class PerformanceHelper {
     				//to determine where the error might be in the code
     				addTrace(moduleName, methodCalled);
     			} else {
-    				long delta = end - start.longValue();
+    				delta = end - start.longValue();
     				if(delta > 5000){
     					LOGGER.info("!!MORE THAN 5 SECONDS " + threadName + ": " + key + " - " + delta + "ms");
     				}else{
@@ -67,6 +68,7 @@ public class PerformanceHelper {
     			}
     		}
         } catch (Throwable e) { /* make sure nothing fails because of Performance measurements*/ }
+    	return delta;
     }
 
 	private void addTrace(String moduleName, String methodCalled) {

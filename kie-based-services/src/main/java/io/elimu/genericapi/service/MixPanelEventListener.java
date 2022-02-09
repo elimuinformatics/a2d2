@@ -116,9 +116,10 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 
 	@Override
 	public void beforeProcessStarted(ProcessStartedEvent event) {
-		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process.start")) {
+		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process." + event.getProcessInstance().getProcessId() + ".start")) {
 			try {
 				JSONObject evt = new JSONObject();
+				evt.put("eventDescription", "Process " + event.getProcessInstance().getProcessId() + " completed");
 				evt.put("eventType", ("beforeProcessStarted"));
 				evt.put("processId", (event.getProcessInstance().getProcessId()));
 				evt.put("processInstanceId", (event.getProcessInstance().getId()));
@@ -139,9 +140,10 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 
 	@Override
 	public void afterProcessCompleted(ProcessCompletedEvent event) {
-		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process.end")) {
+		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process." + event.getProcessInstance().getProcessId() +  ".end")) {
 			try {
 				JSONObject evt = new JSONObject();
+				evt.put("eventDescription", "Process " + event.getProcessInstance().getProcessId() + " completed");
 				evt.put("eventType", ("afterProcessCompleted"));
 				evt.put("processId", (event.getProcessInstance().getProcessId()));
 				evt.put("processInstanceId", (event.getProcessInstance().getId()));
@@ -158,6 +160,7 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 			try {
 				JSONObject evt = new JSONObject();
 				evt.put("eventType", ("beforeNodeTriggered"));
+				evt.put("eventDescription", "Process " + event.getProcessInstance().getProcessId() + " node of type " + event.getNodeInstance().getNodeName() + " triggered");
 				evt.put("processId", (event.getProcessInstance().getProcessId()));
 				evt.put("processInstanceId", (event.getProcessInstance().getId()));
 				if (event.getNodeInstance() != null && event.getNodeInstance().getNodeName() != null) {
@@ -183,6 +186,7 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process.node." + event.getNodeInstance().getNodeName() + ".left")) {
 			try {
 				JSONObject evt = new JSONObject();
+				evt.put("eventDescription", "Process " + event.getProcessInstance().getProcessId() + " node of type " + event.getNodeInstance().getNodeName() + " completed");
 				evt.put("eventType", ("afterNodeLeft"));
 				evt.put("processId", (event.getProcessInstance().getProcessId()));
 				evt.put("processInstanceId", (event.getProcessInstance().getId()));
@@ -205,6 +209,7 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process.var." + event.getVariableId() + ".change")) {
 			try {
 				JSONObject evt = new JSONObject();
+				evt.put("eventDescription", "Process " + event.getProcessInstance().getProcessId() + " variable " + event.getVariableId() + " changed");
 				evt.put("eventType", ("afterVariableChanged"));
 				evt.put("processId", (event.getProcessInstance().getProcessId()));
 				evt.put("processInstanceId", (event.getProcessInstance().getId()));
