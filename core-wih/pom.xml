@@ -31,6 +31,8 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
+		<mixpanel.version>1.4.4</mixpanel.version>
+		<org.json.version>20211205</org.json.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
