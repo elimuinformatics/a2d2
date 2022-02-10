@@ -71,7 +71,11 @@ public class MixPanelStack implements Runnable {
 			int count = 0;
 			while (!events.empty()) {
 				JSONObject evt = events.pop();
-				JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), evt.getString("eventDescription"), evt);
+				String evtName = evt.getString("eventDescription");
+				if (evtName == null || "".equals(evtName.trim())) {
+					evtName = "Omnibus General Event";
+				}
+				JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), evtName, evt);
 				delivery.addMessage(omnibusEvent);
 				count++;
 			}
@@ -90,7 +94,7 @@ public class MixPanelStack implements Runnable {
 	public void registerTime(long timeInMillis, String serviceId) {
 		try {
 			JSONObject evt = new JSONObject();
-			evt.put("eventDescription", "Service " + serviceId + " invoked");
+			evt.put("eventDescription", "Omnibus Service " + serviceId + " invoked");
 			evt.put("eventType", ("Service Executed"));
 			evt.put("serviceName", serviceId);
 			evt.put("executionTime", timeInMillis);
