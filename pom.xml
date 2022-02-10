@@ -68,16 +68,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.mixpanel</groupId>
-				<artifactId>mixpanel-java</artifactId>
-				<version>${mixpanel.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>${org.json.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-to-slf4j</artifactId>
 				<version>${log4j.version}</version>
