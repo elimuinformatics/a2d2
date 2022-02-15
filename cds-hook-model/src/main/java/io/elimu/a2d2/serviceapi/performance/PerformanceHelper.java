@@ -44,7 +44,11 @@ public class PerformanceHelper {
     	} catch (Throwable e) { /* make sure nothing fails because of Performance measurements*/ }
     }
 
-    public long endClock(String moduleName, String methodCalled) {
+    public void endClock(String moduleName, String methodCalled) {
+    	endClockRetTime(moduleName, methodCalled);
+    }
+
+	public long endClockRetTime(String moduleName, String methodCalled) {
     	long delta = -1;
     	try {
     		if(perfomanceDebugEnabled){
@@ -69,7 +73,7 @@ public class PerformanceHelper {
     		}
         } catch (Throwable e) { /* make sure nothing fails because of Performance measurements*/ }
     	return delta;
-    }
+	}
 
 	private void addTrace(String moduleName, String methodCalled) {
 		try {
