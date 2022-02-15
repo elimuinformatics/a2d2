@@ -23,6 +23,9 @@ import org.drools.persistence.PersistableRunner;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.WorkflowProcessInstance;
@@ -132,6 +135,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
 			KieSession ksession = runtime.getKieSession();
 			GenericDebugListener listener = enableDebugging(ksession, request);
+			enableMixpanel(ksession);
 			String procId = getProcessId(request.getMethod());
 			if (procId != null && !NOT_ALLOWED_METHOD_KEY.equals(procId)) {
 				LOG.info("Executing process " + procId + " for service " + getId());
@@ -182,6 +186,13 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		return body;
 	}
 
+	private void enableMixpanel(KieSession ksession) {
+		MixPanelEventListener listener = new MixPanelEventListener(getConfig());
+		ksession.addEventListener((AgendaEventListener) listener);
+		ksession.addEventListener((ProcessEventListener) listener);
+		ksession.addEventListener((RuleRuntimeEventListener) listener);
+	}
+	
 	private GenericDebugListener enableDebugging(KieSession ksession, ServiceRequest request) {
 		String defaultEnabled = System.getProperty("service.debug.enabled", "false");
 		String header = request.getHeader("x-enable-debug");
