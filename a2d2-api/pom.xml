@@ -46,6 +46,7 @@
 		<log4j.version>2.17.1</log4j.version>
 		<logback-classic.version>1.2.10</logback-classic.version>
 		<logback-core.version>1.2.9</logback-core.version>
+		<checker-qual.version>3.8.0</checker-qual.version>		
 	</properties>
 
 	<dependencyManagement>
@@ -792,7 +793,16 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-simple</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.checkerframework</groupId>
+					<artifactId>checker-qual</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.checkerframework</groupId>
+			<artifactId>checker-qual</artifactId>
+			<version>${checker-qual.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
