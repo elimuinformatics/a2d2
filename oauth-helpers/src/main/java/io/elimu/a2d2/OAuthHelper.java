@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.kie.api.runtime.rule.RuleContext;
 
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelperBase;
@@ -87,11 +86,11 @@ public class OAuthHelper {
 		return token;
 	}
 	
-	public static <T> T addOAuthToken(RuleContext context, QueryingServerHelperBase<T, IBaseResource> qsh) throws IllegalAccessException {
+	public static <T> T addOAuthToken(RuleContext context, QueryingServerHelperBase<T, ?> qsh) throws IllegalAccessException {
 		return addOAuthToken(context, qsh, "fhirScope", "fhirTokenUrl", "fhirClientId", "fhirClientSecret", "fhirPassword", "fhirUsername", "fhirGrantType");
 	}
 	
-	public static <T> T addOAuthToken(RuleContext context, QueryingServerHelperBase<T, IBaseResource> qsh,
+	public static <T> T addOAuthToken(RuleContext context, QueryingServerHelperBase<T, ?> qsh,
 			String scopeKey, String tokenUrlKey, String clientIdKey, String clientSecretKey, 
 			String passwordKey, String usernameKey, String grantTypeKey) throws IllegalAccessException {
 		List<String> params = new LinkedList<>();

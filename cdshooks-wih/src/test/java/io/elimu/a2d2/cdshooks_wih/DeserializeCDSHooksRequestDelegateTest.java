@@ -15,7 +15,6 @@
 package io.elimu.a2d2.cdshooks_wih;
 
 import org.drools.core.process.instance.impl.WorkItemImpl;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +24,6 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.internal.utils.KieHelper;
 
-import ca.uhn.fhir.model.api.IResource;
 import io.elimu.a2d2.cdshookswih.DeserializeCDSHooksRequestDelegate;
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 
@@ -48,7 +46,7 @@ public class DeserializeCDSHooksRequestDelegateTest {
 	}
 
 	@Test
-	public void testDeserializeCDSHooksRequestDelegateForType() {
+	public void testDeserializeCDSHooksRequestDelegateForType() throws Exception {
 
 		String requestJson = "{\"hook\":\"patient-view\",\"hookInstance\":\"d1577c69-dfbe-44ad-ba6d-3e05e953b2ea\",\"fhirServer\":\""+FHIR2_SERVER_URL+"\",\"user\":\"Practitioner/COREPRACTITIONER1\",\"fhirAuthorization\":{\"accessToken\":\"cn389ncoiwuencr\",\"tokenType\":\"Bearer\",\"expiresIn\":1000,\"scope\":\"wide\",\"subject\":\"OAuth 2.0\"},\"context\":{\"patientId\":\"SMART-1288992\"},\"prefetch\":{\"patient\":{\"resourceType\":\"Patient\",\"gender\":\"male\",\"birthDate\":\"1925-12-23\",\"id\":\"SMART-1288992\",\"active\":true}}}";
 
@@ -56,13 +54,13 @@ public class DeserializeCDSHooksRequestDelegateTest {
 		execution.setParameter("requestJson", requestJson);
 		wih.executeWorkItem(execution, workItemManager);
 		Object patient=execution.getResult("prefetchResource_patient");
-		Assert.assertTrue(patient instanceof IResource);
+		Assert.assertTrue(Class.forName("ca.uhn.fhir.model.api.IResource").isAssignableFrom(patient.getClass()));
 		Assert.assertEquals(execution.getResult("prefetchResource_patient").getClass().getName(),
 				"ca.uhn.fhir.model.dstu2.resource.Patient");
 	}
 
 	@Test
-	public void testDeserializeForTypeofPatientResourceType() {
+	public void testDeserializeForTypeofPatientResourceType() throws Exception {
 
 		String requestJson = "{\"hookInstance\":\"8ce4bd47-13bc-4a0e-be15-dd3663b3c834\",\"hook\":\"patient-view\",\"fhirServer\":\""+FHIR2_SERVER_URL+"\",\"user\":\"Practitioner/COREPRACTITIONER1\",\"patient\":\"2502\",\"context\":{\"patientId\":\"2502\"},\"prefetch\":{\"patient\":{\"resourceType\":\"Patient\",\"id\":\"2502\",\"meta\":{\"versionId\":\"10\",\"lastUpdated\":\"2017-10-03T19:52:22.000+00:00\"},\"text\":{\"status\":\"generated\",\"div\":\"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><div class=\\\"hapiHeaderText\\\">Mr. Paul <b>WELLES </b></div><table class=\\\"hapiPropertyTable\\\"><tbody><tr><td>Identifier</td><td>98201232</td></tr><tr><td>Address</td><td><span>1 North LaSalle Street </span><br/><span>Chicago </span><span>IL </span><span>USA </span></td></tr><tr><td>Date of birth</td><td><span>02 July 1986</span></td></tr></tbody></table></div>\"},\"identifier\":[{\"use\":\"usual\",\"type\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/v2/0203\",\"code\":\"MR\"}]},\"value\":\"98201232\"},{\"use\":\"usual\",\"type\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/v2/0203\",\"code\":\"PLAC\"}]},\"value\":\"67890\"}],\"active\":true,\"name\":[{\"use\":\"official\",\"family\":[\"Welles\"],\"given\":[\"Paul\"],\"prefix\":[\"Mr.\"]}],\"telecom\":[{\"system\":\"phone\",\"value\":\"(312) 555-2967\",\"use\":\"mobile\"},{\"system\":\"phone\",\"use\":\"home\"}],\"gender\":\"Male\",\"birthDate\":\"1955-07-06\",\"deceasedBoolean\":false,\"address\":[{\"use\":\"home\",\"line\":[\"1 North LaSalle Street\"],\"city\":\"Chicago\",\"state\":\"IL\",\"postalCode\":\"60602\",\"country\":\"USA\"}],\"maritalStatus\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/v3/MaritalStatus\",\"code\":\"M\",\"display\":\"Married\"}]},\"multipleBirthBoolean\":false,\"contact\":[{\"relationship\":[{\"coding\":[{\"system\":\"http://hl7.org/fhir/patient-contact-relationship\",\"code\":\"parent\",\"display\":\"Parent\"}]}],\"name\":{\"use\":\"usual\",\"text\":\"Mary Welles\"},\"telecom\":[{\"system\":\"phone\",\"value\":\"217-555-2016\",\"use\":\"home\"}]}],\"communication\":[{\"language\":{\"text\":\"English(US)\"}}]}}}";
 
@@ -70,11 +68,11 @@ public class DeserializeCDSHooksRequestDelegateTest {
 		execution.setParameter("requestJson", requestJson);
 		wih.executeWorkItem(execution, workItemManager);
 		Object patient=execution.getResult("prefetchResource_patient");
-		Assert.assertTrue(patient instanceof IBaseResource);
+		Assert.assertTrue(Class.forName("org.hl7.fhir.instance.model.api.IBaseResource").isAssignableFrom(patient.getClass()));
 	}
 
 	@Test
-	public void testDeserializeForTypeofQuestionnaireResponseResourceType() {
+	public void testDeserializeForTypeofQuestionnaireResponseResourceType() throws Exception {
 
 		String requestJson = "{\"hookInstance\":\"d1577c69-dfbe-44ad-ba6d-3e05e953b2ea\",\"hook\":\"questionnaire\",\"user\":\"Practitioner/123\",\"patient\":\"4591\",\"prefetch\":{\"patient\":{\"resource\":{\"resourceType\":\"Patient\",\"id\":\"4591\",\"meta\":{\"versionId\":\"3\",\"lastUpdated\":\"2017-12-04T17:30:42.000+00:00\"},\"text\":{\"status\":\"generated\",\"div\":\"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><div class=\\\"hapiHeaderText\\\">Mr. Al <b>GOODE </b></div><table class=\\\"hapiPropertyTable\\\"><tbody><tr><td>Identifier</td><td>9539012</td></tr><tr><td>Address</td><td></td></tr><tr><td>Date of birth</td><td><span>14 July 1965</span></td></tr></tbody></table></div>\"},\"identifier\":[{\"use\":\"usual\",\"type\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/v2/0203\",\"code\":\"MR\"}]},\"system\":\"urn:oid:0.1.2.3.4.5.6.7\",\"value\":\"9539012\"}],\"active\":true,\"name\":[{\"use\":\"official\",\"family\":[\"Goode\"],\"given\":[\"Al\"],\"prefix\":[\"Mr.\"]}],\"telecom\":[{\"system\":\"phone\",\"use\":\"mobile\"},{\"system\":\"phone\",\"use\":\"home\"}],\"gender\":\"Male\",\"birthDate\":\"1965-07-14\",\"deceasedBoolean\":false,\"address\":[{\"use\":\"home\"}],\"maritalStatus\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/v3/MaritalStatus\",\"code\":\"M\",\"display\":\"Married\"}]},\"multipleBirthBoolean\":false,\"contact\":[{\"relationship\":[{\"coding\":[{\"system\":\"http://hl7.org/fhir/patient-contact-relationship\",\"code\":\"partner\",\"display\":\"Partner\"}]}],\"name\":{\"use\":\"usual\",\"text\":\"Ms. Goode\"},\"telecom\":[{\"system\":\"phone\",\"use\":\"home\"}]}],\"communication\":[{\"language\":{\"text\":\"English\"}}]}}},\"context\":{\"questionnaireResponse\":{\"resourceType\":\"QuestionnaireResponse\",\"status\":\"completed\",\"authored\":\"2018-06-14T17:38:49+05:30\",\"group\":{\"linkId\":\"centor-score\",\"title\":\"centor-score\",\"question\":[{\"linkId\":\"tonsillar-exudate-boolean\",\"answer\":[{\"valueBoolean\":false}]},{\"linkId\":\"lack-of-cough-boolean\",\"answer\":[{\"valueBoolean\":false}]},{\"linkId\":\"fever-present-boolean\",\"answer\":[{\"valueBoolean\":false}]},{\"linkId\":\"swollen-nodes-boolean\",\"answer\":[{\"valueBoolean\":false}]}]}}}}";
 
@@ -82,7 +80,7 @@ public class DeserializeCDSHooksRequestDelegateTest {
 		execution.setParameter("requestJson", requestJson);
 		wih.executeWorkItem(execution, workItemManager);
 		Object patient=execution.getResult("contextResource_questionnaireResponse");
-		Assert.assertTrue(patient instanceof IBaseResource);
+		Assert.assertTrue(Class.forName("org.hl7.fhir.instance.model.api.IBaseResource").isAssignableFrom(patient.getClass()));
 	}
 
 	@Test

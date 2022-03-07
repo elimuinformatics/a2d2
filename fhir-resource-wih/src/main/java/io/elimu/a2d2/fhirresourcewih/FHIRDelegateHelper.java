@@ -18,12 +18,6 @@ import java.net.URL;
 import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.api.EncodingEnum;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.client.impl.BaseClient;
-import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
-import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import io.elimu.a2d2.exception.FhirServerException;
 import io.elimu.a2d2.parsing.FhirParseUtil.FormatType;
 
@@ -38,20 +32,23 @@ public class FHIRDelegateHelper {
 	private static final String FHIR3 = "FHIR3";
 	private static final String FHIR2 = "FHIR2";
 
-	public IGenericClient getFhirClient(FhirContext ctx, URL fhirUrl) {
+	public Object getFhirClient(Object ctx, URL fhirUrl) {
 
-		IGenericClient client = null;
-
-		if (fhirUrl != null) {
-			client = ctx.newRestfulGenericClient(fhirUrl.toString());
-			client.setEncoding(EncodingEnum.JSON);
-			((BaseClient) client).setDontValidateConformance(true);
+		Object client = null;
+		try {
+			if (fhirUrl != null) {
+				client = ctx.getClass().getDeclaredMethod("newRestfulGenericClient", String.class).invoke(ctx, fhirUrl.toString());
+				client.getClass().getDeclaredMethod("setEncoding", Class.forName("ca.uhn.fhir.rest.api.EncodingEnum")).invoke(client, Class.forName("ca.uhn.fhir.rest.api.EncodingEnum").getDeclaredField("JSON"));
+				client.getClass().getDeclaredMethod("setDontValidateConformance", Boolean.class).invoke(client, true);
+			}
+	
+			return client;
+		} catch (Exception e) {
+			throw new RuntimeException("Couldn't invoke client", e);
 		}
-
-		return client;
 	}
 
-	public boolean authenticateFhirServer(IGenericClient client, String authHeader) {
+	public boolean authenticateFhirServer(Object client, String authHeader) {
 
 		boolean isAuthenticated = true;
 
@@ -61,9 +58,11 @@ public class FHIRDelegateHelper {
 				String token = authHeader.replace("Basic ", "");
 				String tokenDecrypt = new String(Base64.getDecoder().decode(token));
 				String[] parts = tokenDecrypt.split(":");
-				client.registerInterceptor(new BasicAuthInterceptor(parts[0], parts[1]));
+				Object interceptor = Class.forName("ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor").getConstructor(String.class, String.class).newInstance(parts[0], parts[1]);
+				client.getClass().getDeclaredMethod("registerInterceptor", Object.class).invoke(client, interceptor);
 			} else if (authHeader.startsWith("Bearer ")) {
-				client.registerInterceptor(new BearerTokenAuthInterceptor(authHeader.replace("Bearer ", "")));
+				Object interceptor = Class.forName("ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor").getConstructor(String.class).newInstance(authHeader.replace("Bearer ", ""));
+				client.getClass().getDeclaredMethod("registerInterceptor", Object.class).invoke(client, interceptor);
 			}
 		}
 		}catch(Exception ex) {
@@ -72,24 +71,28 @@ public class FHIRDelegateHelper {
 		return isAuthenticated;
 	}
 
-	public FhirContext getFhirContext(String fhirType) {
-		FhirContext ctx = null;
-		switch (String.valueOf(fhirType)) {
-		case DSTU2:
-			ctx = FhirContext.forDstu2();
-			break;
-		case STU3:
-			ctx = FhirContext.forDstu3();
-			break;
-		case R4:
-			ctx = FhirContext.forR4();
-			break;
-		default:
-			ctx = FhirContext.forDstu2();
-			break;
+	public Object getFhirContext(String fhirType) {
+		Object ctx = null;
+		try {
+			switch (String.valueOf(fhirType)) {
+			case DSTU2:
+				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forDstu2").invoke(null);
+				break;
+			case STU3:
+				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forDstu3").invoke(null);
+				break;
+			case R4:
+				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forR4").invoke(null);
+				break;
+			default:
+				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forDstu2").invoke(null);
+				break;
+			}
+	
+			return ctx;
+		} catch (Exception e) {
+			throw new RuntimeException("Coudln't start FhirContext", e);
 		}
-
-		return ctx;
 	}
 
 	public FormatType getFormatType(String fhirType) {

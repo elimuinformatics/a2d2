@@ -16,15 +16,11 @@ package io.elimu.a2d2.fhirresourcewih;
 
 import java.net.URL;
 import java.util.Map;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import io.elimu.a2d2.exception.FhirServerException;
 import io.elimu.a2d2.parsing.FhirParseUtil;
 
@@ -33,6 +29,7 @@ public class ResourceWriteDelegate implements WorkItemHandler {
 	FHIRDelegateHelper fhirdelegatehelper = null;
 	private static final Logger log = LoggerFactory.getLogger(ResourceWriteDelegate.class);
 	
+	private static final String REFLECT_ERR = "Reflection error";
 	private static final String MISSING_RSRC = "Resource is missing";
 	private static final String CLIENT_NULL = "Fhir client is null : check server URL";
 
@@ -53,11 +50,11 @@ public class ResourceWriteDelegate implements WorkItemHandler {
 				log.error(MISSING_RSRC);
 				throw new FhirServerException(MISSING_RSRC);
 			}
-			IBaseResource fhirResource = getFhirResource(oResource);
+			Object fhirResource = getFhirResource(oResource);
 
-			FhirContext ctx = fhirdelegatehelper.getFhirContext(fhirType);
+			Object ctx = fhirdelegatehelper.getFhirContext(fhirType);
 			if (ctx != null) {
-				IGenericClient client = fhirdelegatehelper.getFhirClient(ctx, serverUrl);
+				Object client = fhirdelegatehelper.getFhirClient(ctx, serverUrl);
 				if (fhirResource == null && oResource instanceof String) {
 					fhirResource = FhirParseUtil.getInstance().parseJsonResource(fhirdelegatehelper.getFormatType(fhirType), oResource.toString());
 				}
@@ -86,28 +83,39 @@ public class ResourceWriteDelegate implements WorkItemHandler {
 		log.trace("ResourceWriteDelegate is completed");
 	}
 	
-	private IBaseResource getFhirResource(Object oResource) {
-		if (oResource instanceof IBaseResource) {
-			return (IBaseResource) oResource;
-		} else if (oResource instanceof String && ((String) oResource).isEmpty()) {
-			log.error("Resource is empty or not a String");
-			throw new FhirServerException(MISSING_RSRC);
+	private Object getFhirResource(Object oResource) {
+		try {
+			if (oResource != null && Class.forName("org.hl7.fhir.instance.model.api.IBaseResource").isAssignableFrom(oResource.getClass())) {
+				return oResource;
+			} else if (oResource instanceof String && ((String) oResource).isEmpty()) {
+				log.error("Resource is empty or not a String");
+				throw new FhirServerException(MISSING_RSRC);
+			}
+		} catch (ClassNotFoundException e) {
+			log.error("Resource cannot be invoked with reflect", e);
+			throw new FhirServerException(REFLECT_ERR);
 		}
 		return null;
 	}
 	
-	private boolean completeworkItem(IGenericClient client, IBaseResource fhirResource,
-			Map<String, Object> workItemResult, WorkItemManager manager, WorkItem workItem, String authHeader,String actionType) {
+	private boolean completeworkItem(Object client, Object fhirResource,
+			Map<String, Object> workItemResult, WorkItemManager manager, WorkItem workItem, String authHeader,String actionType) throws Exception {
 		if (fhirdelegatehelper.authenticateFhirServer(client, authHeader)) {
-			MethodOutcome result = null;
+			Object result = null;
 			if(actionType!=null && actionType.equalsIgnoreCase("update")) {
-				result = client.update().resource(fhirResource).execute();
+				Object execPath = client.getClass().getDeclaredMethod("update").invoke(client);
+				execPath = execPath.getClass().getDeclaredMethod("resource", Class.forName("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(execPath, fhirResource);
+				result = execPath.getClass().getDeclaredMethod("execute").invoke(execPath);
 			}else {
-				result = client.create().resource(fhirResource).execute();
+				Object execPath = client.getClass().getDeclaredMethod("create").invoke(client);
+				execPath = execPath.getClass().getDeclaredMethod("resource", Class.forName("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(execPath, fhirResource);
+				result = execPath.getClass().getDeclaredMethod("execute").invoke(execPath);
 			}
 			
 			if (result != null) {
-				workItemResult.put("fhirResourceId", result.getId().getIdPartAsLong().toString());
+				Object resIdObj = result.getClass().getDeclaredMethod("getId").invoke(result);
+				resIdObj = resIdObj.getClass().getDeclaredMethod("getIdPartAsLong").invoke(resIdObj);
+				workItemResult.put("fhirResourceId", resIdObj.toString());
 				manager.completeWorkItem(workItem.getId(), workItemResult);
 			}
 			return true;

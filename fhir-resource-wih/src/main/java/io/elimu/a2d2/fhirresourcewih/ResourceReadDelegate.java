@@ -21,10 +21,6 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.StringClientParam;
-import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import io.elimu.a2d2.exception.FhirServerException;
 
 public class ResourceReadDelegate implements WorkItemHandler {
@@ -57,9 +53,9 @@ public class ResourceReadDelegate implements WorkItemHandler {
 				throw new FhirServerException("Required input parameter missing");
 			}
 
-			FhirContext ctx = fhirdelegatehelper.getFhirContext(fhirVersion);
+			Object ctx = fhirdelegatehelper.getFhirContext(fhirVersion);
 
-			IGenericClient client = fhirdelegatehelper.getFhirClient(ctx, fhirServer);
+			Object client = fhirdelegatehelper.getFhirClient(ctx, fhirServer);
 
 			if (client != null) {
 
@@ -68,21 +64,25 @@ public class ResourceReadDelegate implements WorkItemHandler {
 					Map<String, Object> results = workItem.getResults();
 
 					if (fhirVersion.equalsIgnoreCase(DSTU2)) {
-						results.put(RESOURCE, ((ca.uhn.fhir.model.dstu2.resource.Bundle) client.search()
-									.forResource(resourceType)
-									.where(new StringClientParam("_id").matchesExactly().value(resourceId))
-									.execute()).getEntryFirstRep().getResource());
-
-					} else if (fhirVersion.equalsIgnoreCase(STU3)) {
-						results.put(RESOURCE, ((org.hl7.fhir.dstu3.model.Bundle) client.search()
-								.forResource(resourceType)
-								.where(new TokenClientParam("_id").exactly().code(resourceId))
-								.execute()).getEntryFirstRep().getResource());
-					} else if (fhirVersion.equalsIgnoreCase(R4)) {
-						results.put(RESOURCE, ((org.hl7.fhir.r4.model.Bundle) client.search()
-								.forResource(resourceType)
-								.where(new TokenClientParam("_id").exactly().code(resourceId))
-								.execute()).getEntryFirstRep().getResource());
+						Object searchObj = client.getClass().getDeclaredMethod("search").invoke(client);
+						Object forResource = searchObj.getClass().getDeclaredMethod("forResource", String.class).invoke(searchObj, resourceType);
+						Object stringClientParam = Class.forName("ca.uhn.fhir.rest.gclient.StringClientParam").getConstructor(String.class).newInstance("_id");
+						stringClientParam = stringClientParam.getClass().getMethod("matchesExactly").invoke(stringClientParam);
+						stringClientParam = stringClientParam.getClass().getMethod("value", String.class).invoke(stringClientParam, resourceId);
+						Object whereObj = forResource.getClass().getDeclaredMethod("where", Class.forName("ca.uhn.fhir.rest.gclient.ICriterion")).invoke(forResource, stringClientParam);
+						Object execObj = whereObj.getClass().getDeclaredMethod("execute").invoke(whereObj);
+						Object entryObj = execObj.getClass().getDeclaredMethod("getEntryFirstRep").invoke(execObj);
+						results.put(RESOURCE, entryObj.getClass().getMethod("getResource").invoke(entryObj));
+					} else if (fhirVersion.equalsIgnoreCase(STU3) || fhirVersion.equalsIgnoreCase(R4)) {
+						Object searchObj = client.getClass().getDeclaredMethod("search").invoke(client);
+						Object forResource = searchObj.getClass().getDeclaredMethod("forResource", String.class).invoke(searchObj, resourceType);
+						Object tokenClientParam = Class.forName("ca.uhn.fhir.rest.gclient.TokenClientParam").getConstructor(String.class).newInstance("_id");
+						tokenClientParam = tokenClientParam.getClass().getMethod("exactly").invoke(tokenClientParam);
+						tokenClientParam = tokenClientParam.getClass().getMethod("code", String.class).invoke(tokenClientParam, resourceId);
+						Object whereObj = forResource.getClass().getDeclaredMethod("where", Class.forName("ca.uhn.fhir.rest.gclient.ICriterion")).invoke(forResource, tokenClientParam);
+						Object execObj = whereObj.getClass().getDeclaredMethod("execute").invoke(whereObj);
+						Object entryObj = execObj.getClass().getDeclaredMethod("getEntryFirstRep").invoke(execObj);
+						results.put(RESOURCE, entryObj.getClass().getMethod("getResource").invoke(entryObj));
 					}
 
 					manager.completeWorkItem(workItem.getId(), results);

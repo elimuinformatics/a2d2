@@ -61,6 +61,21 @@
     	<groupId>io.elimu.a2d2</groupId>
     	<artifactId>fhir-parse-util</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>ca.uhn.hapi.fhir</groupId>
+    	<artifactId>hapi-fhir-structures-dstu2</artifactId>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>ca.uhn.hapi.fhir</groupId>
+    	<artifactId>hapi-fhir-structures-dstu3</artifactId>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>ca.uhn.hapi.fhir</groupId>
+    	<artifactId>hapi-fhir-structures-r4</artifactId>
+    	<scope>test</scope>
+    </dependency>
   </dependencies>
   <parent>
   	<groupId>io.elimu.a2d2</groupId>
