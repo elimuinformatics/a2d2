@@ -24,7 +24,7 @@
 		<relativePath/>
 	</parent>
 	<artifactId>generic-helpers</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<name>Base helpers for the Generic services</name>
 	<description>Contains WIHInvoker</description>
 
