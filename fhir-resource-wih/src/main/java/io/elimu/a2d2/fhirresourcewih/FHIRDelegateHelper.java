@@ -63,6 +63,7 @@ public class FHIRDelegateHelper {
 				String[] parts = tokenDecrypt.split(":");
 				client.registerInterceptor((Object) new BasicAuthInterceptor(parts[0], parts[1]));
 			} else if (authHeader.startsWith("Bearer ")) {
+				log.info("About to set BearerTokenAuthInterceptor...");
 				client.registerInterceptor((Object) new BearerTokenAuthInterceptor(authHeader.replace("Bearer ", "")));
 			}
 		}
