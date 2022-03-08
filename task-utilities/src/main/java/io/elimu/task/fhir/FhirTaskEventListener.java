@@ -3,7 +3,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jbpm.services.task.impl.model.ContentImpl;
 import org.jbpm.services.task.utils.ContentMarshallerHelper;
 import org.jbpm.workflow.instance.WorkflowRuntimeException;
@@ -19,12 +18,6 @@ import org.kie.internal.task.api.TaskContentService;
 import org.kie.internal.task.api.model.InternalTaskData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.api.EncodingEnum;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.client.impl.BaseClient;
 
 public abstract class FhirTaskEventListener implements TaskLifeCycleEventListener {
 
@@ -241,16 +234,23 @@ public abstract class FhirTaskEventListener implements TaskLifeCycleEventListene
 			event.getTaskContext().loadTaskVariables(event.getTask());
 			inputs = event.getTask().getTaskData().getTaskInputVariables();
 		}
-		IGenericClient client = newFhirClient((String) wfInstance.getVariable(fhirServerVariableName));
-		MethodOutcome out = client.update().resource(toFhirTask(event)).execute();
-		assertValidOutcome(wfInstance, out);
+		try {
+			Object client = newFhirClient((String) wfInstance.getVariable(fhirServerVariableName));
+			Object execPath = client.getClass().getMethod("update").invoke(client);
+			execPath = execPath.getClass().getMethod("resource", Class.forName("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(execPath, toFhirTask(event));
+			execPath = execPath.getClass().getMethod("execute").invoke(execPath);
+			assertValidOutcome(wfInstance, execPath);
+		} catch (ReflectiveOperationException e) {
+			throw new WorkflowRuntimeException(null, wfInstance, e);
+		}
 	}
 
-	protected IGenericClient newFhirClient(String baseUrl) {
-		FhirContext ctx = getFhirContext();
-		IGenericClient client = ctx.newRestfulGenericClient(baseUrl);
-		client.setEncoding(EncodingEnum.JSON);
-		((BaseClient)client).setDontValidateConformance(true);
+	protected Object newFhirClient(String baseUrl) throws ReflectiveOperationException {
+		Object ctx = getFhirContext();
+		Object client = ctx.getClass().getMethod("newRestfulGenericClient", String.class).invoke(ctx, baseUrl);
+		Class<?> encEnumClass = Class.forName("ca.uhn.fhir.rest.api.EncodingEnum");
+		client.getClass().getMethod("setEncoding", encEnumClass).invoke(client, encEnumClass.getField("JSON").get(null));
+		client.getClass().getMethod("setDontValidateConformance", boolean.class).invoke(client, true);
 		return client;
 	}
 
@@ -273,40 +273,53 @@ public abstract class FhirTaskEventListener implements TaskLifeCycleEventListene
 			inputs = event.getTask().getTaskData().getTaskInputVariables();
 		}
 		String url = (String) wfInstance.getVariable(fhirServerVariableName);
-		IGenericClient client = newFhirClient(url);
-		final IBaseResource fhirTask = toFhirTask(event);
-		MethodOutcome out = client.create().resource(fhirTask).execute();
-		assertValidOutcome(wfInstance, out);
-		Long fhirId = out.getId().getIdPartAsLong();
-		setId(fhirTask, fhirId.toString());
-		if (FhirTaskEventListener.FHIR_SUB == null) {
-			//we need to check if the fhir sub exists
-			FhirTaskEventListener.FHIR_SUB = getFhirSubscriptionId(client, event);
+		try {
+			Object client = newFhirClient(url);
+			final Object fhirTask = toFhirTask(event);
+			Object execPath = client.getClass().getMethod("create").invoke(client);
+			Class<?> ibaseResClass = Class.forName("org.hl7.fhir.instance.model.api.IBaseResource");
+			execPath = execPath.getClass().getMethod("resource", ibaseResClass).invoke(execPath, fhirTask);
+			Object out = execPath.getClass().getMethod("execute").invoke(execPath);
+			assertValidOutcome(wfInstance, out);
+			Object fhirId = out.getClass().getMethod("getId").invoke(out);
+			fhirId = fhirId.getClass().getMethod("getIdPartAsLong").invoke(fhirId);
+			setId(fhirTask, fhirId.toString());
 			if (FhirTaskEventListener.FHIR_SUB == null) {
-				//we need to create it
-				MethodOutcome out2 = client.create().resource(toFhirSubscription(event)).execute();
-				assertValidOutcome(wfInstance, out2);
-				FhirTaskEventListener.FHIR_SUB = out2.getId().getIdPart();
+				//we need to check if the fhir sub exists
+				FhirTaskEventListener.FHIR_SUB = getFhirSubscriptionId(client, event);
+				if (FhirTaskEventListener.FHIR_SUB == null) {
+					//we need to create it
+					execPath = client.getClass().getMethod("create").invoke(client);
+					execPath = execPath.getClass().getMethod("resource", ibaseResClass).invoke(execPath, toFhirSubscription(event));
+					Object out2 = execPath.getClass().getMethod("execute").invoke(execPath);
+					assertValidOutcome(wfInstance, out2);
+					Object fhirSubId = out2.getClass().getMethod("getId").invoke(out2);
+					fhirSubId = fhirSubId.getClass().getMethod("getIdPart").invoke(fhirSubId);
+					FhirTaskEventListener.FHIR_SUB = fhirSubId.toString();
+				}
 			}
+			String guid = UUID.randomUUID().toString();
+			inputs.put(FhirTaskInputs.JBPM_TASK_HASH_NAME.getDescription(), guid);
+			inputs.put(FhirTaskInputs.FHIR_TASK_ID_NAME.getDescription(), fhirId);
+			final TaskContentService contentService = ((org.jbpm.services.task.commands.TaskContext)event.getTaskContext()).getTaskContentService();
+			ContentMarshallerContext mctx = contentService.getMarshallerContext(event.getTask());
+	        byte[] inputData = ContentMarshallerHelper.marshallContent(inputs, mctx.getEnvironment());
+			long documentContentId = contentService.setDocumentContent(event.getTask().getId(), new ContentImpl(inputData));
+			((InternalTaskData)event.getTask().getTaskData()).setDocumentContentId(documentContentId);
+		} catch (ReflectiveOperationException e) {
+			throw new WorkflowRuntimeException(null, wfInstance, e);
 		}
-		String guid = UUID.randomUUID().toString();
-		inputs.put(FhirTaskInputs.JBPM_TASK_HASH_NAME.getDescription(), guid);
-		inputs.put(FhirTaskInputs.FHIR_TASK_ID_NAME.getDescription(), fhirId);
-		final TaskContentService contentService = ((org.jbpm.services.task.commands.TaskContext)event.getTaskContext()).getTaskContentService();
-		ContentMarshallerContext mctx = contentService.getMarshallerContext(event.getTask());
-        byte[] inputData = ContentMarshallerHelper.marshallContent(inputs, mctx.getEnvironment());
-		long documentContentId = contentService.setDocumentContent(event.getTask().getId(), new ContentImpl(inputData));
-		((InternalTaskData)event.getTask().getTaskData()).setDocumentContentId(documentContentId);
 	}
 
-	protected abstract void assertValidOutcome(WorkflowProcessInstance instance, MethodOutcome out) throws WorkflowRuntimeException;
+	protected abstract void assertValidOutcome(WorkflowProcessInstance instance, Object methodOutcome) throws WorkflowRuntimeException;
 
-	protected abstract IBaseResource toFhirTask(TaskEvent event);
+	protected abstract Object toFhirTask(TaskEvent event) throws ReflectiveOperationException;
 
-	protected abstract void setId(IBaseResource resource, String id);
+	protected abstract void setId(Object resource, String id) throws ReflectiveOperationException;
 	
-	protected abstract String getFhirSubscriptionId(IGenericClient client, TaskEvent event);
-	protected abstract IBaseResource toFhirSubscription(TaskEvent event);
+	protected abstract String getFhirSubscriptionId(Object client, TaskEvent event) throws ReflectiveOperationException;
+	
+	protected abstract Object toFhirSubscription(TaskEvent event) throws ReflectiveOperationException;
 
-	protected abstract FhirContext getFhirContext();
+	protected abstract Object getFhirContext() throws ReflectiveOperationException;
 }
