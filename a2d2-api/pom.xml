@@ -47,6 +47,7 @@
 		<logback-classic.version>1.2.10</logback-classic.version>
 		<logback-core.version>1.2.9</logback-core.version>
 		<checker-qual.version>3.8.0</checker-qual.version>		
+		<wih.version>0.0.2-SNAPSHOT</wih.version>
 	</properties>
 
 	<dependencyManagement>
@@ -220,7 +221,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>core-wih</artifactId>
-			<version>${project.version}</version>
+			<version>${wih.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.thoughtworks.xstream</groupId>
@@ -269,12 +270,12 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>ftl-transform-wih</artifactId>
-			<version>${project.version}</version>
+			<version>${wih.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>fhir-resource-wih</artifactId>
-			<version>${project.version}</version>
+			<version>${wih.version}</version>
 		</dependency>
 		<!-- Added for phq9-registry converters to work -->
 		<!--dependency>
@@ -296,7 +297,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cdshooks-wih</artifactId>
-			<version>${project.version}</version>
+			<version>${wih.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -895,7 +896,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>sms-wih</artifactId>
-			<version>${project.version}</version>
+			<version>${wih.version}</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

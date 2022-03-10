@@ -28,6 +28,7 @@
 	<packaging>jar</packaging>
 
 	<name>core-wih</name>
+	<version>0.0.2-SNAPSHOT</version>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -97,6 +98,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-model</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

@@ -23,6 +23,7 @@
 	<packaging>jar</packaging>
 
 	<name>sms-wih</name>
+	<version>0.0.2-SNAPSHOT</version>
 	<url>https://www.elimu.io</url>
 
 	<properties>

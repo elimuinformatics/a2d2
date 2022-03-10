@@ -24,6 +24,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>ftl-transform-wih</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>ftl-transform-wih</name>
@@ -97,6 +98,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>kie-based-services</artifactId>
+			<version>${project.parent.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>
@@ -114,7 +116,20 @@
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-utils</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>io.elimu.a2d2</groupId>
+					<artifactId>service-daos</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.elimu.a2d2</groupId>
+					<artifactId>generic-model</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.elimu.a2d2</groupId>
+			<artifactId>service-daos</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -130,12 +145,18 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>
+			<version>${project.parent.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
    			 		<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.elimu.a2d2</groupId>
+			<artifactId>generic-model</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
