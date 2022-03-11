@@ -64,7 +64,6 @@ public class FHIRDelegateHelper {
 				log.info("About to set BearerTokenAuthInterceptor...");
 				Object interceptor = Class.forName("ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor").getConstructor(String.class).newInstance(authHeader.replace("Bearer ", ""));
 				client.getClass().getDeclaredMethod("registerInterceptor", Object.class).invoke(client, interceptor);
-				client.registerInterceptor((Object) new BearerTokenAuthInterceptor(authHeader.replace("Bearer ", "")));
 			}
 		}
 		}catch(Exception ex) {
