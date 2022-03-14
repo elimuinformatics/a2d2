@@ -2,7 +2,6 @@ package io.elimu.genericapi.service;
 
 import java.io.IOException;
 import java.util.Stack;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import org.json.JSONException;
@@ -21,10 +20,12 @@ public class MixPanelStack implements Runnable {
 	
 	private final Stack<JSONObject> events = new Stack<>();
 
+	private String distinctId; 
 	private String token;
 
 	private MixPanelStack() {
 		this.token = System.getProperty("mixpanel.app.token");
+		this.distinctId = System.getProperty("mixpanel.app.name");
 		if (this.token == null || "".equals(this.token.trim())) {
 			LOG.warn("Implementation of mixpanel requires a mixpanel.app.token configured in the JVM properties. It will be disabled for now");
 			Thread thread = new Thread() {
@@ -58,7 +59,10 @@ public class MixPanelStack implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (events.empty()) {
+			if (events.empty() || distinctId == null) {
+				if (distinctId == null) {
+					LOG.warn("Issue initializing mixpanel app (JVM property mixpanel.app.name not initialized)");
+				}
 				try {
 					Thread.sleep(5000L);
 				} catch (InterruptedException e) {
@@ -75,7 +79,8 @@ public class MixPanelStack implements Runnable {
 				if (evtName == null || "".equals(evtName.trim())) {
 					evtName = "Omnibus General Event";
 				}
-				JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), evtName, evt);
+				
+				JSONObject omnibusEvent = messageBuilder.event(distinctId, evtName, evt);
 				delivery.addMessage(omnibusEvent);
 				count++;
 			}
