@@ -28,6 +28,8 @@ import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.elimu.a2d2.genericmodel.ServiceRequest;
+
 /**
  * Considering keys
  * 
@@ -38,13 +40,22 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 
 	private static final Logger LOG = LoggerFactory.getLogger(MixPanelEventListener.class);
 	private final Properties serviceConfig;
+	private String distinctId;
 	
 	public MixPanelEventListener(Properties config) {
 		this.serviceConfig = config;
 	}
 	
 	protected void process(JSONObject event) {
+		event.put("distinctId", this.distinctId);
 		MixPanelStack.getInstance().add(event);
+	}
+	
+	protected void identify(ServiceRequest serviceRequest) {
+		//TODO same implementation as MixPanelService must be placed here
+		if (serviceRequest != null) {
+			this.distinctId = serviceRequest.getHeader("x-practitioner-id") + "_" + serviceRequest.getHeader("x-organization-id");
+		}
 	}
 	
 	@Override
@@ -206,6 +217,9 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 
 	@Override
 	public void afterVariableChanged(ProcessVariableChangedEvent event) {
+		if ("serviceRequest".equals(event.getVariableId())) {
+			identify((ServiceRequest) event.getNewValue());
+		}
 		if (serviceConfig.containsKey("mixpanel.log") && serviceConfig.getProperty("mixpanel.log").contains("process.var." + event.getVariableId() + ".change")) {
 			try {
 				JSONObject evt = new JSONObject();
