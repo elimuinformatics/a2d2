@@ -20,9 +20,9 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
 		String appToken = System.getProperty("mixpanel.app.token");
-		String distinctId = System.getProperty("mixpanel.app.name");
+		String distinctId = (String) workItem.getParameter("distinctId");
 		if (appToken == null || distinctId == null) {
-			LOG.info("No mixpannel app token or name provided in the system config. Returning without sending event");
+			LOG.info("No mixpannel app token or distinct ID provided. Returning without sending event");
 			manager.completeWorkItem(workItem.getId(), workItem.getResults());
 			return;
 		}
