@@ -15,7 +15,10 @@
 package io.elimu.a2d2.rulewih;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
 import org.drools.core.common.InternalAgenda;
 import org.kie.api.KieBase;
 import org.kie.api.event.rule.AgendaEventListener;
@@ -27,6 +30,7 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 import io.elimu.a2d2.genericmodel.NamedDataObject;
 
@@ -44,13 +48,16 @@ public class RuleInvokeDelegate implements WorkItemHandler {
 		this.env = ksession.getEnvironment();
 	}
 
-	private Object extractListener(KieSession ksession) {
+	private List<Object> extractListeners(KieSession ksession) {
+		List<Object> listeners = new LinkedList<>();
 		for (AgendaEventListener listener : ksession.getAgendaEventListeners()) {
 			if (listener.getClass().getName().endsWith("GenericDebugListener")) {
-				return listener;
+				listeners.add(listener);
+			} else if (listener.getClass().getName().endsWith("MixPanelEventListener")) {
+				listeners.add(listener);
 			}
 		}
-		return null;
+		return listeners;
 	}
 
 	@Override
@@ -85,13 +92,15 @@ public class RuleInvokeDelegate implements WorkItemHandler {
 		}
 		
 		KieSession ksession = kbase.newKieSession(null, env);
-		Object listener = extractListener(this.ksession);
-		if (listener != null) {
-			if (listener instanceof AgendaEventListener) {
-				ksession.addEventListener((AgendaEventListener) listener);
-			}
-			if (listener instanceof RuleRuntimeEventListener) {
-				ksession.addEventListener((RuleRuntimeEventListener) listener);
+		List<Object> listeners = extractListeners(this.ksession);
+		if (listeners != null) {
+			for (Object listener : listeners) {
+				if (listener instanceof AgendaEventListener) {
+					ksession.addEventListener((AgendaEventListener) listener);
+				}
+				if (listener instanceof RuleRuntimeEventListener) {
+					ksession.addEventListener((RuleRuntimeEventListener) listener);
+				}
 			}
 		}
 		facts.values().forEach(object -> ksession.insert(object));

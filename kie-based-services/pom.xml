@@ -16,9 +16,27 @@
 
 	<properties>
 		<cxf.version>3.4.5</cxf.version>
+		<mixpanel.version>1.4.4</mixpanel.version>
+		<org.json.version>20211205</org.json.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.mixpanel</groupId>
+			<artifactId>mixpanel-java</artifactId>
+			<version>${mixpanel.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.json</groupId>
+					<artifactId>json</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${org.json.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
