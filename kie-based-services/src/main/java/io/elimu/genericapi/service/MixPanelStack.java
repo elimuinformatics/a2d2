@@ -21,6 +21,7 @@ public class MixPanelStack implements Runnable {
 	
 	private final Stack<JSONObject> events = new Stack<>();
 
+	private String distinctId; 
 	private String token;
 
 	private MixPanelStack() {
@@ -58,7 +59,10 @@ public class MixPanelStack implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (events.empty()) {
+			if (events.empty() || distinctId == null) {
+				if (distinctId == null) {
+					LOG.warn("Issue initializing mixpanel app (JVM property mixpanel.app.name not initialized)");
+				}
 				try {
 					Thread.sleep(5000L);
 				} catch (InterruptedException e) {
@@ -75,7 +79,11 @@ public class MixPanelStack implements Runnable {
 				if (evtName == null || "".equals(evtName.trim())) {
 					evtName = "Omnibus General Event";
 				}
-				JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), evtName, evt);
+				String distinctId = evt.getString("distinctId");
+				if (distinctId == null || "".equals(distinctId.trim())) {
+					distinctId = UUID.randomUUID().toString();
+				}
+				JSONObject omnibusEvent = messageBuilder.event(distinctId, evtName, evt);
 				delivery.addMessage(omnibusEvent);
 				count++;
 			}

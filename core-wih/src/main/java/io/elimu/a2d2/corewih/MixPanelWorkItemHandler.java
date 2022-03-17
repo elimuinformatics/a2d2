@@ -1,7 +1,6 @@
 package io.elimu.a2d2.corewih;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.json.JSONObject;
 import org.kie.api.runtime.process.WorkItem;
@@ -21,8 +20,9 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
 		String appToken = System.getProperty("mixpanel.app.token");
-		if (appToken == null) {
-			LOG.info("No mixpannel app token provided in the system config. Returning without sending event");
+		String distinctId = (String) workItem.getParameter("distinctId");
+		if (appToken == null || distinctId == null) {
+			LOG.info("No mixpannel app token or distinct ID provided. Returning without sending event");
 			manager.completeWorkItem(workItem.getId(), workItem.getResults());
 			return;
 		}
@@ -37,7 +37,7 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 			}
 		}
 		MessageBuilder messageBuilder = new MessageBuilder(appToken);
-		JSONObject omnibusEvent = messageBuilder.event(UUID.randomUUID().toString(), evtName, evt);
+		JSONObject omnibusEvent = messageBuilder.event(distinctId, evtName, evt);
 		MixpanelAPI mixpanel = new MixpanelAPI();
 		try {
 			mixpanel.sendMessage(omnibusEvent);
