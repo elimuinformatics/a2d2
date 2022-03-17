@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.drools.core.spi.KnowledgeHelper;
 
@@ -39,7 +40,7 @@ public class MixPanelService {
 		parameters.put("eventDescription", eventName);
 		String distinctId = this.distinctId.get();
 		if ("".equals(distinctId) || distinctId == null) {
-			throw new WorkItemHandlerException("Call MixPanel.identify(...) first");
+			distinctId = UUID.randomUUID().toString();
 		}
 		parameters.put("distinctId", distinctId);
 		if (action != null) {

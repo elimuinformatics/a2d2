@@ -59,10 +59,7 @@ public class MixPanelStack implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (events.empty() || distinctId == null) {
-				if (distinctId == null) {
-					LOG.warn("Issue initializing mixpanel app (JVM property mixpanel.app.name not initialized)");
-				}
+			if (events.empty()) {
 				try {
 					Thread.sleep(5000L);
 				} catch (InterruptedException e) {
