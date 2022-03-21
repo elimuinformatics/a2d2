@@ -37,9 +37,10 @@ public class FHIRDelegateHelper {
 		Object client = null;
 		try {
 			if (fhirUrl != null) {
-				client = ctx.getClass().getDeclaredMethod("newRestfulGenericClient", String.class).invoke(ctx, fhirUrl.toString());
-				client.getClass().getDeclaredMethod("setEncoding", Class.forName("ca.uhn.fhir.rest.api.EncodingEnum")).invoke(client, Class.forName("ca.uhn.fhir.rest.api.EncodingEnum").getDeclaredField("JSON"));
-				client.getClass().getDeclaredMethod("setDontValidateConformance", Boolean.class).invoke(client, true);
+				ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				client = ctx.getClass().getMethod("newRestfulGenericClient", String.class).invoke(ctx, fhirUrl.toString());
+				client.getClass().getMethod("setEncoding", cl.loadClass("ca.uhn.fhir.rest.api.EncodingEnum")).invoke(client, cl.loadClass("ca.uhn.fhir.rest.api.EncodingEnum").getDeclaredField("JSON").get(null));
+				client.getClass().getMethod("setDontValidateConformance", boolean.class).invoke(client, true);
 			}
 	
 			return client;
@@ -51,19 +52,19 @@ public class FHIRDelegateHelper {
 	public boolean authenticateFhirServer(Object client, String authHeader) {
 
 		boolean isAuthenticated = true;
-
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try {
 		if (authHeader != null && !"".equals(authHeader.trim())) {
 			if (authHeader.startsWith("Basic ")) {
 				String token = authHeader.replace("Basic ", "");
 				String tokenDecrypt = new String(Base64.getDecoder().decode(token));
 				String[] parts = tokenDecrypt.split(":");
-				Object interceptor = Class.forName("ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor").getConstructor(String.class, String.class).newInstance(parts[0], parts[1]);
-				client.getClass().getDeclaredMethod("registerInterceptor", Object.class).invoke(client, interceptor);
+				Object interceptor = cl.loadClass("ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor").getConstructor(String.class, String.class).newInstance(parts[0], parts[1]);
+				client.getClass().getMethod("registerInterceptor", Object.class).invoke(client, interceptor);
 			} else if (authHeader.startsWith("Bearer ")) {
 				log.info("About to set BearerTokenAuthInterceptor...");
-				Object interceptor = Class.forName("ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor").getConstructor(String.class).newInstance(authHeader.replace("Bearer ", ""));
-				client.getClass().getDeclaredMethod("registerInterceptor", Object.class).invoke(client, interceptor);
+				Object interceptor = cl.loadClass("ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor").getConstructor(String.class).newInstance(authHeader.replace("Bearer ", ""));
+				client.getClass().getMethod("registerInterceptor", Object.class).invoke(client, interceptor);
 			}
 		}
 		}catch(Exception ex) {
@@ -74,19 +75,20 @@ public class FHIRDelegateHelper {
 
 	public Object getFhirContext(String fhirType) {
 		Object ctx = null;
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try {
 			switch (String.valueOf(fhirType)) {
 			case DSTU2:
-				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forDstu2").invoke(null);
+				ctx = cl.loadClass("ca.uhn.fhir.context.FhirContext").getMethod("forDstu2").invoke(null);
 				break;
 			case STU3:
-				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forDstu3").invoke(null);
+				ctx = cl.loadClass("ca.uhn.fhir.context.FhirContext").getMethod("forDstu3").invoke(null);
 				break;
 			case R4:
-				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forR4").invoke(null);
+				ctx = cl.loadClass("ca.uhn.fhir.context.FhirContext").getMethod("forR4").invoke(null);
 				break;
 			default:
-				ctx = Class.forName("ca.uhn.fhir.context.FhirContext").getDeclaredMethod("forDstu2").invoke(null);
+				ctx = cl.loadClass("ca.uhn.fhir.context.FhirContext").getMethod("forDstu2").invoke(null);
 				break;
 			}
 	

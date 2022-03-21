@@ -14,6 +14,8 @@
 
 package io.elimu.a2d2.fhir_resource_wih;
 
+import java.net.URL;
+
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -24,14 +26,16 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.internal.utils.KieHelper;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.impl.BaseClient;
 import io.elimu.a2d2.exception.FhirServerException;
+import io.elimu.a2d2.fhirresourcewih.FHIRDelegateHelper;
 import io.elimu.a2d2.fhirresourcewih.ResourceWriteDelegate;
 
-@Ignore ("disable for now as the test is based on public testing server")
+//@Ignore ("disable for now as the test is based on public testing server")
 public class ResourceWriteDelegateTest {
 
 	private static WorkItemManager workItemManager;
@@ -64,6 +68,13 @@ public class ResourceWriteDelegateTest {
 
 		workItemManager.registerWorkItemHandler("ResourceWriteDelegate", wih);
 
+	}
+
+	@Test
+	public void testDelegatehelper() throws Exception {
+		FHIRDelegateHelper helper = new FHIRDelegateHelper();
+		Object ctx = helper.getFhirContext("R4");
+		helper.getFhirClient(ctx, new URL(FHIR2_URL));
 	}
 
 	@Test

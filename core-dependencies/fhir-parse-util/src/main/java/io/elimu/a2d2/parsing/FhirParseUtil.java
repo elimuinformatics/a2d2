@@ -14,6 +14,7 @@
 
 package io.elimu.a2d2.parsing;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +34,8 @@ public class FhirParseUtil {
 
 		FormatType(String method) { 
 			try {
-				Class<?> ctxClass = Class.forName("ca.uhn.fhir.context.FhirContext");
+				ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
 				this.ctx = ctxClass.getMethod(method).invoke(null);
 			} catch (Exception e) {
 				throw new RuntimeException("Cannot instantiate FhirContext", e);
@@ -93,7 +95,9 @@ public class FhirParseUtil {
 	public synchronized String encodeJsonResource(FormatType type, Object hapiresource) {
 		try {
 			Object parser = type.getCtx().getClass().getMethod("newJsonParser").invoke(type.getCtx());
-			return (String) parser.getClass().getMethod("encodeResourceToString", Class.forName("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(parser, hapiresource);
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Method encodeMethod = cl.loadClass("ca.uhn.fhir.parser.JsonParser").getMethod("encodeResourceToString", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource"));
+			return (String) encodeMethod.invoke(parser, hapiresource);
 		} catch (Exception e) {
 			throw new RuntimeException("Coudln't invoke newJsonParser.encodeResourceToString", e);
 		}
@@ -102,7 +106,9 @@ public class FhirParseUtil {
 	public synchronized String encodeXmlResource(FormatType type, Object hapiresource) {
 		try {
 			Object parser = type.getCtx().getClass().getMethod("newXmlParser").invoke(type.getCtx());
-			return (String) parser.getClass().getMethod("encodeResourceToString", Class.forName("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(parser, hapiresource);
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Method encodeMethod = cl.loadClass("ca.uhn.fhir.parser.XmlParser").getMethod("encodeResourceToString", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource"));
+			return (String) encodeMethod.invoke(parser, hapiresource);
 		} catch (Exception e) {
 			throw new RuntimeException("Coudln't invoke newXmlParser.encodeResourceToString", e);
 		}

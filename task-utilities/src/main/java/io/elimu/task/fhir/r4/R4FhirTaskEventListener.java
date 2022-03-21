@@ -79,7 +79,8 @@ public class R4FhirTaskEventListener extends io.elimu.task.fhir.FhirTaskEventLis
 
 	@Override
 	protected Object getFhirContext() throws ReflectiveOperationException {
-		return Class.forName("ca.uhn.fhir.context.FhirContext").getMethod("forR4").invoke(null);
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		return cl.loadClass("ca.uhn.fhir.context.FhirContext").getMethod("forR4").invoke(null);
 	}
 
 	@Override
@@ -87,8 +88,9 @@ public class R4FhirTaskEventListener extends io.elimu.task.fhir.FhirTaskEventLis
 		WorkflowProcessInstance wfInstance = super.getProcessVariables(event);
 		String url = getSubscriptionUrl(wfInstance);
 		Object searchPath = client.getClass().getMethod("search").invoke(client);
-		searchPath = searchPath.getClass().getMethod("forResource", Class.class).invoke(searchPath, Class.forName("org.hl7.fhir.r4.model.Subscription"));
-		Class<?> strClientParamClass = Class.forName("ca.uhn.fhir.rest.gclient.StringClientParam");
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		searchPath = searchPath.getClass().getMethod("forResource", Class.class).invoke(searchPath, cl.loadClass("org.hl7.fhir.r4.model.Subscription"));
+		Class<?> strClientParamClass = cl.loadClass("ca.uhn.fhir.rest.gclient.StringClientParam");
 		Object strClientParam = strClientParamClass.getConstructor(String.class).newInstance("criteria");
 		strClientParam = strClientParam.getClass().getMethod("matchesExactly").invoke(strClientParam);
 		strClientParam = strClientParam.getClass().getMethod("value", String.class).invoke(strClientParam, "Task?");
@@ -127,20 +129,21 @@ public class R4FhirTaskEventListener extends io.elimu.task.fhir.FhirTaskEventLis
 	@Override
 	protected Object toFhirSubscription(TaskEvent event) throws ReflectiveOperationException {
 		try {
-			Object sub = Class.forName("org.hl7.fhir.r4.model.Subscription").getConstructor().newInstance();
-			Object channel = Class.forName("org.hl7.fhir.r4.model.Subscription$SubscriptionChannelComponent").getConstructor().newInstance();
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Object sub = cl.loadClass("org.hl7.fhir.r4.model.Subscription").getConstructor().newInstance();
+			Object channel = cl.loadClass("org.hl7.fhir.r4.model.Subscription$SubscriptionChannelComponent").getConstructor().newInstance();
 			WorkflowProcessInstance wfInstance = super.getProcessVariables(event);
 			getSubscriptionUrl(wfInstance);
 			String microserviceAuth = (String) wfInstance.getVariable(microserviceAuthVariableName);
 			channel.getClass().getMethod("setEndpoint", String.class).invoke(channel, getSubscriptionUrl(wfInstance));
-			Class<?> subChannelTypeClass = Class.forName("org.hl7.fhir.r4.model.Subscription$SubscriptionChannelType");
+			Class<?> subChannelTypeClass = cl.loadClass("org.hl7.fhir.r4.model.Subscription$SubscriptionChannelType");
 			channel.getClass().getMethod("setType", subChannelTypeClass).invoke(channel, subChannelTypeClass.getField("RESTHOOK").get(null));
 			channel.getClass().getMethod("setPayload", String.class).invoke(channel, "application/fhir+json");
 			if (microserviceAuth != null) {
 				channel.getClass().getMethod("addHeader", String.class).invoke(channel, "Authorization: Basic " + microserviceAuth);
 			}
 			sub.getClass().getMethod("setChannel", channel.getClass()).invoke(sub, channel);
-			Class<?> subStatusClass = Class.forName("org.hl7.fhir.r4.model.Subscription$SubscriptionStatus");
+			Class<?> subStatusClass = cl.loadClass("org.hl7.fhir.r4.model.Subscription$SubscriptionStatus");
 			sub.getClass().getMethod("setStatus", subStatusClass).invoke(sub, subStatusClass.getField("REQUESTED").get(null));
 			sub.getClass().getMethod("setCriteria", String.class).invoke(sub, "Task?");
 			return sub;

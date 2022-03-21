@@ -14,6 +14,7 @@
 
 package io.elimu.a2d2.fhirresourcewih;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
 import org.kie.api.runtime.process.WorkItem;
@@ -40,7 +41,7 @@ public class ResourceReadDelegate implements WorkItemHandler {
 
 		URL fhirServer;
 		try {
-
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			fhirServer = new URL((String) workItem.getParameter("fhirServer"));
 
 			String resourceType = (String) workItem.getParameter("resourceType");
@@ -64,24 +65,44 @@ public class ResourceReadDelegate implements WorkItemHandler {
 					Map<String, Object> results = workItem.getResults();
 
 					if (fhirVersion.equalsIgnoreCase(DSTU2)) {
-						Object searchObj = client.getClass().getDeclaredMethod("search").invoke(client);
-						Object forResource = searchObj.getClass().getDeclaredMethod("forResource", String.class).invoke(searchObj, resourceType);
-						Object stringClientParam = Class.forName("ca.uhn.fhir.rest.gclient.StringClientParam").getConstructor(String.class).newInstance("_id");
-						stringClientParam = stringClientParam.getClass().getMethod("matchesExactly").invoke(stringClientParam);
-						stringClientParam = stringClientParam.getClass().getMethod("value", String.class).invoke(stringClientParam, resourceId);
-						Object whereObj = forResource.getClass().getDeclaredMethod("where", Class.forName("ca.uhn.fhir.rest.gclient.ICriterion")).invoke(forResource, stringClientParam);
-						Object execObj = whereObj.getClass().getDeclaredMethod("execute").invoke(whereObj);
-						Object entryObj = execObj.getClass().getDeclaredMethod("getEntryFirstRep").invoke(execObj);
+						Object searchObj = client.getClass().getMethod("search").invoke(client);
+						Method forResourceMethod = searchObj.getClass().getMethod("forResource", String.class);
+						forResourceMethod.setAccessible(true);
+						Object forResource = forResourceMethod.invoke(searchObj, resourceType);
+						Object stringClientParam = cl.loadClass("ca.uhn.fhir.rest.gclient.StringClientParam").getConstructor(String.class).newInstance("_id");
+						Method matchesMethod = stringClientParam.getClass().getMethod("matchesExactly");
+						matchesMethod.setAccessible(true);
+						stringClientParam = matchesMethod.invoke(stringClientParam);
+						Method valueMethod = stringClientParam.getClass().getMethod("value", String.class);
+						valueMethod.setAccessible(true);
+						stringClientParam = valueMethod.invoke(stringClientParam, resourceId);
+						Method whereMethod = forResource.getClass().getMethod("where", cl.loadClass("ca.uhn.fhir.rest.gclient.ICriterion"));
+						whereMethod.setAccessible(true);
+						Object whereObj = whereMethod.invoke(forResource, stringClientParam);
+						Method execMethod = whereObj.getClass().getMethod("execute");
+						execMethod.setAccessible(true);
+						Object execObj = execMethod.invoke(whereObj);
+						Object entryObj = execObj.getClass().getMethod("getEntryFirstRep").invoke(execObj);
 						results.put(RESOURCE, entryObj.getClass().getMethod("getResource").invoke(entryObj));
 					} else if (fhirVersion.equalsIgnoreCase(STU3) || fhirVersion.equalsIgnoreCase(R4)) {
-						Object searchObj = client.getClass().getDeclaredMethod("search").invoke(client);
-						Object forResource = searchObj.getClass().getDeclaredMethod("forResource", String.class).invoke(searchObj, resourceType);
-						Object tokenClientParam = Class.forName("ca.uhn.fhir.rest.gclient.TokenClientParam").getConstructor(String.class).newInstance("_id");
-						tokenClientParam = tokenClientParam.getClass().getMethod("exactly").invoke(tokenClientParam);
-						tokenClientParam = tokenClientParam.getClass().getMethod("code", String.class).invoke(tokenClientParam, resourceId);
-						Object whereObj = forResource.getClass().getDeclaredMethod("where", Class.forName("ca.uhn.fhir.rest.gclient.ICriterion")).invoke(forResource, tokenClientParam);
-						Object execObj = whereObj.getClass().getDeclaredMethod("execute").invoke(whereObj);
-						Object entryObj = execObj.getClass().getDeclaredMethod("getEntryFirstRep").invoke(execObj);
+						Object searchObj = client.getClass().getMethod("search").invoke(client);
+						Method forResourceMethod = searchObj.getClass().getMethod("forResource", String.class);
+						forResourceMethod.setAccessible(true);
+						Object forResource = forResourceMethod.invoke(searchObj, resourceType);
+						Object tokenClientParam = cl.loadClass("ca.uhn.fhir.rest.gclient.TokenClientParam").getConstructor(String.class).newInstance("_id");
+						Method exactlyMethod = tokenClientParam.getClass().getMethod("exactly");
+						exactlyMethod.setAccessible(true);
+						tokenClientParam = exactlyMethod.invoke(tokenClientParam);
+						Method codeMethod = tokenClientParam.getClass().getMethod("code", String.class);
+						codeMethod.setAccessible(true);
+						tokenClientParam = codeMethod.invoke(tokenClientParam, resourceId);
+						Method whereMethod = forResource.getClass().getMethod("where", cl.loadClass("ca.uhn.fhir.rest.gclient.ICriterion"));
+						whereMethod.setAccessible(true);
+						Object whereObj = whereMethod.invoke(forResource, tokenClientParam);
+						Method execMethod = whereObj.getClass().getMethod("execute");
+						execMethod.setAccessible(true);
+						Object execObj = execMethod.invoke(whereObj);
+						Object entryObj = execObj.getClass().getMethod("getEntryFirstRep").invoke(execObj);
 						results.put(RESOURCE, entryObj.getClass().getMethod("getResource").invoke(entryObj));
 					}
 

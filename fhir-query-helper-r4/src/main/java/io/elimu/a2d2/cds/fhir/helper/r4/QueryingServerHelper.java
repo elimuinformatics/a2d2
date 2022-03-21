@@ -80,7 +80,8 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 			public IBaseResource execute(FhirClientWrapper client) {
 				log.debug("Invoking url {}", resourceQuery);
 				try {
-					Class<IBaseResource> clz = (Class<IBaseResource>) Class.forName("org.hl7.fhir.r4.model." + resourceType);
+					ClassLoader cl = Thread.currentThread().getContextClassLoader();
+					Class<IBaseResource> clz = (Class<IBaseResource>) cl.loadClass("org.hl7.fhir.r4.model." + resourceType);
 					return client.fetchResourceFromUrl(clz, resourceQuery);
 				} catch (ClassNotFoundException e) {
 					log.error("ResourceType " + resourceType + " not supported for direct path reading in fhir " + client.getFhirContext().getVersion().getVersion().name());

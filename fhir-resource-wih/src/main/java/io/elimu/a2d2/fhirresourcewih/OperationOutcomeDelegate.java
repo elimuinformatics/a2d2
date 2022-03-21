@@ -70,21 +70,22 @@ public class OperationOutcomeDelegate implements WorkItemHandler {
 				distinct().
 				collect(Collectors.toSet());
 		try {
-			Object outcome = Class.forName(outcomeClassName).getConstructor().newInstance();
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Object outcome = cl.loadClass(outcomeClassName).getConstructor().newInstance();
 			for (String issueId : issueIds) {
 				Map<String, Object> subset = extractIssueDetails(workItem.getParameters(), issueId);
 				Method addIssueMethod = outcome.getClass().getMethod("addIssue");
 				Object issue = addIssueMethod.invoke(outcome);
 				if (subset.containsKey("code")) {
 					String code = (String) subset.get("code");
-					Object ccode = Class.forName(issueTypeClassName).getMethod(codeMethodName, String.class).invoke(null, code);
-					issue.getClass().getMethod("setCode", Class.forName(issueTypeClassName)).invoke(issue, ccode);
+					Object ccode = cl.loadClass(issueTypeClassName).getMethod(codeMethodName, String.class).invoke(null, code);
+					issue.getClass().getMethod("setCode", cl.loadClass(issueTypeClassName)).invoke(issue, ccode);
 				}
 				if (subset.containsKey("details") || subset.containsKey("detailsCode") || subset.containsKey("detailsSystem")) {
 					String details = (String) subset.get("details");
 					String code = (String) subset.get("detailsCode");
 					String system = (String) subset.get("detailsSystem");
-					Object cc = Class.forName(ccClassName).getConstructor().newInstance();
+					Object cc = cl.loadClass(ccClassName).getConstructor().newInstance();
 					if (code != null || system != null) {
 						Object coding = cc.getClass().getMethod("addCoding").invoke(cc);
 						if (code != null) {
@@ -112,7 +113,7 @@ public class OperationOutcomeDelegate implements WorkItemHandler {
 				}
 				if (subset.containsKey("severity")) {
 					String code = (String) subset.get("severity");
-					Object ccode = Class.forName(issueSeverityClassName).getMethod(codeMethodName, String.class).invoke(null, code);
+					Object ccode = cl.loadClass(issueSeverityClassName).getMethod(codeMethodName, String.class).invoke(null, code);
 					issue.getClass().getMethod("setSeverity", ccode.getClass()).invoke(issue, ccode);
 				}
 			}

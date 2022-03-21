@@ -235,9 +235,10 @@ public abstract class FhirTaskEventListener implements TaskLifeCycleEventListene
 			inputs = event.getTask().getTaskData().getTaskInputVariables();
 		}
 		try {
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			Object client = newFhirClient((String) wfInstance.getVariable(fhirServerVariableName));
 			Object execPath = client.getClass().getMethod("update").invoke(client);
-			execPath = execPath.getClass().getMethod("resource", Class.forName("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(execPath, toFhirTask(event));
+			execPath = execPath.getClass().getMethod("resource", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(execPath, toFhirTask(event));
 			execPath = execPath.getClass().getMethod("execute").invoke(execPath);
 			assertValidOutcome(wfInstance, execPath);
 		} catch (ReflectiveOperationException e) {
@@ -248,7 +249,8 @@ public abstract class FhirTaskEventListener implements TaskLifeCycleEventListene
 	protected Object newFhirClient(String baseUrl) throws ReflectiveOperationException {
 		Object ctx = getFhirContext();
 		Object client = ctx.getClass().getMethod("newRestfulGenericClient", String.class).invoke(ctx, baseUrl);
-		Class<?> encEnumClass = Class.forName("ca.uhn.fhir.rest.api.EncodingEnum");
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Class<?> encEnumClass = cl.loadClass("ca.uhn.fhir.rest.api.EncodingEnum");
 		client.getClass().getMethod("setEncoding", encEnumClass).invoke(client, encEnumClass.getField("JSON").get(null));
 		client.getClass().getMethod("setDontValidateConformance", boolean.class).invoke(client, true);
 		return client;
@@ -277,7 +279,8 @@ public abstract class FhirTaskEventListener implements TaskLifeCycleEventListene
 			Object client = newFhirClient(url);
 			final Object fhirTask = toFhirTask(event);
 			Object execPath = client.getClass().getMethod("create").invoke(client);
-			Class<?> ibaseResClass = Class.forName("org.hl7.fhir.instance.model.api.IBaseResource");
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Class<?> ibaseResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource");
 			execPath = execPath.getClass().getMethod("resource", ibaseResClass).invoke(execPath, fhirTask);
 			Object out = execPath.getClass().getMethod("execute").invoke(execPath);
 			assertValidOutcome(wfInstance, out);
