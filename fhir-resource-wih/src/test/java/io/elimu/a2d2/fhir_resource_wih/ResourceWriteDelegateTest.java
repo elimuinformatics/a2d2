@@ -35,7 +35,7 @@ import io.elimu.a2d2.exception.FhirServerException;
 import io.elimu.a2d2.fhirresourcewih.FHIRDelegateHelper;
 import io.elimu.a2d2.fhirresourcewih.ResourceWriteDelegate;
 
-//@Ignore ("disable for now as the test is based on public testing server")
+@Ignore ("disable for now as the test is based on public testing server")
 public class ResourceWriteDelegateTest {
 
 	private static WorkItemManager workItemManager;
