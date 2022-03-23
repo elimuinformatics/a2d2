@@ -14,30 +14,35 @@
 
 package io.elimu.a2d2.parsing;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import ca.uhn.fhir.context.FhirContext;
 
 public class FhirParseUtil {
 
-	//TODO Change this to change amount of instances available
+	//Change this to change amount of instances available
 	private static final int AMOUNT_OF_PARSERS = Integer.parseInt(System.getProperty("fhir.parsers.count", "30"));
 
 	public static enum FormatType {
-		FHIR2(FhirContext.forDstu2()),
-		FHIR3(FhirContext.forDstu3()),
-		FHIR4(FhirContext.forR4());
+		FHIR2("forDstu2"),
+		FHIR3("forDstu3"),
+		FHIR4("forR4");
 
 
-		private final FhirContext ctx;
+		private final Object ctx;
 
-		FormatType(FhirContext ctx) {
-			this.ctx = ctx;
+		FormatType(String method) { 
+			try {
+				ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
+				this.ctx = ctxClass.getMethod(method).invoke(null);
+			} catch (Exception e) {
+				throw new RuntimeException("Cannot instantiate FhirContext", e);
+			}
 		}
 
-		public FhirContext getCtx() {
+		public Object getCtx() {
 			return ctx;
 		}
 	}
@@ -59,23 +64,53 @@ public class FhirParseUtil {
 	private FhirParseUtil() {
 	}
 
-	public synchronized IBaseResource parseJsonResource(FormatType type, String input) {
-		return type.getCtx().newJsonParser().parseResource(input);
+	public synchronized Object parseJsonResource(FormatType type, String input) {
+		try {
+			Object parser = type.getCtx().getClass().getMethod("newJsonParser").invoke(type.getCtx());
+			return parser.getClass().getMethod("parseResource", String.class).invoke(parser, input);
+		} catch (Exception e) {
+			throw new RuntimeException("Coudln't invoke newJsonParser.parserResource", e);
+		}
 	}
 
-	public synchronized IBaseResource parseXmlResource(FormatType type, String input) {
-		return type.getCtx().newXmlParser().parseResource(input);
+	public synchronized Object parseXmlResource(FormatType type, String input) {
+		try {
+			Object parser = type.getCtx().getClass().getMethod("newXmlParser").invoke(type.getCtx());
+			return parser.getClass().getMethod("parseResource", String.class).invoke(parser, input);
+		} catch (Exception e) {
+			throw new RuntimeException("Coudln't invoke newXmlParser.parserResource", e);
+		}
 	}
 
-	public synchronized <T extends IBaseResource> T parseResource(FormatType type, String input, Class<T> outputType) {
-		return type.getCtx().newJsonParser().parseResource(outputType, input);
+	@SuppressWarnings("unchecked")
+	public synchronized <T> T parseResource(FormatType type, String input, Class<T> outputType) {
+		try {
+			Object parser = type.getCtx().getClass().getMethod("newJsonParser").invoke(type.getCtx());
+			return (T) parser.getClass().getMethod("parseResource", Class.class, String.class).invoke(parser, outputType, input);
+		} catch (Exception e) {
+			throw new RuntimeException("Coudln't invoke newJsonParser.parserResource", e);
+		}
 	}
 
-	public synchronized String encodeJsonResource(FormatType type, IBaseResource resource) {
-		return type.getCtx().newJsonParser().encodeResourceToString(resource);
+	public synchronized String encodeJsonResource(FormatType type, Object hapiresource) {
+		try {
+			Object parser = type.getCtx().getClass().getMethod("newJsonParser").invoke(type.getCtx());
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Method encodeMethod = cl.loadClass("ca.uhn.fhir.parser.JsonParser").getMethod("encodeResourceToString", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource"));
+			return (String) encodeMethod.invoke(parser, hapiresource);
+		} catch (Exception e) {
+			throw new RuntimeException("Coudln't invoke newJsonParser.encodeResourceToString", e);
+		}
 	}
 
-	public synchronized String encodeXmlResource(FormatType type, IBaseResource resource) {
-		return type.getCtx().newXmlParser().encodeResourceToString(resource);
+	public synchronized String encodeXmlResource(FormatType type, Object hapiresource) {
+		try {
+			Object parser = type.getCtx().getClass().getMethod("newXmlParser").invoke(type.getCtx());
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Method encodeMethod = cl.loadClass("ca.uhn.fhir.parser.XmlParser").getMethod("encodeResourceToString", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource"));
+			return (String) encodeMethod.invoke(parser, hapiresource);
+		} catch (Exception e) {
+			throw new RuntimeException("Coudln't invoke newXmlParser.encodeResourceToString", e);
+		}
 	}
 }

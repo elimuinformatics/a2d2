@@ -15,7 +15,6 @@
 package io.elimu.a2d2.fhirresourcewih;
 
 import java.util.Map;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
@@ -42,9 +41,9 @@ public class SerializeResourceDelegate implements WorkItemHandler {
 		FormatType type = FHIRDelegateHelper.getFormatTypeFromVersion((String) workItem.getParameter("fhirVersion"));
 		String output = null;
 		if ("json".equals(outputType)) {
-			output = FhirParseUtil.getInstance().encodeJsonResource(type, (IBaseResource) payload);
+			output = FhirParseUtil.getInstance().encodeJsonResource(type, payload);
 		} else if ("xml".equals(outputType)) {
-			output = FhirParseUtil.getInstance().encodeXmlResource(type, (IBaseResource) payload);
+			output = FhirParseUtil.getInstance().encodeXmlResource(type, payload);
 		}
 		if (output == null) {
 			log.debug("Either xml or json payload was empty or invalid");

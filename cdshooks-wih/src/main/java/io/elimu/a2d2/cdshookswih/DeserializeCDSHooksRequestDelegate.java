@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.kie.api.runtime.process.WorkItem;
@@ -113,7 +112,7 @@ public class DeserializeCDSHooksRequestDelegate implements WorkItemHandler {
 			FormatType fhirVersion, String param) {
 		for (Entry<String, Object> entry : item.entrySet()) {
 			workItemResult.put(param.concat("_").concat(entry.getKey()), entry.getValue());
-			IBaseResource resource = parseResource(entry.getValue(), fhirVersion);
+			Object resource = parseResource(entry.getValue(), fhirVersion);
 			if (resource != null) {
 				workItemResult.put(param.concat("Resource_").concat(entry.getKey()), resource);
 				log.debug("Added  the {} Resource ::{}", param, entry.getKey());
@@ -121,7 +120,7 @@ public class DeserializeCDSHooksRequestDelegate implements WorkItemHandler {
 		}
 	}
 
-	private IBaseResource parseResource(Object jsonObject, FormatType fhirVersion) {
+	private Object parseResource(Object jsonObject, FormatType fhirVersion) {
 		try {
 
 			JSONObject parsedJsonObj = null;

@@ -14,6 +14,7 @@
 
 package io.elimu.a2d2.fhirresourcewih;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
 import org.kie.api.runtime.process.WorkItem;
@@ -21,10 +22,6 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.StringClientParam;
-import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import io.elimu.a2d2.exception.FhirServerException;
 
 public class ResourceReadDelegate implements WorkItemHandler {
@@ -44,7 +41,7 @@ public class ResourceReadDelegate implements WorkItemHandler {
 
 		URL fhirServer;
 		try {
-
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			fhirServer = new URL((String) workItem.getParameter("fhirServer"));
 
 			String resourceType = (String) workItem.getParameter("resourceType");
@@ -57,9 +54,9 @@ public class ResourceReadDelegate implements WorkItemHandler {
 				throw new FhirServerException("Required input parameter missing");
 			}
 
-			FhirContext ctx = fhirdelegatehelper.getFhirContext(fhirVersion);
+			Object ctx = fhirdelegatehelper.getFhirContext(fhirVersion);
 
-			IGenericClient client = fhirdelegatehelper.getFhirClient(ctx, fhirServer);
+			Object client = fhirdelegatehelper.getFhirClient(ctx, fhirServer);
 
 			if (client != null) {
 
@@ -68,21 +65,45 @@ public class ResourceReadDelegate implements WorkItemHandler {
 					Map<String, Object> results = workItem.getResults();
 
 					if (fhirVersion.equalsIgnoreCase(DSTU2)) {
-						results.put(RESOURCE, ((ca.uhn.fhir.model.dstu2.resource.Bundle) client.search()
-									.forResource(resourceType)
-									.where(new StringClientParam("_id").matchesExactly().value(resourceId))
-									.execute()).getEntryFirstRep().getResource());
-
-					} else if (fhirVersion.equalsIgnoreCase(STU3)) {
-						results.put(RESOURCE, ((org.hl7.fhir.dstu3.model.Bundle) client.search()
-								.forResource(resourceType)
-								.where(new TokenClientParam("_id").exactly().code(resourceId))
-								.execute()).getEntryFirstRep().getResource());
-					} else if (fhirVersion.equalsIgnoreCase(R4)) {
-						results.put(RESOURCE, ((org.hl7.fhir.r4.model.Bundle) client.search()
-								.forResource(resourceType)
-								.where(new TokenClientParam("_id").exactly().code(resourceId))
-								.execute()).getEntryFirstRep().getResource());
+						Object searchObj = client.getClass().getMethod("search").invoke(client);
+						Method forResourceMethod = searchObj.getClass().getMethod("forResource", String.class);
+						forResourceMethod.setAccessible(true);
+						Object forResource = forResourceMethod.invoke(searchObj, resourceType);
+						Object stringClientParam = cl.loadClass("ca.uhn.fhir.rest.gclient.StringClientParam").getConstructor(String.class).newInstance("_id");
+						Method matchesMethod = stringClientParam.getClass().getMethod("matchesExactly");
+						matchesMethod.setAccessible(true);
+						stringClientParam = matchesMethod.invoke(stringClientParam);
+						Method valueMethod = stringClientParam.getClass().getMethod("value", String.class);
+						valueMethod.setAccessible(true);
+						stringClientParam = valueMethod.invoke(stringClientParam, resourceId);
+						Method whereMethod = forResource.getClass().getMethod("where", cl.loadClass("ca.uhn.fhir.rest.gclient.ICriterion"));
+						whereMethod.setAccessible(true);
+						Object whereObj = whereMethod.invoke(forResource, stringClientParam);
+						Method execMethod = whereObj.getClass().getMethod("execute");
+						execMethod.setAccessible(true);
+						Object execObj = execMethod.invoke(whereObj);
+						Object entryObj = execObj.getClass().getMethod("getEntryFirstRep").invoke(execObj);
+						results.put(RESOURCE, entryObj.getClass().getMethod("getResource").invoke(entryObj));
+					} else if (fhirVersion.equalsIgnoreCase(STU3) || fhirVersion.equalsIgnoreCase(R4)) {
+						Object searchObj = client.getClass().getMethod("search").invoke(client);
+						Method forResourceMethod = searchObj.getClass().getMethod("forResource", String.class);
+						forResourceMethod.setAccessible(true);
+						Object forResource = forResourceMethod.invoke(searchObj, resourceType);
+						Object tokenClientParam = cl.loadClass("ca.uhn.fhir.rest.gclient.TokenClientParam").getConstructor(String.class).newInstance("_id");
+						Method exactlyMethod = tokenClientParam.getClass().getMethod("exactly");
+						exactlyMethod.setAccessible(true);
+						tokenClientParam = exactlyMethod.invoke(tokenClientParam);
+						Method codeMethod = tokenClientParam.getClass().getMethod("code", String.class);
+						codeMethod.setAccessible(true);
+						tokenClientParam = codeMethod.invoke(tokenClientParam, resourceId);
+						Method whereMethod = forResource.getClass().getMethod("where", cl.loadClass("ca.uhn.fhir.rest.gclient.ICriterion"));
+						whereMethod.setAccessible(true);
+						Object whereObj = whereMethod.invoke(forResource, tokenClientParam);
+						Method execMethod = whereObj.getClass().getMethod("execute");
+						execMethod.setAccessible(true);
+						Object execObj = execMethod.invoke(whereObj);
+						Object entryObj = execObj.getClass().getMethod("getEntryFirstRep").invoke(execObj);
+						results.put(RESOURCE, entryObj.getClass().getMethod("getResource").invoke(entryObj));
 					}
 
 					manager.completeWorkItem(workItem.getId(), results);

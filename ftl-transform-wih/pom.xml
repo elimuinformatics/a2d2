@@ -43,14 +43,17 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu2</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu3</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-client</artifactId>
+			<scope>test</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>
@@ -61,6 +64,7 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-base</artifactId>
+			<scope>test</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>
@@ -162,6 +166,10 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+   	 		<artifactId>slf4j-api</artifactId>
 		</dependency>
 	</dependencies>
 </project>

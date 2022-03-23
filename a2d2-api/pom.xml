@@ -151,17 +151,6 @@
 			<version>1.2.3</version>
 		</dependency>
 		<dependency>
-			<groupId>io.elimu.a2d2</groupId>
-			<artifactId>task-utilities</artifactId>
-			<version>1.0.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-io</groupId>
-					<artifactId>commons-io</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<version>1.4.19</version>
@@ -277,23 +266,6 @@
 			<artifactId>fhir-resource-wih</artifactId>
 			<version>${wih.version}</version>
 		</dependency>
-		<!-- Added for phq9-registry converters to work -->
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>org.hl7.fhir.utilities</artifactId>
-			<version>${hapi.fhir.util.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-converter</artifactId>
-			<version>${hapi.fhir.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
-			<version>${hapi.fhir.version}</version>
-		</dependency>
-		<!-- END added for phq9-registry converters -->
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cdshooks-wih</artifactId>
@@ -728,7 +700,6 @@
 			<version>2.6.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- integration with Swagger API doc generation http://goo.gl/J5FQDM -->
 		<!-- integration with Swagger API doc generation http://goo.gl/J5FQDM -->
 		<dependency>
 			<groupId>io.springfox</groupId>

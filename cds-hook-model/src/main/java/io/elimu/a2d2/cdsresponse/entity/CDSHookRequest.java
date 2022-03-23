@@ -16,8 +16,6 @@ package io.elimu.a2d2.cdsresponse.entity;
 
 import java.util.Map;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
 public class CDSHookRequest {
 
 	private String hook;
@@ -27,8 +25,8 @@ public class CDSHookRequest {
 	private String user;
 	private Map<String, Object> context;
 	private Map<String, Object> prefetch;
-	private Map<String, IBaseResource> contextResources;
-	private Map<String, IBaseResource> prefetchResources;
+	private Map<String, Object> contextResources;
+	private Map<String, Object> prefetchResources;
 
 	public String getHook() {
 		return hook;
@@ -103,28 +101,28 @@ public class CDSHookRequest {
 	/**
 	 * @return the contextResources
 	 */
-	public Map<String, IBaseResource> getContextResources() {
+	public Map<String, Object> getContextResources() {
 		return contextResources;
 	}
 
 	/**
 	 * @param contextResources the contextResources to set
 	 */
-	public void setContextResources(Map<String, IBaseResource> contextResources) {
+	public void setContextResources(Map<String, Object> contextResources) {
 		this.contextResources = contextResources;
 	}
 
 	/**
 	 * @return the prefetchResources
 	 */
-	public Map<String, IBaseResource> getPrefetchResources() {
+	public Map<String, Object> getPrefetchResources() {
 		return prefetchResources;
 	}
 
 	/**
 	 * @param prefetchResources the prefetchResources to set
 	 */
-	public void setPrefetchResources(Map<String, IBaseResource> prefetchResources) {
+	public void setPrefetchResources(Map<String, Object> prefetchResources) {
 		this.prefetchResources = prefetchResources;
 	}
 
