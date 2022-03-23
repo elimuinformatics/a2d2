@@ -375,6 +375,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>kie-based-services</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.inject</groupId>

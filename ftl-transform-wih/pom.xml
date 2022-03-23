@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>kie-based-services</artifactId>
-			<version>${project.parent.version}</version>
+			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>
