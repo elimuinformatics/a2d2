@@ -57,6 +57,7 @@ public class ConfigRegisterableItemsFactory extends BasicRegisterableItemsFactor
 	
 	@Override
 	public Map<String, WorkItemHandler> getWorkItemHandlers(RuntimeEngine runtime) {
+		Thread.currentThread().setContextClassLoader(kcontainer.getClassLoader());//used by WIHs to determine FHIR classes
 		Map<String, WorkItemHandler> defaultHandlers = new HashMap<>();
         if (getDescriptor() != null) {
         	Map<String, Object> params = getParametersMap(runtime);
