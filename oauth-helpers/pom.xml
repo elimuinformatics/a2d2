@@ -23,15 +23,15 @@
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>oauth-helpers</artifactId>
-	<version>0.0.8</version>
+	<version>0.0.9</version>
 	<description>OAuth Helper</description>
 
 	<properties>
-		<genericmodel.version>0.0.1-SNAPSHOT</genericmodel.version>
+		<genericmodel.version>0.0.3-SNAPSHOT</genericmodel.version>
 	</properties>
 
 	<dependencies>

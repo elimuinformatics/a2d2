@@ -23,12 +23,11 @@
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>fhir-query-helper-base</artifactId>
-	<version>0.0.8</version>
+	<version>0.0.9</version>
 	<description>CDS Helper base</description>
 
 	<properties>
@@ -41,7 +40,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

@@ -6,7 +6,7 @@
 	
 	<groupId>io.elimu.a2d2</groupId>
 	<artifactId>task-utilities</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 	<description>Task Utilities</description>
 

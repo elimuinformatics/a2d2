@@ -22,13 +22,12 @@
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>core-wih</artifactId>
 	<packaging>jar</packaging>
 
 	<name>core-wih</name>
-	<version>0.0.2-SNAPSHOT</version>
 	<url>http://maven.apache.org</url>
 
 	<properties>

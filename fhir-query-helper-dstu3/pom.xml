@@ -22,12 +22,11 @@
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>fhir-query-helper-dstu3</artifactId>
-	<version>0.0.8</version>
+	<version>0.0.9</version>
 	<packaging>jar</packaging>
 	<description>CDS Helper DSTU3</description>
 
@@ -36,7 +35,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.3-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>

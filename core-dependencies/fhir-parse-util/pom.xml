@@ -21,13 +21,11 @@
 	<parent>
 	  <groupId>io.elimu.a2d2</groupId>
 	  <artifactId>core-dependencies</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>
-	  <relativePath/>
+	  <version>0.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>fhir-parse-util</artifactId>
 	<name>FHIR Parse Utilities</name>
-	<version>0.0.2-SNAPSHOT</version>
 	<description>Implementation for FHIR Parsing utilities</description>
 
 

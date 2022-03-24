@@ -3,10 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.elimu.a2d2</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
+		<base.version>0.0.3-SNAPSHOT</base.version>
 		<jdk.version>1.8</jdk.version>
 		<kie.version>7.50.0.Final</kie.version>
 		<wb.kie.version>7.50.0.Final</wb.kie.version>
@@ -21,7 +22,7 @@
 		<jackson.version>2.12.3</jackson.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
-		<cds.helper.version>0.0.8</cds.helper.version>
+		<cds.helper.version>0.0.9</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
 		<jacoco.version>0.8.7</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
@@ -175,27 +176,27 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>web-util</artifactId>
-				<version>${project.version}</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>fhir-parse-util</artifactId>
-				<version>${project.version}</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>cds-hook-model</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-model</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-helpers</artifactId>
-				<version>0.0.4</version>
+				<version>${cds.helper.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
@@ -212,7 +213,16 @@
 				<artifactId>fhir-query-helper-r4</artifactId>
 				<version>${cds.helper.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>fhir-helpers</artifactId>
+				<version>${cds.helper.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>oauth-helpers</artifactId>
+				<version>${cds.helper.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>fhir-query-helper-base</artifactId>
@@ -221,22 +231,22 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>kie-based-services</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>service-daos</artifactId>
-				<version>${project.version}</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>cds-hook-services</artifactId>
-				<version>${project.version}</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>patient-review-kjar-helper</artifactId>
-				<version>${project.version}</version>
+				<version>${base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.kie</groupId>
