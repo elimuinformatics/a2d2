@@ -20,7 +20,7 @@
 
   <groupId>io.elimu.a2d2</groupId>
   <artifactId>cdshooks-wih</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cdshooks-wih</name>
@@ -80,6 +80,6 @@
   <parent>
   	<groupId>io.elimu.a2d2</groupId>
   	<artifactId>parent</artifactId>
-  	<version>0.0.3-SNAPSHOT</version>
+  	<version>0.0.4-SNAPSHOT</version>
   </parent>
 </project>

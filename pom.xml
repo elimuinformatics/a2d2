@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.elimu.a2d2</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<base.version>0.0.3-SNAPSHOT</base.version>
+		<base.version>0.0.4-SNAPSHOT</base.version>
 		<jdk.version>1.8</jdk.version>
 		<kie.version>7.50.0.Final</kie.version>
 		<wb.kie.version>7.50.0.Final</wb.kie.version>
