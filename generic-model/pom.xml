@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.6-SNAPSHOT</version>
+		<version>0.0.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>generic-model</artifactId>
 	<name>Base model for the Generic services</name>

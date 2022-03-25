@@ -37,16 +37,12 @@ public class FhirParseUtil {
 		}
 
 		public Object getCtx() {
-			synchronized (this) {
-				if (ctx == null) {
-					try {
-						ClassLoader cl = Thread.currentThread().getContextClassLoader();
-						Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
-						this.ctx = ctxClass.getMethod(method).invoke(null);
-					} catch (Exception e) {
-						throw new RuntimeException("Cannot instantiate FhirContext", e);
-					}
-				}
+			try {
+				ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
+				this.ctx = ctxClass.getMethod(method).invoke(null);
+			} catch (Exception e) {
+				throw new RuntimeException("Cannot instantiate FhirContext", e);
 			}
 			return ctx;
 		}
