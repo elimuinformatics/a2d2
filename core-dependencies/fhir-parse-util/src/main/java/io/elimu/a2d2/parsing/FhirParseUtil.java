@@ -29,20 +29,25 @@ public class FhirParseUtil {
 		FHIR3("forDstu3"),
 		FHIR4("forR4");
 
-
-		private final Object ctx;
+		private final String method;
+		private Object ctx;
 
 		FormatType(String method) { 
-			try {
-				ClassLoader cl = Thread.currentThread().getContextClassLoader();
-				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
-				this.ctx = ctxClass.getMethod(method).invoke(null);
-			} catch (Exception e) {
-				throw new RuntimeException("Cannot instantiate FhirContext", e);
-			}
+			this.method = method;
 		}
 
 		public Object getCtx() {
+			synchronized (this) {
+				if (ctx == null) {
+					try {
+						ClassLoader cl = Thread.currentThread().getContextClassLoader();
+						Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
+						this.ctx = ctxClass.getMethod(method).invoke(null);
+					} catch (Exception e) {
+						throw new RuntimeException("Cannot instantiate FhirContext", e);
+					}
+				}
+			}
 			return ctx;
 		}
 	}
