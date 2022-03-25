@@ -21,7 +21,7 @@
 	<parent>
 	  <groupId>io.elimu.a2d2</groupId>
 	  <artifactId>core-dependencies</artifactId>
-	  <version>0.0.4-SNAPSHOT</version>
+	  <version>0.0.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>datafetch-service</artifactId>
