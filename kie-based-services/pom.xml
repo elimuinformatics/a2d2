@@ -4,13 +4,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>io.elimu.a2d2</groupId>
-		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/>
-	</parent>
 	<artifactId>kie-based-services</artifactId>
+	<version>0.0.7-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>Kie Based Services</description>
 
@@ -49,6 +44,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-model</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kie</groupId>
@@ -581,6 +577,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>service-daos</artifactId>
+			<version>${project.parent.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.code.gson</groupId>
@@ -656,5 +653,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<parent>
+		<groupId>io.elimu.a2d2</groupId>
+		<artifactId>parent</artifactId>
+		<version>0.0.7-SNAPSHOT</version>
+	</parent>
 </project>
 

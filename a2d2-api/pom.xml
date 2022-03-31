@@ -32,6 +32,7 @@
 	</parent>
 
 	<properties>
+		<internal.deps.version>0.0.7-SNAPSHOT</internal.deps.version>
 		<hapi.fhir.version>5.6.0</hapi.fhir.version>
 		<hapi.fhir.util.version>5.5.7</hapi.fhir.util.version>
 		<!-- <kie.version>7.50.0.Final</kie.version> -->
@@ -47,7 +48,6 @@
 		<logback-classic.version>1.2.10</logback-classic.version>
 		<logback-core.version>1.2.9</logback-core.version>
 		<checker-qual.version>3.8.0</checker-qual.version>		
-		<wih.version>0.0.2-SNAPSHOT</wih.version>
 	</properties>
 
 	<dependencyManagement>
@@ -180,7 +180,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>web-util</artifactId>
-			<version>${project.version}</version>
+			<version>${internal.deps.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.spec.javax.servlet</groupId>
@@ -191,7 +191,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-services</artifactId>
-			<version>${project.version}</version>
+			<version>${internal.deps.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.thoughtworks.xstream</groupId>
@@ -210,7 +210,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>core-wih</artifactId>
-			<version>${wih.version}</version>
+			<version>${internal.deps.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.thoughtworks.xstream</groupId>
@@ -259,17 +259,17 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>ftl-transform-wih</artifactId>
-			<version>${wih.version}</version>
+			<version>${internal.deps.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>fhir-resource-wih</artifactId>
-			<version>${wih.version}</version>
+			<version>${internal.deps.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cdshooks-wih</artifactId>
-			<version>${wih.version}</version>
+			<version>${internal.deps.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -285,7 +285,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-helpers</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.9</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- web development, including Tomcat and spring-webmvc -->
@@ -867,7 +867,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>sms-wih</artifactId>
-			<version>${wih.version}</version>
+			<version>${internal.deps.version}</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
