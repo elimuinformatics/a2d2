@@ -25,30 +25,22 @@ public class ConfigAPIUtil {
 	
 	public Map<String, Object> getConfig(String environment, String client, String appName) {
 		Map<String, Object> retval = new HashMap<>();
-		String prefix = System.getProperty("proc.envvar.prefix");
-		String configApiUrl = System.getProperty(prefix + ".allservices.configApiUrl");
+		String configApiUrl = System.getProperty("configApiUrl");
 		if (configApiUrl == null) {
 			return retval;
 		}
-		String token = generateToken(prefix);
+		String token = generateToken();
 		if (token == null) {
 			return retval;
 		}
-		retval.putAll(readUrlIntoRetval(configApiUrl + "/default/" + environment + "/default"));
-		retval.putAll(readUrlIntoRetval(configApiUrl + "/default/" + environment + "/" + appName));
-		retval.putAll(readUrlIntoRetval(configApiUrl + "/" + client + "/" + environment + "/default"));
-		retval.putAll(readUrlIntoRetval(configApiUrl + "/" + client + "/" + environment + "/" + appName));
-		return retval;
-	}
-
-	private Map<String, Object> readUrlIntoRetval(String url) {
-		Map<String, Object> retval = new HashMap<>();
+		String url = configApiUrl + "/" + client + "/" + environment + "/" + appName;
 		CachedResult result = CACHE.get(url);
 		if (result != null && !result.isOld()) {
 			retval.putAll(result.getVariables());
 		} else {
 			try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
 				HttpGet get = new HttpGet(url);
+				get.addHeader("Authorization", "Bearer " + token);
 				HttpResponse response = httpclient.execute(get);
 				if (response.getStatusLine().getStatusCode() == 200) {
 					JsonNode data = new ObjectMapper().readTree(response.getEntity().getContent());
@@ -78,12 +70,13 @@ public class ConfigAPIUtil {
 		return retval;
 	}
 
-	private String generateToken(String prefix) {
-		String clientId = System.getProperty(prefix + ".allservices.configApiClientId");
+	private String generateToken() {
+		String prefix = System.getProperty("proc.envvar.prefix");
+		String clientId = System.getProperty("configApiClientId");
 		if (clientId == null) {
 			return null;
 		}
-		String clientSecret = System.getProperty(prefix + ".allservices.configApiClientSecret");
+		String clientSecret = System.getProperty("configApiClientSecret");
 		if (clientSecret == null) {
 			return null;
 		}
