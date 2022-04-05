@@ -5,18 +5,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.drools.core.spi.KnowledgeHelper;
 
-import io.elimu.a2d2.exception.WorkItemHandlerException;
 import io.elimu.a2d2.genericmodel.ServiceRequest;
 
 public class MixPanelService {
 	private static final MixPanelService INSTANCE = new MixPanelService();
 
-	private ThreadLocal<String> distinctId = ThreadLocal.withInitial(() -> "");
-	
+	private ThreadLocal<ServiceRequest> requestData = new ThreadLocal<>();
+	private ThreadLocal<String> distinctId = new ThreadLocal<>();
 	private MixPanelService() {
 	}
 
@@ -29,20 +27,18 @@ public class MixPanelService {
 	}
 	
 	public void identify(ServiceRequest request) {
-		//TODO this still needs to be decided. There are open discussions on how to extract the discinctId
-		//One proposal is to send it on the HTTP body, but it would disrupt service structure and openness of the omnibus-api service model
-		//Other alternatives would be as HTTP headers
-		//Another option could be to extract it from the HTTP OAuth as well, if possible
+		if (request != null) {
+			this.requestData.set(request);
+		}
 	}
 	
 	public void track(KnowledgeHelper drools, String eventName, Map<String, Object> action) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("eventDescription", eventName);
 		String distinctId = this.distinctId.get();
-		if ("".equals(distinctId) || distinctId == null) {
-			distinctId = UUID.randomUUID().toString();
-		}
 		parameters.put("distinctId", distinctId);
+		ServiceRequest request = this.requestData.get();
+		parameters.put("serviceRequest", request);
 		if (action != null) {
 			for (String key : action.keySet()) {
 				parameters.put("mixpanel_" + key, action.get(key));

@@ -21,7 +21,6 @@ public class MixPanelStack implements Runnable {
 	
 	private final Stack<JSONObject> events = new Stack<>();
 
-	private String distinctId; 
 	private String token;
 
 	private MixPanelStack() {
@@ -107,5 +106,9 @@ public class MixPanelStack implements Runnable {
 		} catch (JSONException e) {
 			LOG.warn("problem creating MixPanel event data", e);
 		}
+	}
+
+	public int size() {
+		return events.size();
 	}
 }
