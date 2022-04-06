@@ -40,7 +40,7 @@
 		<jasypt.version>3.0.3</jasypt.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<maven.version>3.8.4</maven.version>
-		<tomcat-embed-websocket.version>9.0.55</tomcat-embed-websocket.version>
+		<tomcat-embed-websocket.version>9.0.62</tomcat-embed-websocket.version>
 		<spring.version>5.3.15</spring.version>
 		<resteasy-client.version>4.7.2.Final</resteasy-client.version>
 		<tomcat-embed-core.version>9.0.62</tomcat-embed-core.version>
