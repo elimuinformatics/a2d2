@@ -51,6 +51,7 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 	
 	protected void process(JSONObject event) {
 		event.put("distinctId", this.distinctId);
+		event.put("$distinct_id", distinctId);
 		this.otherData.forEach((k,v) -> event.put(k, v));
 		MixPanelStack.getInstance().add(event);
 	}

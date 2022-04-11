@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.elimu.a2d2.genericmodel.ServiceRequest;
 import io.elimu.a2d2.oauth.BodyBuilder;
 import io.elimu.a2d2.oauth.OAuthUtils;
 
@@ -21,15 +22,18 @@ public class ConfigAPIUtil {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ConfigAPIUtil.class);
 
+	private static final String AUTH_HEADER = "Authorization";
+	private static final String BEARER_PREFIX = "Bearer ";
+	
 	private final static Map<String, CachedResult> CACHE = new HashMap<>();
 	
-	public Map<String, Object> getConfig(String environment, String client, String appName) {
+	public Map<String, Object> getConfig(ServiceRequest request, String environment, String client, String appName) {
 		Map<String, Object> retval = new HashMap<>();
 		String configApiUrl = System.getProperty("configApiUrl");
 		if (configApiUrl == null) {
 			return retval;
 		}
-		String token = generateToken();
+		String token = getOrGenerateToken(request);
 		if (token == null) {
 			return retval;
 		}
@@ -40,7 +44,7 @@ public class ConfigAPIUtil {
 		} else {
 			try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
 				HttpGet get = new HttpGet(url);
-				get.addHeader("Authorization", "Bearer " + token);
+				get.addHeader(AUTH_HEADER, BEARER_PREFIX + token);
 				HttpResponse response = httpclient.execute(get);
 				if (response.getStatusLine().getStatusCode() == 200) {
 					JsonNode data = new ObjectMapper().readTree(response.getEntity().getContent());
@@ -67,10 +71,14 @@ public class ConfigAPIUtil {
 				LOG.warn("Error invoking config-api", e);
 			}
 		}
+		LOG.info("ConfigAPIUtil fetched {} variable values", CACHE.get(url).getVariables().size());
 		return retval;
 	}
 
-	private String generateToken() {
+	private String getOrGenerateToken(ServiceRequest request) {
+		if (request != null && request.getHeader(AUTH_HEADER) != null && request.getHeader(AUTH_HEADER).startsWith(BEARER_PREFIX)) {
+			return request.getHeader(AUTH_HEADER).replace(BEARER_PREFIX, "");
+		}
 		String prefix = System.getProperty("proc.envvar.prefix");
 		String clientId = System.getProperty("configApiClientId");
 		if (clientId == null) {

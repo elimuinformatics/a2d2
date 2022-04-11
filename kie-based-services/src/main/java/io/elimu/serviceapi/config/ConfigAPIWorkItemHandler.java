@@ -8,6 +8,7 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.api.runtime.process.WorkflowProcessInstance;
 
+import io.elimu.a2d2.genericmodel.ServiceRequest;
 import io.elimu.serviceapi.service.AppContextUtils;
 
 public class ConfigAPIWorkItemHandler implements WorkItemHandler {
@@ -24,7 +25,8 @@ public class ConfigAPIWorkItemHandler implements WorkItemHandler {
 		String appName = (String) workItem.getParameter("configApiAppName");
 		String client = (String) workItem.getParameter("configApiClient");
 		WorkflowProcessInstance pI = (WorkflowProcessInstance) ksession.getProcessInstance(workItem.getProcessInstanceId());
-		Map<String, Object> newValues = new ConfigAPIUtil().getConfig(env, client, appName);
+		ServiceRequest request = (ServiceRequest) pI.getVariable("serviceRequest");
+		Map<String, Object> newValues = new ConfigAPIUtil().getConfig(request, env, client, appName);
 		for (Map.Entry<String, Object> entry : newValues.entrySet()) {
 			pI.setVariable(entry.getKey(), entry.getValue());
 		}

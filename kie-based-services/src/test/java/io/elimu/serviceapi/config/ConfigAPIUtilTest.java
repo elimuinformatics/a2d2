@@ -6,12 +6,14 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Test;
 
+import io.elimu.a2d2.genericmodel.ServiceRequest;
+
 public class ConfigAPIUtilTest {
 
 	@Test
 	public void testConfigApiCall() throws Exception {
 		ConfigAPIUtil util = new ConfigAPIUtil();
-		Map<String, Object> values = util.getConfig("dev", "default", "pphtn-submit");
+		Map<String, Object> values = util.getConfig(new ServiceRequest(), "dev", "default", "pphtn-submit");
 		Assert.assertNotNull(values);
 		Assert.assertTrue(values.isEmpty());
 
@@ -36,7 +38,7 @@ public class ConfigAPIUtilTest {
 		System.setProperty("testenv.allservices.fhirPassword", System.getProperty("password"));
 		System.setProperty("testenv.allservices.fhirScope", System.getProperty("scope"));
 		
-		values = util.getConfig("dev", "default", "pphtn-submit");
+		values = util.getConfig(new ServiceRequest(), "dev", "default", "pphtn-submit");
 		Assert.assertNotNull(values);
 		Assert.assertFalse(values.isEmpty());
 		Assert.assertTrue(values.containsKey("fhirBaseUrl"));
