@@ -21,7 +21,6 @@ public class MixPanelStack implements Runnable {
 	
 	private final Stack<JSONObject> events = new Stack<>();
 
-	private String distinctId; 
 	private String token;
 
 	private MixPanelStack() {
@@ -59,10 +58,7 @@ public class MixPanelStack implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			if (events.empty() || distinctId == null) {
-				if (distinctId == null) {
-					LOG.warn("Issue initializing mixpanel app (JVM property mixpanel.app.name not initialized)");
-				}
+			if (events.empty()) {
 				try {
 					Thread.sleep(5000L);
 				} catch (InterruptedException e) {
@@ -110,5 +106,9 @@ public class MixPanelStack implements Runnable {
 		} catch (JSONException e) {
 			LOG.warn("problem creating MixPanel event data", e);
 		}
+	}
+
+	public int size() {
+		return events.size();
 	}
 }

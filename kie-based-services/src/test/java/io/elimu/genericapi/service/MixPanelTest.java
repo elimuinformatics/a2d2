@@ -1,13 +1,18 @@
 package io.elimu.genericapi.service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Properties;
 
+import org.drools.core.event.ProcessVariableChangedEventImpl;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.junit.Test;
 import org.kie.api.event.process.ProcessStartedEvent;
+import org.kie.api.event.process.ProcessVariableChangedEvent;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.process.ProcessInstance;
+
+import io.elimu.a2d2.genericmodel.ServiceRequest;
 
 public class MixPanelTest {
 
@@ -51,7 +56,15 @@ public class MixPanelTest {
 				return null;
 			}
 		};
+		ServiceRequest request = new ServiceRequest();
+		request.addHeaderValue("mixpanel-distinct-id", "test-distinct-id");
+		request.addHeaderValue("mixpanel-whatever-field", "test value");
+		ProcessVariableChangedEvent serviceRequestEvent = new ProcessVariableChangedEventImpl(
+				"serviceRequest", "serviceRequest", null, request, Collections.emptyList(), procInst, null);
+		listener.afterVariableChanged(serviceRequestEvent);
 		listener.beforeProcessStarted(evt);
-		Thread.sleep(10000);//wait for messages to be consumed
+		while (MixPanelStack.getInstance().size() > 0) {
+			Thread.sleep(1000); //wait for messages to be consumed
+		}
 	}
 }
