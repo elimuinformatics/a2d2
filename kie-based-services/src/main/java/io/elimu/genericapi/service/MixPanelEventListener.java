@@ -1,5 +1,7 @@
 package io.elimu.genericapi.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -41,6 +43,7 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 	private static final Logger LOG = LoggerFactory.getLogger(MixPanelEventListener.class);
 	private final Properties serviceConfig;
 	private String distinctId;
+	private Map<String, String> otherData = new HashMap<>();
 	
 	public MixPanelEventListener(Properties config) {
 		this.serviceConfig = config;
@@ -48,13 +51,19 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 	
 	protected void process(JSONObject event) {
 		event.put("distinctId", this.distinctId);
+		this.otherData.forEach((k,v) -> event.put(k, v));
 		MixPanelStack.getInstance().add(event);
 	}
 	
 	protected void identify(ServiceRequest serviceRequest) {
-		//TODO same implementation as MixPanelService must be placed here
 		if (serviceRequest != null) {
-			this.distinctId = serviceRequest.getHeader("x-practitioner-id") + "_" + serviceRequest.getHeader("x-organization-id");
+			this.distinctId = serviceRequest.getHeader("mixpanel-distinct-id");
+			this.otherData.clear();
+			for (String headerName : serviceRequest.getHeaders().keySet()) {
+				if (headerName.startsWith("mixpanel-")) {
+					this.otherData.put(headerName.replace("mixpanel-", ""), serviceRequest.getHeader(headerName));
+				}
+			}
 		}
 	}
 	
