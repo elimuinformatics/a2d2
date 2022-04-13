@@ -51,6 +51,7 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 				distinctId = request.getHeader(MIXPANEL_REQUEST_PREFIX + "distinct-id");
 			}
 		}
+		evt.put("$distinct_id", distinctId);
 		MessageBuilder messageBuilder = new MessageBuilder(appToken);
 		JSONObject omnibusEvent = messageBuilder.event(distinctId, evtName, evt);
 		MixpanelAPI mixpanel = new MixpanelAPI(mixpanelUrl + "/track", mixpanelUrl + "/engage");
