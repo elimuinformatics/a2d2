@@ -42,9 +42,9 @@ import io.elimu.a2d2.genericmodel.ServiceResponse;
 import io.elimu.a2d2.process.ServiceUtils;
 import io.elimu.genericapi.plugins.ModulePluginLoader;
 import io.elimu.genericapi.scrubbers.ScrubberLocator;
+import io.elimu.serviceapi.config.ConfigAPIProcessVariableInitHelper;
 import io.elimu.serviceapi.service.AbstractKieService;
 import io.elimu.serviceapi.service.AppContextUtils;
-import io.elimu.serviceapi.service.ProcessVariableInitHelper;
 
 public class GenericKieBasedService extends AbstractKieService implements GenericService {
 
@@ -57,7 +57,6 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 	private String processId;
 	private boolean logExecution = false;
 	private Properties config;
-	ProcessVariableInitHelper processVariableHelper;
 	private JSONObject discoveryDsl;
 	
 	public JSONObject getDiscoveryDsl() {
@@ -100,7 +99,6 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		} catch (IOException e) {
 			throw new GenericServiceConfigException("File " + appConfigFile + " found, but couldn't be read. Service " + getId() + " not loaded.", e);
 		}
-		processVariableHelper = new ProcessVariableInitHelper();
 		URL jarPath = ServiceUtils.toJarPath(getDependency());
 		//priority 1: localized service properties file
 		//configure a system property pointing to the server's config folder
@@ -143,7 +141,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				params.put("serviceRequest", request);
 				params.put("serviceResponse", defaultResponse());
 				params.put("defaultCustomer", getDefaultCustomer());
-				params.putAll(processVariableHelper.initVariables(getDependency()));
+				params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, getClient(), getDependency(), getConfig()));
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {
@@ -179,6 +177,11 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		}
 	}
 	
+	private String getClient() {
+		// This might change if we have to extract the value from somewhere else. For now, it is the same as defaultCustomer
+		return getDefaultCustomer();
+	}
+
 	private String appendListenerOutput(ServiceRequest request, GenericDebugListener listener, String body) {
 		if ("true".equalsIgnoreCase(request.getHeader("x-output-debug"))) {
 			return listener.toJson(body); //outputs JSON with the listener collected data
