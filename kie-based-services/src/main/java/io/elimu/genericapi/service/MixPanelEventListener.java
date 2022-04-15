@@ -86,6 +86,7 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 			try {
 				JSONObject evt = new JSONObject();
 				evt.put("eventType", ("afterMatchFired"));
+				evt.put("eventDescription", "Rule " + event.getMatch().getRule().getName() + " fired");
 				evt.put("ruleName", (event.getMatch().getRule().getName()));
 				JSONArray array = new JSONArray();
 				for (Object obj : event.getMatch().getObjects()) {
