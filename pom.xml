@@ -20,6 +20,7 @@
 		<spring.boot.starter.version>2.6.6</spring.boot.starter.version>
 		<spring.version>5.3.18</spring.version>
 		<jackson.version>2.12.3</jackson.version>
+		<protobuf-java.version>3.19.4</protobuf-java.version>		
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
 		<cds.helper.version>0.0.9</cds.helper.version>
