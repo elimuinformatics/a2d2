@@ -33,6 +33,7 @@
 	<properties>
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<org.json.version>20211205</org.json.version>
+		<sping-web.version>5.3.18</sping-web.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -102,7 +103,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>5.3.8</version>
+			<version>${sping-web.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
