@@ -144,7 +144,25 @@
 					<groupId>org.eclipse.aether</groupId>
 					<artifactId>aether-impl</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant-launcher</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant-launcher</artifactId>
+			<version>1.10.11</version>
+		</dependency>	
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.10.11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
