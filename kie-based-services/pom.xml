@@ -144,7 +144,16 @@
 					<groupId>org.eclipse.aether</groupId>
 					<artifactId>aether-impl</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.protobuf</groupId>
+					<artifactId>protobuf-java</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.protobuf</groupId>
+		    <artifactId>protobuf-java</artifactId>
+		    <version>${protobuf-java.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
