@@ -62,7 +62,21 @@ public class MixPanelEventListener implements ProcessEventListener, RuleRuntimeE
 			this.otherData.clear();
 			for (String headerName : serviceRequest.getHeaders().keySet()) {
 				if (headerName.startsWith("mixpanel-")) {
-					this.otherData.put(headerName.replace("mixpanel-", ""), serviceRequest.getHeader(headerName));
+					String startPoint = headerName.replace("mixpanel-", "");
+					startPoint = startPoint.replaceAll("-", " ");
+					String[] split = startPoint.split(" ");
+					StringBuilder attrName = new StringBuilder();
+					for (int index = 0; index < split.length; index++) {
+						String part = split[index];
+						if (part.length() < 1) {
+							continue;
+						}
+						if (index > 0) {
+							attrName.append(' ');
+						}
+						attrName.append(part.toUpperCase().charAt(0)).append(part.substring(1));
+					}
+					this.otherData.put(attrName.toString(), serviceRequest.getHeader(headerName));
 				}
 			}
 		}
