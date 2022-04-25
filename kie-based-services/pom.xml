@@ -146,8 +146,8 @@
 					<artifactId>aether-impl</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.apache.ant</groupId>
-					<artifactId>ant-launcher</artifactId>
+					<groupId>com.google.protobuf</groupId>
+					<artifactId>protobuf-java</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.ant</groupId>
@@ -156,9 +156,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.ant</groupId>
-			<artifactId>ant-launcher</artifactId>
-			<version>${ant.version}</version>
+		    <groupId>com.google.protobuf</groupId>
+		    <artifactId>protobuf-java</artifactId>
+		    <version>${protobuf-java.version}</version>
 		</dependency>	
 		<dependency>
 			<groupId>org.apache.ant</groupId>
