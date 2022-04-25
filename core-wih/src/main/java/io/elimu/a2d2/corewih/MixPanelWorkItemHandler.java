@@ -83,14 +83,6 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 		return retval.toString();
 	}
 
-	/*public static void main(String[] args) {
-		System.out.println(new MixPanelWorkItemHandler().prettify("mixpanel-organization-id"));
-		System.out.println(new MixPanelWorkItemHandler().prettify("mixpanel-organization-name"));
-		System.out.println(new MixPanelWorkItemHandler().prettify("some-other-name"));
-		System.out.println(new MixPanelWorkItemHandler().prettify("a-b-c-dee"));
-		System.out.println(new MixPanelWorkItemHandler().prettify("what---on-earth---"));
-	}*/
-	
 	@Override
 	public void abortWorkItem(WorkItem workItem, WorkItemManager manager) {
 		// do nothing
