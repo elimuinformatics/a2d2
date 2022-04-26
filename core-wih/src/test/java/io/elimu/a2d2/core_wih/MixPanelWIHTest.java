@@ -9,6 +9,7 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 
 import io.elimu.a2d2.corewih.MixPanelWorkItemHandler;
+import io.elimu.a2d2.genericmodel.ServiceRequest; 
 
 public class MixPanelWIHTest {
 
@@ -19,6 +20,9 @@ public class MixPanelWIHTest {
 			return;
 		}
 		WorkItemImpl workItem = new WorkItemImpl();
+		ServiceRequest sreq = new ServiceRequest();
+		sreq.addHeaderValue("mixpanel-some-value", "Some Value");
+		workItem.setParameter("serviceRequest", sreq);
 		workItem.setParameter("eventDescription", "My Test Event");
 		workItem.setParameter("mixpanel_info", "Some value");
 		workItem.setParameter("mixpanel_otherInfo", "Something else");

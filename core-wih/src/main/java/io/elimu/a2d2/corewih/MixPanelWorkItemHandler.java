@@ -44,14 +44,14 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 		if (request != null) {
 			for (String headerName : request.getHeaders().keySet()) {
 				if (headerName.startsWith(MIXPANEL_REQUEST_PREFIX)) {
-					evt.put(headerName.replace(MIXPANEL_REQUEST_PREFIX, ""), request.getHeader(headerName));
+					evt.put(prettify(headerName), request.getHeader(headerName));
 				}
 			}
 			if (request.getHeader(MIXPANEL_REQUEST_PREFIX + "distinct-id") != null) {
 				distinctId = request.getHeader(MIXPANEL_REQUEST_PREFIX + "distinct-id");
 			}
 		}
-		evt.put("$distinct_id", distinctId);
+		evt.put("distinct_id", distinctId);
 		MessageBuilder messageBuilder = new MessageBuilder(appToken);
 		JSONObject omnibusEvent = messageBuilder.event(distinctId, evtName, evt);
 		MixpanelAPI mixpanel = new MixpanelAPI(mixpanelUrl + "/track", mixpanelUrl + "/engage");
@@ -63,6 +63,24 @@ public class MixPanelWorkItemHandler implements WorkItemHandler {
 			LOG.error("Could not send event to mixpanel", e);
 			manager.abortWorkItem(workItem.getId());
 		}
+	}
+
+	private String prettify(String headerName) {
+		String startPoint = headerName.replace(MIXPANEL_REQUEST_PREFIX, "");
+		startPoint = startPoint.replaceAll("-", " ");
+		String[] split = startPoint.split(" ");
+		StringBuilder retval = new StringBuilder();
+		for (int index = 0; index < split.length; index++) {
+			String part = split[index];
+			if (part.length() < 1) {
+				continue;
+			}
+			if (index > 0) {
+				retval.append(' ');
+			}
+			retval.append(part.toUpperCase().charAt(0)).append(part.substring(1));
+		}
+		return retval.toString();
 	}
 
 	@Override
