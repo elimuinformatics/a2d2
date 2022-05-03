@@ -19,7 +19,7 @@
 		<hibernate.version>5.4.24.Final</hibernate.version>
 		<spring.boot.starter.version>2.6.7</spring.boot.starter.version>
 		<spring.version>5.3.19</spring.version>
-		<jackson.version>2.12.3</jackson.version>
+		<jackson.version>2.12.6.1</jackson.version>
 		<protobuf-java.version>3.19.4</protobuf-java.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
