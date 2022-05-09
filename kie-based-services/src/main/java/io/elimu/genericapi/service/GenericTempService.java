@@ -1,11 +1,13 @@
 package io.elimu.genericapi.service;
 
-import io.elimu.a2d2.genericmodel.ServiceRequest;
-import io.elimu.a2d2.genericmodel.ServiceResponse;
+import java.util.Arrays;
+import java.util.List;
 
 import org.kie.api.task.model.Task;
 
 import io.elimu.a2d2.cdsmodel.Dependency;
+import io.elimu.a2d2.genericmodel.ServiceRequest;
+import io.elimu.a2d2.genericmodel.ServiceResponse;
 
 public class GenericTempService implements GenericService {
 
@@ -51,5 +53,10 @@ public class GenericTempService implements GenericService {
 	@Override
 	public Task getTask(Long taskId) {
 		return null;
+	}
+	
+	@Override
+	public List<String> getOtherCustomers() {
+		return Arrays.asList(getDefaultCustomer());
 	}
 }

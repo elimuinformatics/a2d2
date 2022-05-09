@@ -59,7 +59,7 @@ public class ServiceStoreImpl implements ServiceStore {
 		cdsRepository.save(new ServiceInfo(service.getId(), versionNumber,
 				service.getDependency().getExternalForm(), "generic",
 				service.getDefaultCustomer(), service.getServiceCategory(),
-				"in-progress"));
+				"in-progress", service.getOtherCustomers()));
 		if(service.getDefaultCustomer()==null) {
 			log.error("kie-default customer is null");
 			return;

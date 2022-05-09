@@ -9,4 +9,4 @@ cds.based.project.description=Calculates Caprini scores and provides score, risk
 cds.based.project.prefetch.patient=Patient/{{context.patientId}}
 serviceCategory=cds-services
 packages=testing
-
+kie.project.space=example,elimu,om2

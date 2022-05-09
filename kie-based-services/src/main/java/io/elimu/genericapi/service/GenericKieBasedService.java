@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,9 @@ import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.elimu.a2d2.cdsmodel.Dependency;
 import io.elimu.a2d2.genericmodel.ServiceRequest;
 import io.elimu.a2d2.genericmodel.ServiceResponse;
@@ -58,6 +62,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 	private boolean logExecution = false;
 	private Properties config;
 	private JSONObject discoveryDsl;
+	private List<String> otherCustomers;;
 	
 	public JSONObject getDiscoveryDsl() {
 		return discoveryDsl;
@@ -117,6 +122,10 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			for (String plugin : pluginEntries.split(",")) {
 				ModulePluginLoader.get(getClassLoader(), plugin).process(getDependency());
 			}
+		}
+		//init other customers
+		if (config.getProperty("kie.project.space") != null) {
+			setOtherCustomers(Arrays.asList(config.getProperty("kie.project.space").split(",")));
 		}
 	}
 
@@ -321,4 +330,11 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		return getManager().getRuntimeEngine(ProcessInstanceIdContext.get()).getTaskService().getTaskById(taskId);
 	}
 
+	public void setOtherCustomers(List<String> otherCustomers) {
+		this.otherCustomers = otherCustomers;
+	}
+	
+	public List<String> getOtherCustomers() {
+		return otherCustomers;
+	}
 }
