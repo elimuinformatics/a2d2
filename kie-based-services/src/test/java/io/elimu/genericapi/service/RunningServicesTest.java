@@ -149,6 +149,8 @@ public class RunningServicesTest {
 		Assert.isTrue(service0.getOtherCustomers().contains("elimu"));
 		Assert.isTrue(service0.getOtherCustomers().contains("om2"));
 		Assert.isTrue(service0.getOtherCustomers().contains("example"));
+		Assert.isTrue(!service0.getOtherCustomers().stream().noneMatch(p -> p.equalsIgnoreCase("example")));
+		Assert.isTrue(service0.getOtherCustomers().stream().anyMatch(p -> p.equalsIgnoreCase("example")));
 		GenericService service1 = RunningServices.getInstance().unregister(dep.getArtifactId(), false);
 		Assert.isNull(service1);
 	}
