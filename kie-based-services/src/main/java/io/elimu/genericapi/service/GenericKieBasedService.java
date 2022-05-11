@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,9 @@ import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.elimu.a2d2.cdsmodel.Dependency;
 import io.elimu.a2d2.genericmodel.ServiceRequest;
 import io.elimu.a2d2.genericmodel.ServiceResponse;
@@ -58,6 +62,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 	private boolean logExecution = false;
 	private Properties config;
 	private JSONObject discoveryDsl;
+	private List<String> otherCustomers;;
 	
 	public JSONObject getDiscoveryDsl() {
 		return discoveryDsl;
@@ -118,6 +123,10 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				ModulePluginLoader.get(getClassLoader(), plugin).process(getDependency());
 			}
 		}
+		//init other customers
+		if (config.getProperty("kie.project.space") != null) {
+			setOtherCustomers(Arrays.asList(config.getProperty("kie.project.space").split(",")));
+		}
 	}
 
 
@@ -141,7 +150,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				params.put("serviceRequest", request);
 				params.put("serviceResponse", defaultResponse());
 				params.put("defaultCustomer", getDefaultCustomer());
-				params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, getClient(), getDependency(), getConfig()));
+				params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, getClient(request), getDependency(), getConfig()));
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {
@@ -177,9 +186,21 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		}
 	}
 	
-	private String getClient() {
-		// This might change if we have to extract the value from somewhere else. For now, it is the same as defaultCustomer
-		return getDefaultCustomer();
+	private String getClient(ServiceRequest request) {
+		String auth = request.getHeader("Authorization");
+		if (auth == null) {
+			return getDefaultCustomer();
+		}
+		try {
+			String token = auth.replace("Bearer ", "");
+			String tokenClaim = token.split("\\.")[1];
+			tokenClaim = new String(Base64.getDecoder().decode(tokenClaim.getBytes()));
+			JsonNode node = new ObjectMapper().readTree(tokenClaim.getBytes());
+			return node.has("tenant") ? node.get("tenant").asText() : getDefaultCustomer();
+		} catch (IOException | NullPointerException e) {
+			LOG.warn("Couldn't extract tenant from bearer token: {}", e.getMessage());
+			return getDefaultCustomer();
+		}
 	}
 
 	private String appendListenerOutput(ServiceRequest request, GenericDebugListener listener, String body) {
@@ -321,4 +342,11 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		return getManager().getRuntimeEngine(ProcessInstanceIdContext.get()).getTaskService().getTaskById(taskId);
 	}
 
+	public void setOtherCustomers(List<String> otherCustomers) {
+		this.otherCustomers = otherCustomers;
+	}
+	
+	public List<String> getOtherCustomers() {
+		return otherCustomers;
+	}
 }

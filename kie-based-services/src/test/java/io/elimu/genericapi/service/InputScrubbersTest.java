@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -32,7 +33,7 @@ import io.jsonwebtoken.lang.Assert;
 public class InputScrubbersTest {
 
 	ServiceInfo serviceInfo = new ServiceInfo("input-show-service", 5L, "io.elimu.generic:input-show-service:1.0.1",
-			"generic", "testing", "cds-services", "done");
+			"generic", "testing", "cds-services", "done", new ArrayList<>());
 
 	@BeforeClass
 	public static void setUp() throws Exception {

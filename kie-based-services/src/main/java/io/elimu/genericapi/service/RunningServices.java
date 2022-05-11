@@ -299,7 +299,7 @@ public class RunningServices {
 
 	public String getSpaceFromJar(Dependency dep) throws IOException {
 		Properties props = ServiceUtils.getConfig(dep, AppContextUtils.getInstance().getProfileName());
-		return props.getProperty("kie.project.space");
+		return props.getProperty("kie.project.space") == null ? null : props.getProperty("kie.project.space").split(",")[0];
 	}
 
 	private String extractSpace(Dependency dep, InputStream inputStream) throws IOException {

@@ -82,6 +82,12 @@ LOCK TABLES `serviceinfo` WRITE;
 /*!40000 ALTER TABLE `serviceinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
+CREATE TABLE `othercustomers` (
+  `ServiceId` varchar(255) NOT NULL, 
+  `ServiceVersion` int(11) NOT NULL, 
+  `element` varchar(255) default NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 -- Table structure for table `client`
 --

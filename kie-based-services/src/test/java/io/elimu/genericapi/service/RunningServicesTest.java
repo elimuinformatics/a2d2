@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -16,7 +17,6 @@ import org.drools.core.io.impl.BaseResource;
 import org.drools.core.io.impl.ByteArrayResource;
 import org.drools.core.io.impl.ClassPathResource;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieServices;
@@ -32,7 +32,7 @@ import io.jsonwebtoken.lang.Assert;
 public class RunningServicesTest {
 	
 	ServiceInfo serviceInfo = new ServiceInfo("example-service", 5L, "io.elimu.generic:example-service:1.0.1",
-			"generic", "testing", "cds-services", "done");
+			"generic", "testing", "cds-services", "done", new ArrayList<>());
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -125,9 +125,9 @@ public class RunningServicesTest {
 
 	}
 
-	@Ignore("Broken, fix later")
 	@Test
 	public void testUnregisterWithoutDeletion() throws Exception {
+		System.setProperty("kie.maven.offline.force", "true");
 		String releaseId = System.getProperty("test.service.release") + ".1";
 		Dependency dep = new Dependency(releaseId);
 		RunningServices.getInstance().register(new GenericKieBasedService(dep));
@@ -135,16 +135,24 @@ public class RunningServicesTest {
 		Assert.notNull(service1);
 	}
 	
-	@Ignore("Broken, fix later")
 	@Test
 	public void testUnregisterWithZeroDeletion() throws Exception {
+		System.setProperty("kie.maven.offline.force", "true");
 		String releaseId = System.getProperty("test.service.release") + ".1";
 		Dependency dep = new Dependency(releaseId);
-		RunningServices.getInstance().register(new GenericKieBasedService(dep));
+		GenericKieBasedService service0 = new GenericKieBasedService(dep);
+		Properties props = service0.getConfig();
+		Assert.isTrue("testingDev".equals(props.get("packages")), "packages property should have been testingDev but was " + props.get("packages"));
+		RunningServices.getInstance().register(service0);
+		Assert.notNull(service0.getOtherCustomers());
+		Assert.notEmpty(service0.getOtherCustomers());
+		Assert.isTrue(service0.getOtherCustomers().contains("elimu"));
+		Assert.isTrue(service0.getOtherCustomers().contains("om2"));
+		Assert.isTrue(service0.getOtherCustomers().contains("example"));
+		Assert.isTrue(!service0.getOtherCustomers().stream().noneMatch(p -> p.equalsIgnoreCase("example")));
+		Assert.isTrue(service0.getOtherCustomers().stream().anyMatch(p -> p.equalsIgnoreCase("example")));
 		GenericService service1 = RunningServices.getInstance().unregister(dep.getArtifactId(), false);
 		Assert.isNull(service1);
-		Properties props = ((GenericKieBasedService) service1).getConfig();
-		Assert.isTrue("testingDev".equals(props.get("packages")), "packages property should have been testingDev but was " + props.get("packages"));
 	}
 
 }

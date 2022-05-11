@@ -1,11 +1,12 @@
 package io.elimu.genericapi.service;
 
-import io.elimu.a2d2.genericmodel.ServiceRequest;
-import io.elimu.a2d2.genericmodel.ServiceResponse;
+import java.util.List;
 
 import org.kie.api.task.model.Task;
 
 import io.elimu.a2d2.cdsmodel.Dependency;
+import io.elimu.a2d2.genericmodel.ServiceRequest;
+import io.elimu.a2d2.genericmodel.ServiceResponse;
 
 public interface GenericService {
 
@@ -15,4 +16,5 @@ public interface GenericService {
 	String getDefaultCustomer();
 	void updateTask(Task task) throws GenericServiceException;
 	Task getTask(Long taskId);
+	List<String> getOtherCustomers();
 }

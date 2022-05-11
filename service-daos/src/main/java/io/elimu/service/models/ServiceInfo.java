@@ -14,9 +14,17 @@
 
 package io.elimu.service.models;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -49,6 +57,11 @@ public class ServiceInfo {
     @Column(nullable = false)
     private String status;
 
+    @ElementCollection
+    @CollectionTable(name="othercustomers", joinColumns= {@JoinColumn(name="ServiceId"), @JoinColumn(name="ServiceVersion")})
+    @Column(name="element")
+    private Set<String> otherCustomers = new HashSet<String>();
+    
     public ServiceInfo() {
     }
 
@@ -60,14 +73,11 @@ public class ServiceInfo {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public ServiceInfo(String id, Long version, String serviceData, String serviceType, String defaultCustomer, String serviceCategory, String status) {
-        this.id = new ServiceInfoKey(id, version);
-        this.serviceData = serviceData;
-        this.serviceType = serviceType;
-        this.defaultCustomer = defaultCustomer;
+    public ServiceInfo(String id, Long version, String serviceData, String serviceType, String defaultCustomer, String serviceCategory, String status, List<String> otherCustomers) {
+    	this(id, version, serviceData, serviceType, defaultCustomer);
         this.serviceCategory=serviceCategory;
-        this.timestamp = System.currentTimeMillis();
         this.status = status;
+        this.otherCustomers = new HashSet<>(otherCustomers);
     }
 
     public ServiceInfoKey getId() {
@@ -126,6 +136,14 @@ public class ServiceInfo {
 		return status;
 	}
 
+	public void setOtherCustomers(Set<String> otherCustomers) {
+		this.otherCustomers = otherCustomers;
+	}
+	
+	public Set<String> getOtherCustomers() {
+		return otherCustomers;
+	}
+	
 	@Override
     public String toString() {
         return "ServiceInfo {" +
@@ -135,6 +153,7 @@ public class ServiceInfo {
                 ", defaultCustomer='" + defaultCustomer + '\'' +
                 ", serviceCategory='"+ serviceCategory + '\'' +
                 ", timestamp=" + timestamp +
-                ", status='" + status + "'}";
+                ", status='" + status + '\'' +
+                ", otherCustomers='" + otherCustomers + "'}";
     }
 }
