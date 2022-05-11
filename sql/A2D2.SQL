@@ -85,6 +85,12 @@ CREATE TABLE serviceinfo (
 
 ALTER TABLE serviceinfo OWNER TO postgres;
 
+CREATE TABLE othercustomers (
+    ServiceId character varying(255) NOT NULL,
+    ServiceVersion integer NOT NULL,
+    element character varying(255) default NULL
+);
+
 --
 -- TOC entry 185 (class 1259 OID 16398)
 -- Name: client; Type: TABLE; Schema: public; Owner: postgres

@@ -18,9 +18,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -53,6 +57,8 @@ public class ServiceInfo {
     @Column(nullable = false)
     private String status;
 
+    @ElementCollection
+    @CollectionTable(name="othercustomers", joinColumns= {@JoinColumn(name="ServiceId"), @JoinColumn(name="ServiceVersion")})
     @Column(name="element")
     private Set<String> otherCustomers = new HashSet<String>();
     
