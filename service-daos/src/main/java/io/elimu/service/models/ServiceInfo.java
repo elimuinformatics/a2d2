@@ -76,7 +76,7 @@ public class ServiceInfo {
     	this(id, version, serviceData, serviceType, defaultCustomer);
         this.serviceCategory=serviceCategory;
         this.status = status;
-        this.otherCustomers = othreCustomers == null ? new HashSet<>() : new HashSet<>(otherCustomers);
+        this.otherCustomers = otherCustomers == null ? new HashSet<>() : new HashSet<>(otherCustomers);
     }
 
     public ServiceInfoKey getId() {
