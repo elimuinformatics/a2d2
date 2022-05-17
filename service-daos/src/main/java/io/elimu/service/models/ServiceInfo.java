@@ -23,7 +23,6 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -77,7 +76,7 @@ public class ServiceInfo {
     	this(id, version, serviceData, serviceType, defaultCustomer);
         this.serviceCategory=serviceCategory;
         this.status = status;
-        this.otherCustomers = new HashSet<>(otherCustomers);
+        this.otherCustomers = otherCustomers == null ? new HashSet<>() : new HashSet<>(otherCustomers);
     }
 
     public ServiceInfoKey getId() {

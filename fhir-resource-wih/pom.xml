@@ -23,7 +23,7 @@
 	<packaging>jar</packaging>
 
 	<name>fhir-resource-wih</name>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -182,6 +182,6 @@
 	<parent>
 		<groupId>io.elimu.a2d2</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.7-SNAPSHOT</version>
+		<version>0.0.8-SNAPSHOT</version>
 	</parent>
 </project>
