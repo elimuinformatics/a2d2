@@ -111,7 +111,7 @@ public class ServiceHelper {
 			RunningServices.getInstance().downloadDependency(new Dependency(dep));
 			RunningServices.getInstance()
 			.register(new GenericKieBasedService(dep, client));
-		} catch (Exception e) {
+		} catch (Throwable e) { //this has to capture any type of Throwable. Do not change to Exception
 			log.error("Couldn't initialize service '" + dep + "'", e);
 		}
 	}
