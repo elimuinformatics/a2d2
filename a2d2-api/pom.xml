@@ -877,6 +877,14 @@
 			<name>Nexus Repository</name>
 			<url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
 			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
 		</repository>
 		<snapshotRepository>
 			<uniqueVersion>true</uniqueVersion>
@@ -884,6 +892,14 @@
 			<name>Nexus Repository</name>
 			<url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
 			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
