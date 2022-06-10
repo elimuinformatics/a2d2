@@ -47,10 +47,7 @@
 		<log4j.version>2.17.1</log4j.version>
 		<logback-classic.version>1.2.10</logback-classic.version>
 		<logback-core.version>1.2.9</logback-core.version>
-		<checker-qual.version>3.8.0</checker-qual.version>
-		<kotlin-stdlib.version>1.6.21</kotlin-stdlib.version>
-		<okio.version>3.1.0</okio.version>
-		<okhttp.version>4.9.3</okhttp.version>			
+		<checker-qual.version>3.8.0</checker-qual.version>		
 	</properties>
 
 	<dependencyManagement>
@@ -208,10 +205,6 @@
 					<groupId>commons-io</groupId>
 					<artifactId>commons-io</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>com.squareup.okhttp3</groupId>
-					<artifactId>okhttp</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -267,23 +260,11 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>ftl-transform-wih</artifactId>
 			<version>${internal.deps.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.squareup.okhttp3</groupId>
-					<artifactId>okhttp</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>fhir-resource-wih</artifactId>
 			<version>${internal.deps.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.squareup.okhttp3</groupId>
-					<artifactId>okhttp</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -882,37 +863,6 @@
 					<artifactId>spring-expression</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.squareup.okio</groupId>
-					<artifactId>okio</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.jetbrains.kotlin</groupId>
-					<artifactId>kotlin-stdlib</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okio</groupId>
-			<artifactId>okio</artifactId>
-			<version>${okio.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jetbrains.kotlin</groupId>
-					<artifactId>kotlin-stdlib</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-stdlib</artifactId>
-			<version>${kotlin-stdlib.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
