@@ -56,6 +56,7 @@
 		<module>service-daos</module>
 		<module>cds-hook-services</module>
 		<module>core-wih</module>
+		<module>cql-wih</module>
 		<module>ftl-transform-wih</module>
 		<module>fhir-resource-wih</module>
 		<module>cdshooks-wih</module>
