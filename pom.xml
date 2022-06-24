@@ -37,7 +37,7 @@
 		<log4j.version>2.17.1</log4j.version>
 		<junit-platform-commons.version>1.8.1</junit-platform-commons.version>
 		<apiguardian.version>1.1.2</apiguardian.version>
-		<netty.version>4.1.73.Final</netty.version>
+		<netty.version>4.1.77.Final</netty.version>
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<org.json.version>20211205</org.json.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -519,6 +519,14 @@
 		  	<name>Nexus Repository</name>
 			<url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
 			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
 		</repository>
 		<snapshotRepository>
 			<uniqueVersion>true</uniqueVersion>
@@ -526,6 +534,14 @@
 		  	<name>Nexus Repository</name>
 			<url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
 			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
