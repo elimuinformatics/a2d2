@@ -1589,4 +1589,22 @@ create index idx_qrtz_ft_tg on qrtz_fired_triggers(SCHED_NAME,TRIGGER_GROUP);
     create index IDX_TaskVariableImpl_pInstId on TaskVariableImpl(processInstanceId);
     create index IDX_TaskVariableImpl_processId on TaskVariableImpl(processId);
 
+alter table AuditTaskImpl add column end_date timestamp;
+alter table BAMTaskSummary add column end_date timestamp;
+alter table TaskEvent add column end_date timestamp;
+alter table NodeInstanceLog add column end_date timestamp;
+alter table VariableInstanceLog add column end_date timestamp;
+alter table Attachment modify attachedAt DATETIME(6);
+alter table NodeInstanceLog add column observation varchar(255);
+ALTER TABLE TaskEvent ADD COLUMN currentOwner varchar(255);
+create table TimerMappingInfo (
+        id int8 not null,
+        externalTimerId varchar(255),
+        kieSessionId int8 not null,
+        timerId int8 not null,
+        uuid varchar(255) not null,
+        primary key (id)
+);
+ALTER TABLE TimerMappingInfo ADD COLUMN info oid;
+
 commit;
