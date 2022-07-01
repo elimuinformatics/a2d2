@@ -17,7 +17,7 @@
 		<json-simple.version>1.1.1</json-simple.version>
 		<h2.version>2.1.210</h2.version>
 		<hibernate.version>5.4.24.Final</hibernate.version>
-		<spring.boot.starter.version>2.6.7</spring.boot.starter.version>
+		<spring.boot.starter.version>2.7.1</spring.boot.starter.version>
 		<spring.version>5.3.21</spring.version>
 		<jackson.version.databind>2.12.6.1</jackson.version.databind>
 		<jackson.version>2.12.6</jackson.version>
