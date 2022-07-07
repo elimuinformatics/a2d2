@@ -1,14 +1,8 @@
 package io.elimu.a2d2.cql;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.drools.core.process.instance.impl.WorkItemImpl;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r4.model.Identifier.IdentifierUse;
-import org.hl7.fhir.r4.model.Patient;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opencds.cqf.cds.response.CdsCard;
@@ -20,9 +14,10 @@ public class CqfInlineWIHTest {
 		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
 		workItem.setParameter("fhirServerUrl", "https://cqf-internal.elimuinformatics.com/fhir");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://cqf-internal.elimuinformatics.com/fhir");
 		workItem.setParameter("planDefinitionId", "ColorectalCancerScreeningCDS");
 		workItem.setParameter("patientId", "should-screen-ccs");
-		Patient patient = new Patient();
+		/*Patient patient = new Patient();
 		patient.setId("should-screen-ccs");
 		patient.addExtension().setUrl("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race").addExtension().setUrl("obmCategory").
 			setValue(new Coding().setSystem("urn:oid:2.16.840.1.113883.6.238").setCode("2028-9").setDisplay("Asian"));
@@ -34,7 +29,8 @@ public class CqfInlineWIHTest {
 		patient.addName().setFamily("Dere").addGiven("Ben");
 		patient.setGender(AdministrativeGender.MALE);
 		patient.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse("1968-01-01"));
-		workItem.setParameter("prefetch_patient", patient);
+		workItem.setParameter("prefetch_patient", patient);*/
+		workItem.setParameter("context_patientId", "should-screen-ccs");
 		NoOpWorkItemManager manager = new NoOpWorkItemManager();
 		handler.executeWorkItem(workItem, manager);
 		Assert.assertEquals(true, manager.isCompleted());
