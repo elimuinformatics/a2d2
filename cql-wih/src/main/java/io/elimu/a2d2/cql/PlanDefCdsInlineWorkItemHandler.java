@@ -1,5 +1,6 @@
 package io.elimu.a2d2.cql;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,11 @@ import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.opencds.cqf.cds.response.CdsCard;
+import org.opencds.cqf.cds.response.CdsCard.Links;
+import org.opencds.cqf.cds.response.CdsCard.Suggestions;
+import org.opencds.cqf.cds.response.CdsCard.Suggestions.Action;
 import org.opencds.cqf.cds.response.R4CarePlanToCdsCard;
+import org.opencds.cqf.cql.engine.exception.CqlException;
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverter;
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverterFactory;
 import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor;
@@ -45,9 +50,13 @@ import org.opencds.cqf.cql.evaluator.library.CqlFhirParametersConverter;
 import org.opencds.cqf.cql.evaluator.library.LibraryProcessor;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.client.impl.GenericClient;
 import ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor;
@@ -77,32 +86,32 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 
 	public PlanDefCdsInlineWorkItemHandler() {
 		this.ctx = FhirContext.forR4();
-		this.clientFactory = new ClientFactory(ctx);
+		this.clientFactory = new ClientFactory(this.ctx);
 		this.adapterFactory = new AdapterFactory();
 		this.fhirTypeConverter = new FhirTypeConverterFactory().create(FhirVersionEnum.R4);
-		this.cqlFhirParametersConverter = new CqlFhirParametersConverter(ctx, adapterFactory, fhirTypeConverter);
-		libraryVersionSelector = new LibraryVersionSelector(adapterFactory);
-		this.frlcpFactory = new FhirRestLibraryContentProviderFactory(clientFactory, adapterFactory, libraryVersionSelector);
+		this.cqlFhirParametersConverter = new CqlFhirParametersConverter(this.ctx, this.adapterFactory, this.fhirTypeConverter);
+		this.libraryVersionSelector = new LibraryVersionSelector(this.adapterFactory);
+		this.frlcpFactory = new FhirRestLibraryContentProviderFactory(this.clientFactory, this.adapterFactory, this.libraryVersionSelector);
 		this.libraryContentProviderFactories = new HashSet<>();
-		libraryContentProviderFactories.add(frlcpFactory);
-		this.libraryLoaderFactory = new LibraryContentProviderFactory(ctx, adapterFactory, libraryContentProviderFactories, libraryVersionSelector);
+		this.libraryContentProviderFactories.add(this.frlcpFactory);
+		this.libraryLoaderFactory = new LibraryContentProviderFactory(this.ctx, this.adapterFactory, this.libraryContentProviderFactories, this.libraryVersionSelector);
 		this.mrFactory = new FhirModelResolverFactory();
 		this.modelResolverFactories = new HashSet<>();
-		modelResolverFactories.add(mrFactory);
-		this.trpFactory = new FhirRestRetrieveProviderFactory(ctx, clientFactory);
+		this.modelResolverFactories.add(this.mrFactory);
+		this.trpFactory = new FhirRestRetrieveProviderFactory(this.ctx, this.clientFactory);
 		this.retrieveProviderFactories = new HashSet<>();
-		retrieveProviderFactories.add(trpFactory);
-		this.dataProviderFactory = new DataProviderFactory(ctx, modelResolverFactories, retrieveProviderFactories);
+		this.retrieveProviderFactories.add(this.trpFactory);
+		this.dataProviderFactory = new DataProviderFactory(this.ctx, this.modelResolverFactories, this.retrieveProviderFactories);
 		this.terminologyProviderFactories = new HashSet<>();
-		terminologyProviderFactories.add(new FhirRestTerminologyProviderFactory(ctx, clientFactory));
-		this.terminologyProviderFactory = new TerminologyProviderFactory(ctx, terminologyProviderFactories);
-		this.endpointConverter = new EndpointConverter(adapterFactory);
-		this.libProcessor = new LibraryProcessor(ctx, cqlFhirParametersConverter, 
-				libraryLoaderFactory, dataProviderFactory, terminologyProviderFactory, 
-				endpointConverter, mrFactory, () -> new CqlEvaluatorBuilder());
-		this.operationParametersParser = new MyOperationsParametersParser(adapterFactory, fhirTypeConverter);
-		this.expressionEvaluator = new ExpressionEvaluator(ctx, cqlFhirParametersConverter, libraryLoaderFactory, dataProviderFactory, 
-				terminologyProviderFactory, endpointConverter, mrFactory, () -> new CqlEvaluatorBuilder());
+		this.terminologyProviderFactories.add(new FhirRestTerminologyProviderFactory(this.ctx, this.clientFactory));
+		this.terminologyProviderFactory = new TerminologyProviderFactory(this.ctx, this.terminologyProviderFactories);
+		this.endpointConverter = new EndpointConverter(this.adapterFactory);
+		this.libProcessor = new LibraryProcessor(this.ctx, this.cqlFhirParametersConverter, 
+				this.libraryLoaderFactory, this.dataProviderFactory, this.terminologyProviderFactory, 
+				this.endpointConverter, this.mrFactory, () -> new CqlEvaluatorBuilder());
+		this.operationParametersParser = new MyOperationsParametersParser(this.adapterFactory, this.fhirTypeConverter);
+		this.expressionEvaluator = new ExpressionEvaluator(this.ctx, this.cqlFhirParametersConverter, this.libraryLoaderFactory, this.dataProviderFactory, 
+				this.terminologyProviderFactory, this.endpointConverter, this.mrFactory, () -> new CqlEvaluatorBuilder());
 	}
 	
 	@Override
@@ -158,82 +167,119 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			}
 			planDefinition = (PlanDefinition) bundle.getEntryFirstRep().getResource();
 		}
-		/*org.hl7.fhir.r4.model.Library r4library = fhirClient.fetchResourceFromUrl(org.hl7.fhir.r4.model.Library.class, fhirServerUrl + "/Library/" + planDefinition.getIdElement().getIdPart());
-		List<Library> libraries = new LinkedList<>();*/
-		/*List<org.hl7.fhir.r4.model.Library> r4libraries = bundle2.getEntry().stream().map(e -> { return (org.hl7.fhir.r4.model.Library) e.getResource(); }).collect(Collectors.toList());
-		Libary mainLibrary = 
-		ModelManager modelManager = new ModelManager();
-		LibraryManager libraryManager = new LibraryManager(modelManager);
-		for (org.hl7.fhir.r4.model.Library library : r4libraries) {
-			for (Attachment content : library.getContent()) {
-				if ("text/cql".equals(content.getContentType())) {
-					try {
-						String cql = new String(content.getData());
-						CqlTranslator translator = CqlTranslator.fromText(cql, modelManager, libraryManager);
-						Library lib = JsonCqlLibraryReader.read(new StringReader(translator.toJxson()));
-						libraries.add(lib);
-					} catch (IOException e) {
-						//TODO error
-						e.printStackTrace();
-					}
-				}
-			}
-		}*/
-		/*CacheAwareModelManager modelManager = new CacheAwareModelManager(new HashMap<>());
-		LibraryManager libraryManager = new LibraryManager(modelManager);
-		PriorityLibrarySourceLoader librarySourceLoader = new PriorityLibrarySourceLoader();
-		librarySourceLoader.setNamespaceManager(new NamespaceManager());
-		AdapterFactory adapterFactory = new AdapterFactory();
-		FhirClientFhirLibraryContentProvider libraryContentProvider = new FhirClientFhirLibraryContentProvider(
-				fhirClient, adapterFactory, new LibraryVersionSelector(adapterFactory));
-		librarySourceLoader.registerProvider(libraryContentProvider);
-		libraryManager.setLibrarySourceLoader(librarySourceLoader);
-		
-		for (Attachment content : r4library.getContent()) {
-			if ("text/cql".equals(content.getContentType())) {
-				try {
-					String cql = new String(content.getData());
-					CqlTranslator translator = CqlTranslator.fromText(cql, modelManager, libraryManager, Options.EnableLocators, Options.EnableResultTypes);
-					Library lib = JsonCqlLibraryReader.read(new StringReader(translator.toJxson()));
-					libraries.add(lib);
-				} catch (IOException e) {
-					//TODO error
-					e.printStackTrace();
-				}
-			}
-		}
-		ModelResolver resolver = new R4FhirModelResolver();
-		R4FhirTerminologyProvider terminologyProvider = new R4FhirTerminologyProvider(fhirClient);
-		Context context = new Context(libraries.get(0));
-		for (Map.Entry<String, Object> entry : prefetchData.entrySet()) {
-			context.setContextValue(entry.getKey(), entry.getValue());
-		}
-		for (Map.Entry<String, String> entry : contextData.entrySet()) {
-			context.setContextValue(entry.getKey(), entry.getValue());
-		}
-		context.registerLibraryLoader(new InMemoryLibraryLoader(libraries));
-		R4HookEvaluator evaluator = new R4HookEvaluator(resolver);
-		List<CdsCard> cards = evaluator.evaluateCdsHooksPlanDefinition(context, planDefinition, patientId, fhirClient);
-		results.put("cards", cards);
-		results.put("cardsJson", new Gson().toJson(cards));*/
 		RestFhirDal fhirDal = new RestFhirDal(fhirClient);
-		ActivityDefinitionProcessor activityDefinitionProcessor = new ActivityDefinitionProcessor(ctx, fhirDal, libProcessor);
+		ActivityDefinitionProcessor activityDefinitionProcessor = new ActivityDefinitionProcessor(this.ctx, fhirDal, this.libProcessor);
 		DecoratedPlanDefinitionProcessor pdProcessor = new DecoratedPlanDefinitionProcessor(FhirContext.forR4(), fhirDal, 
-				libProcessor, expressionEvaluator, activityDefinitionProcessor, operationParametersParser);
+				this.libProcessor, this.expressionEvaluator, activityDefinitionProcessor, this.operationParametersParser);
 		Endpoint terminologyEndpoint = new Endpoint().setAddress(fhirTerminologyClient.getServerBase())
 		        .setConnectionType(new Coding().setCode(Constants.HL7_FHIR_REST));
 		Endpoint dataEndpoint = new Endpoint().setAddress(fhirClient.getServerBase())
 		        .setConnectionType(new Coding().setCode(Constants.HL7_FHIR_REST));
-		CarePlan carePlan = pdProcessor.apply(planDefinition.getIdElement(), 
+		try {
+			CarePlan carePlan = pdProcessor.apply(planDefinition.getIdElement(), 
 				"Patient/"+patientId, encounterId == null ? null : "Encounter/" + encounterId, 
 				practitionerId == null ? null : "Practitioner/" + practitionerId,
 				organizationId == null ? null : "Organization/" + organizationId, 
 				userType, userLanguage, userTaskContext, setting, settingContext, Boolean.TRUE, new Parameters(), 
 				Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, dataEndpoint, terminologyEndpoint);
-		List<CdsCard> cards = convert(carePlan);
-		results.put("cards", cards);
-		results.put("cardsJson", new Gson().toJson(cards));
-		manager.completeWorkItem(workItem.getId(), results);
+			List<CdsCard> cards = convert(carePlan);
+			results.put("cards", cards);
+			results.put("cardsJson", asJson(cards));
+		} catch (CqlException e) {
+			results.put("error", e.getMessage());
+		} finally {
+			manager.completeWorkItem(workItem.getId(), results);
+		}
+	}
+
+	private String asJson(List<CdsCard> cards) {
+		IParser parser = FhirContext.forR4().newJsonParser();
+		List<String> retval = new ArrayList<>();
+		if (cards != null) {
+			for (CdsCard card : cards) {
+				JsonObject obj = new JsonObject();
+				if (card.getDetail() != null) {
+					obj.add("detail", new JsonPrimitive(card.getDetail()));
+				}
+				if (card.getIndicator() != null) {
+					obj.add("indicator", new JsonPrimitive(card.getIndicator().code));
+				}
+				if (card.getLinks() != null) {
+					JsonArray arr = new JsonArray();
+					for (Links link : card.getLinks()) {
+						JsonObject linkJson = new JsonObject();
+						if (link.hasAppContext()) {
+							linkJson.add("appContext", new JsonPrimitive(link.getAppContext()));
+						}
+						if (link.hasLabel()) {
+							linkJson.add("label", new JsonPrimitive(link.getLabel()));
+						}
+						if (link.hasType()) {
+							linkJson.add("type", new JsonPrimitive(link.getType()));
+						}
+						if (link.hasUrl()) {
+							linkJson.add("url", new JsonPrimitive(link.getUrl().toExternalForm()));
+						}
+						arr.add(linkJson);
+					}
+					obj.add("links", arr);
+				}
+				if (card.getSelectionBehavior() != null) {
+					obj.add("selectionBehavior", new JsonPrimitive(card.getSelectionBehavior()));
+				}
+				if (card.getSource() != null) {
+					JsonObject source = new JsonObject();
+					if (card.getSource().getIcon() != null) {
+						source.add("icon", new JsonPrimitive(card.getSource().getIcon().toExternalForm()));
+					}
+					if (card.getSource().getLabel() != null) {
+						source.add("label", new JsonPrimitive(card.getSource().getLabel()));
+					}
+					if (card.getSource().getUrl() != null) {
+						source.add("url", new JsonPrimitive(card.getSource().getUrl().toExternalForm()));
+					}
+					obj.add("source", source);
+				}
+				if (card.getSuggestions() != null) {
+					JsonArray arr = new JsonArray();
+					for (Suggestions sug : card.getSuggestions()) {
+						JsonObject sugJson = new JsonObject();
+						if (sug.getActions() != null) {
+							JsonArray actArray = new JsonArray();
+							for (Action a : sug.getActions()) {
+								JsonObject ajson = new JsonObject();
+								if (a.getDescription() != null) {
+									ajson.add("description", new JsonPrimitive(a.getDescription()));
+								}
+								if (a.getType() != null) {
+									ajson.add("type", new JsonPrimitive(a.getType().name()));
+								}
+								if (a.getResource() != null) {
+									String json = parser.encodeResourceToString(a.getResource());
+									JsonObject jsonMap = new Gson().fromJson(json, JsonObject.class);
+									ajson.add("resource", jsonMap);
+								}
+								actArray.add(ajson);
+							}
+							sugJson.add("actions", actArray);
+						}
+						if (sug.getLabel() != null) {
+							sugJson.add("label", new JsonPrimitive(sug.getLabel()));
+						}
+						if (sug.getUuid() != null) {
+							sugJson.add("uuid", new JsonPrimitive(sug.getUuid()));
+						}
+						arr.add(sugJson);
+					}
+					obj.add("suggestions", arr);
+				}
+				if (card.getSummary() != null) {
+					obj.add("summary", new JsonPrimitive(card.getSummary()));
+				}
+				retval.add(new Gson().toJson(obj));
+			}
+		}
+		return retval.toString();
 	}
 
 	private List<CdsCard> convert(CarePlan carePlan) {

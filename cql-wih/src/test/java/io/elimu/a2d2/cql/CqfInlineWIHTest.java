@@ -6,6 +6,7 @@ import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opencds.cqf.cds.response.CdsCard;
+import org.opencds.cqf.cds.response.CdsCard.IndicatorCode;
 
 public class CqfInlineWIHTest {
 
@@ -37,9 +38,27 @@ public class CqfInlineWIHTest {
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertNotNull(workItem.getResult("cardsJson"));
 		Assert.assertNotNull(workItem.getResult("cards"));
-		List<CdsCard> cards = (List<CdsCard>) workItem.getResult("cards");
+		List<?> cards = (List<?>) workItem.getResult("cards");
 		Assert.assertNotNull(cards);
 		Assert.assertTrue(cards.size() > 0 );
-		
+		CdsCard card = (CdsCard) cards.get(0);
+		Assert.assertNotNull(card);
+		Assert.assertNotNull(card.getSummary());
+		Assert.assertEquals("Recommend appropriate colorectal cancer screening", card.getSummary());
+		Assert.assertNotNull(card.getIndicator());
+		Assert.assertEquals(IndicatorCode.WARN, card.getIndicator());;
+		Assert.assertNotNull(card.getDetail());
+		Assert.assertEquals("Patient meets the inclusion criteria for appropriate colorectal cancer screening, but has no evidence of appropriate screening.", card.getDetail());
+		Assert.assertNotNull(card.getSource());
+		Assert.assertNotNull(card.getSource().getLabel());
+		Assert.assertEquals("U.S. Preventive Services Task Force Final Recommendation Statement Colorectal Cancer: Screening", card.getSource().getLabel());
+		Assert.assertNotNull(card.getSource().getUrl());
+		Assert.assertEquals("https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening", card.getSource().getUrl().toExternalForm());
+
+		workItem.setParameter("context_patientId", "something-else");
+		workItem.setParameter("patientId", "something-else");
+		handler.executeWorkItem(workItem, manager);
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNotNull(workItem.getResult("error"));
 	}
 }

@@ -2,6 +2,7 @@ package io.elimu.a2d2.cql;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,11 +35,14 @@ import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.r4.model.PlanDefinition;
 import org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType;
+import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent;
 import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent;
 import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent;
 import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.RelatedArtifact;
 import org.hl7.fhir.r4.model.RequestGroup;
+import org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.r4.model.RequestGroup.RequestIntent;
 import org.hl7.fhir.r4.model.RequestGroup.RequestStatus;
 import org.hl7.fhir.r4.model.Resource;
@@ -46,6 +50,7 @@ import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Type;
 import org.hl7.fhir.r4.model.UriType;
+import org.opencds.cqf.cds.response.CdsCard;
 import org.opencds.cqf.cql.engine.runtime.DateTime;
 import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor;
 import org.opencds.cqf.cql.evaluator.expression.ExpressionEvaluator;
@@ -57,8 +62,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.fhirpath.FhirPathExecutionException;
 import ca.uhn.fhir.fhirpath.IFhirPath;
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.IVersionSpecificBundleFactory;
 
 public class DecoratedPlanDefinitionProcessor {
@@ -185,14 +192,47 @@ public class DecoratedPlanDefinitionProcessor {
     }
 
     RequestGroup result = session.requestGroup;
-
+    //result.setAction(toRequestGroupActions(session.planDefinition.getAction()));
     session.carePlan.addActivity().setReference(new Reference(result));
     session.carePlan.addContained(result);
-
+    
     return session.carePlan;
   }
 
-  private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefinitionActionComponent> metConditions,
+  /*private List<RequestGroupActionComponent> toRequestGroupActions(List<PlanDefinitionActionComponent> actions) {
+	  List<RequestGroupActionComponent> retval = null;
+	  if (actions != null) {
+		  retval = new ArrayList<>(actions.size());
+		  for (PlanDefinitionActionComponent action: actions) {
+			  RequestGroupActionComponent rgac = new RequestGroupActionComponent();
+			  if (action.hasTitle()) {
+				  rgac.setTitle(action.getTitle());
+			  }
+			  if (action.hasDescription()) {
+				  rgac.setDescription(action.getDescription());
+			  }
+			  if (action.hasExtension()) {
+				  rgac.setExtension(action.getExtension());
+			  }
+			  if (action.hasDocumentation()) {
+				  rgac.setDocumentation(action.getDocumentation());
+			  }
+			  if (action.hasSelectionBehavior()) {
+				  rgac.setSelectionBehavior(RequestGroup.ActionSelectionBehavior.valueOf(action.getSelectionBehavior().name()));
+			  }
+			  if (action.hasPrefix()) {
+				  rgac.setPrefix(action.getPrefix());
+			  }
+			  if (action.hasType()) {
+				  rgac.setType(action.getType());
+			  }
+			  retval.add(rgac);
+		  }
+	  }
+	return retval;
+}*/
+
+private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefinitionActionComponent> metConditions,
       PlanDefinition.PlanDefinitionActionComponent action) {
     if (meetsConditions(session, action)) {
       if (action.hasRelatedAction()) {
@@ -403,6 +443,7 @@ public class DecoratedPlanDefinitionProcessor {
   }
 
   private void resolveDynamicActions(Session session, PlanDefinition.PlanDefinitionActionComponent action) {
+	  boolean somethingFound = false;
     for (PlanDefinition.PlanDefinitionActionDynamicValueComponent dynamicValue : action.getDynamicValue()) {
       logger.info("Resolving dynamic value {} {}", dynamicValue.getPath(), dynamicValue.getExpression());
 
@@ -441,11 +482,13 @@ public class DecoratedPlanDefinitionProcessor {
         		result = new Extension().setValue((StringType) result).setUrl(dynamicValue.getPath());
         	}
             action.setProperty(propertyType, (Base) result);
+            somethingFound = true;
           } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(
                 String.format("Could not set path %s to value: %s", dynamicValue.getPath(), result));
           }
+          
         } else {
           try {
             session.carePlan.setProperty(dynamicValue.getPath(), (Base) result);
@@ -456,6 +499,20 @@ public class DecoratedPlanDefinitionProcessor {
           }
         }
       }
+    }
+    if (somethingFound == true) {
+    	RequestGroupActionComponent act = session.requestGroup.addAction().setTitle(action.getTitle())
+    	.setTitle(action.getTitle()).setDescription(action.getDescription()).setTextEquivalent(action.getTextEquivalent())
+    	.setCode(action.getCode()).setTiming(action.getTiming());
+    	if (action.hasExtension()) {
+    		act.addExtension(action.getExtensionFirstRep());
+    	}
+    	if (action.hasDocumentation()) {
+    		act.addDocumentation(action.getDocumentationFirstRep());
+    	}
+    	if (action.hasSelectionBehavior()) {
+    		act.setSelectionBehavior(RequestGroup.ActionSelectionBehavior.valueOf(action.getSelectionBehavior().name()));
+    	}
     }
   }
 
