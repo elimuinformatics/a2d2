@@ -49,7 +49,8 @@
 		<checker-qual.version>3.8.0</checker-qual.version>
 		<kotlin-stdlib.version>1.6.21</kotlin-stdlib.version>
 		<okio.version>3.1.0</okio.version>
-		<okhttp.version>4.9.3</okhttp.version>			
+		<okhttp.version>4.9.3</okhttp.version>
+		<mysql-connector-java.version>8.0.29</mysql-connector-java.version>	
 	</properties>
 
 	<dependencyManagement>
@@ -818,7 +819,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.21</version>
+			<version>${mysql-connector-java.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
