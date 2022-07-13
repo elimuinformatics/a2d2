@@ -1259,4 +1259,49 @@ CREATE INDEX IDX_QRTZ_FT_TG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
     create index IDX_TaskVariableImpl_pInstId on TaskVariableImpl(processInstanceId);
     create index IDX_TaskVariableImpl_processId on TaskVariableImpl(processId);
 
+alter table AuditTaskImpl add column end_date datetime;
+alter table BAMTaskSummary add column end_date datetime;
+alter table TaskEvent add column end_date datetime;
+alter table NodeInstanceLog add column end_date datetime;
+alter table VariableInstanceLog add column end_date datetime;
+alter table Attachment modify attachedAt DATETIME(6);
+alter table AuditTaskImpl modify activationTime DATETIME(6);
+alter table AuditTaskImpl modify createdOn DATETIME(6);
+alter table AuditTaskImpl modify dueDate DATETIME(6);
+alter table AuditTaskImpl modify lastModificationDate DATETIME(6);
+alter table BAMTaskSummary modify createdDate DATETIME(6);
+alter table BAMTaskSummary modify endDate DATETIME(6);
+alter table BAMTaskSummary modify startDate DATETIME(6);
+alter table Deadline modify deadline_date DATETIME(6);
+alter table ExecutionErrorInfo modify ERROR_ACK_AT DATETIME(6);
+alter table ExecutionErrorInfo modify ERROR_DATE DATETIME(6);
+alter table NodeInstanceLog modify log_date DATETIME(6);
+alter table NodeInstanceLog modify sla_due_date DATETIME(6);
+alter table ProcessInstanceInfo modify lastModificationDate DATETIME(6);
+alter table ProcessInstanceInfo modify lastReadDate DATETIME(6);
+alter table ProcessInstanceInfo modify startDate DATETIME(6);
+alter table ProcessInstanceLog modify end_date DATETIME(6);
+alter table ProcessInstanceLog modify sla_due_date DATETIME(6);
+alter table ProcessInstanceLog modify start_date DATETIME(6);
+alter table SessionInfo modify lastModificationDate DATETIME(6);
+alter table SessionInfo modify startDate DATETIME(6);
+alter table Task modify activationTime DATETIME(6);
+alter table Task modify createdOn DATETIME(6);
+alter table Task modify expirationTime DATETIME(6);
+alter table TaskEvent modify logTime DATETIME(6);
+alter table TaskVariableImpl modify modificationDate DATETIME(6);
+alter table VariableInstanceLog modify log_date DATETIME(6);
+alter table WorkItemInfo modify creationDate DATETIME(6);
+alter table task_comment modify addedAt DATETIME(6);
+ALTER TABLE TaskEvent ADD COLUMN currentOwner varchar(255);
+create table TimerMappingInfo (
+        id bigint not null auto_increment,
+        externalTimerId varchar(255),
+        kieSessionId bigint not null,
+        timerId bigint not null,
+        uuid varchar(255) not null,
+        primary key (id)
+);
+ALTER TABLE TimerMappingInfo ADD COLUMN info longblob;
+
 commit;

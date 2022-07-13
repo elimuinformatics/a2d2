@@ -35,6 +35,7 @@
     <class>org.jbpm.process.audit.VariableInstanceLog</class>
     <!-- manager -->
     <class>org.jbpm.runtime.manager.impl.jpa.ContextMappingInfo</class>
+    <class>org.jbpm.runtime.manager.impl.jpa.TimerMappingInfo</class>
     <!-- task -->
     <class>org.jbpm.services.task.impl.model.AttachmentImpl</class>
     <class>org.jbpm.services.task.impl.model.ContentImpl</class>
