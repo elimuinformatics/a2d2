@@ -307,5 +307,4 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	public void abortWorkItem(WorkItem workItem, WorkItemManager manager) {
 		// do nothing
 	}
-
 }
