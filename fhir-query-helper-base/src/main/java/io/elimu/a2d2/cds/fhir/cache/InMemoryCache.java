@@ -45,7 +45,7 @@ public class InMemoryCache implements CacheService<ResponseEvent<FhirResponse<?>
 	@Override
 	public void put(String key, ResponseEvent<FhirResponse<?>> value) {
 		responsesCache.put(key, value);
-
+		CacheCleaner.getInstance().register(key, value.getTimeout(), this);
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public class CacheUtil {
 	public static final String CACHE_TYPE_PROPERTY = System.getProperty("cache.type.impl", "NO_CACHE");
 	public static final String PREFIX_KEY = System.getProperty("cache.prefix", "a2d2");
 	public static final String BASIC = "Basic";
-
+	
 	private static final List<Integer> VALID_STATES = Arrays.asList(200);
 
 	private CacheUtil() {
