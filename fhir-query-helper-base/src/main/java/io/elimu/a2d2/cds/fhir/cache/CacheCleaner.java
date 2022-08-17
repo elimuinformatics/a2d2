@@ -1,8 +1,8 @@
 package io.elimu.a2d2.cds.fhir.cache;
 
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class CacheCleaner implements Runnable {
 		}
 	}
 	
-	PriorityQueue<CacheReference> queue = new PriorityQueue<>(Comparator.comparingLong(CacheReference::getTimestamp));
+	Queue<CacheReference> queue = new LinkedBlockingQueue<>();
 	
 	@Override
 	public void run() {
@@ -62,13 +62,14 @@ public class CacheCleaner implements Runnable {
 					Thread.sleep(100);
 					continue;
 				}
-				CacheReference ref = queue.remove();
+				CacheReference ref = queue.peek();
 				int cleanupsDone = 0;
-				if (System.currentTimeMillis() > ref.getTimestamp()) {
+				if (ref != null && System.currentTimeMillis() > ref.getTimestamp()) {
+					queue.remove();
 					ref.getService().delete(ref.getKey());
 					cleanupsDone++;
 				} else {
-					queue.add(ref);
+					Thread.sleep(100);
 				}
 				if (cleanupsDone > 0) {
 					LOG.debug("Cache cleaned up " + cleanupsDone + " old entries.");
