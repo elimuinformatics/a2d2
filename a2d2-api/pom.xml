@@ -923,9 +923,9 @@
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
-			<id>nexus-repo-releases</id>
-			<name>Nexus Repository</name>
-			<url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
+			<id>guided-clinical-maven-repo</id>
+      		<name>guided-clinical-maven-repo</name>
+      		<url>https://guided-clinical-926418967601.d.codeartifact.us-east-1.amazonaws.com/maven/maven-repo/</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
@@ -938,9 +938,9 @@
 		</repository>
 		<snapshotRepository>
 			<uniqueVersion>true</uniqueVersion>
-			<id>nexus-repo-snapshots</id>
-			<name>Nexus Repository</name>
-			<url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
+			<id>guided-clinical-maven-repo</id>
+      		<name>guided-clinical-maven-repo</name>
+      		<url>https://guided-clinical-926418967601.d.codeartifact.us-east-1.amazonaws.com/maven/maven-repo/</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>

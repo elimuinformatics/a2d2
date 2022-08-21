@@ -89,12 +89,12 @@ logging:
 spring: 
   profiles: local
   datasource:
-     driverClassName: com.mysql.cj.jdbc.Driver
-     url: jdbc:mysql://mydatabase:3306/fhir_420_dev
-     username: root
-     password: ENC(jfJpEylxzIDVqvMel1B2ig==)
-     className: com.mysql.cj.jdbc.MysqlXADataSource
+     driverClassName: org.postgresql.Driver
+     url: jdbc:postgresql://localhost:5432/a2d2
+     username: a2d2
+     password: a2d2
+     className: org.postgresql.Driver
      quartz.config: quartz-staging.properties   
 spring.jpa:
-    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect   
+    properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     properties.hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
