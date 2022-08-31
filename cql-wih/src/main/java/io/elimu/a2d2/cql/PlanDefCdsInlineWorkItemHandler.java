@@ -1,6 +1,7 @@
 package io.elimu.a2d2.cql;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.opencds.cqf.cql.evaluator.builder.Constants;
 import org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder;
 import org.opencds.cqf.cql.evaluator.builder.EndpointConverter;
 import org.opencds.cqf.cql.evaluator.builder.ModelResolverFactory;
+import org.opencds.cqf.cql.evaluator.builder.dal.FhirRestFhirDalFactory;
 import org.opencds.cqf.cql.evaluator.builder.data.DataProviderFactory;
 import org.opencds.cqf.cql.evaluator.builder.data.FhirModelResolverFactory;
 import org.opencds.cqf.cql.evaluator.builder.data.FhirRestRetrieveProviderFactory;
@@ -85,7 +87,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	private ExpressionEvaluator expressionEvaluator;
 
 	public PlanDefCdsInlineWorkItemHandler() {
-		this.ctx = FhirContext.forR4();
+		this.ctx = FhirContext.forR4Cached();
 		this.clientFactory = new ClientFactory(this.ctx);
 		this.adapterFactory = new AdapterFactory();
 		this.fhirTypeConverter = new FhirTypeConverterFactory().create(FhirVersionEnum.R4);
@@ -167,9 +169,10 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			}
 			planDefinition = (PlanDefinition) bundle.getEntryFirstRep().getResource();
 		}
-		RestFhirDal fhirDal = new RestFhirDal(fhirClient);
+		RestFhirDal fhirDal = (RestFhirDal) new FhirRestFhirDalFactory(this.clientFactory).create(
+			              fhirServerUrl, Collections.singletonList("Content-Type: application/json"));
 		ActivityDefinitionProcessor activityDefinitionProcessor = new ActivityDefinitionProcessor(this.ctx, fhirDal, this.libProcessor);
-		DecoratedPlanDefinitionProcessor pdProcessor = new DecoratedPlanDefinitionProcessor(FhirContext.forR4(), fhirDal, 
+		DecoratedPlanDefinitionProcessor pdProcessor = new DecoratedPlanDefinitionProcessor(this.ctx, fhirDal, 
 				this.libProcessor, this.expressionEvaluator, activityDefinitionProcessor, this.operationParametersParser);
 		Endpoint terminologyEndpoint = new Endpoint().setAddress(fhirTerminologyClient.getServerBase())
 		        .setConnectionType(new Coding().setCode(Constants.HL7_FHIR_REST));

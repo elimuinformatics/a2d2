@@ -33,7 +33,10 @@ public class CqfInlineWIHTest {
 		workItem.setParameter("prefetch_patient", patient);*/
 		workItem.setParameter("context_patientId", "should-screen-ccs");
 		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
 		handler.executeWorkItem(workItem, manager);
+		long time = System.currentTimeMillis() - start;
+		System.out.println("Time to run 1st time (ms): " + time);
 		Assert.assertEquals(true, manager.isCompleted());
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertNotNull(workItem.getResult("cardsJson"));
@@ -54,7 +57,13 @@ public class CqfInlineWIHTest {
 		Assert.assertEquals("U.S. Preventive Services Task Force Final Recommendation Statement Colorectal Cancer: Screening", card.getSource().getLabel());
 		Assert.assertNotNull(card.getSource().getUrl());
 		Assert.assertEquals("https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening", card.getSource().getUrl().toExternalForm());
-
+		
+		workItem.setParameter("patientId", "should-not-screen-ccs");
+		start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		time = System.currentTimeMillis() - start;
+		System.out.println("Time to run 2nd time (ms): " + time);
+		
 		workItem.setParameter("context_patientId", "something-else");
 		workItem.setParameter("patientId", "something-else");
 		handler.executeWorkItem(workItem, manager);
