@@ -309,7 +309,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-helpers</artifactId>
-			<version>0.0.11</version>
+			<version>0.0.12</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- web development, including Tomcat and spring-webmvc -->
@@ -783,7 +783,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.3.3</version>
+			<version>42.4.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>

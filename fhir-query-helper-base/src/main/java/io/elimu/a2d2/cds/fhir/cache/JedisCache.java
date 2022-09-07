@@ -16,19 +16,23 @@ package io.elimu.a2d2.cds.fhir.cache;
 
 import java.time.Duration;
 import java.util.Set;
+
 import io.elimu.a2d2.cds.fhir.cache.CacheUtil.CACHE_TYPE;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.ResponseEvent;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Protocol;
 
 public class JedisCache implements CacheService<ResponseEvent<FhirResponse<?>>> {
 
 	private CACHE_TYPE cacheType = null;
 
 	private static final int JEDIS_PORT = Integer.parseInt(System.getProperty("cache.jedis.port", "6379"));
+	private static final String JEDIS_PWD = System.getProperty("cache.jedis.password");
 	private static final String JEDIS_HOST = System.getProperty("cache.jedis.host", "localhost");
+	private static final Boolean JEDIS_SSL = Boolean.valueOf(System.getProperty("cache.jedis.use_ssl", "false"));
 	private static final int JEDIS_TIMEOUT_CONNECTION = Integer.parseInt(System.getProperty("cache.jedis.connection.timeout", "10000")); //milliseconds (default timeout 2000)
 	private static final int JEDIS_TIMEOUT_KEY_SECONDS = Integer.parseInt(System.getProperty("cache.jedis.key.timeout", "1800")); //1800 = 30 minutes
 
@@ -46,7 +50,7 @@ public class JedisCache implements CacheService<ResponseEvent<FhirResponse<?>>> 
 	@Override
 	public void connect() {
 		if(jedisPool == null) {
-			jedisPool = new JedisPool(buildPoolConfig(), JEDIS_HOST, JEDIS_PORT, JEDIS_TIMEOUT_CONNECTION);
+			jedisPool = new JedisPool(buildPoolConfig(), JEDIS_HOST, JEDIS_PORT, JEDIS_TIMEOUT_CONNECTION, JEDIS_PWD, Protocol.DEFAULT_DATABASE, JEDIS_SSL);
 			jedis = jedisPool.getResource();
 		}
 	}

@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>oauth-helpers</artifactId>
-	<version>0.0.11</version>
+	<version>0.0.12</version>
 	<description>OAuth Helper</description>
 
 	<properties>
