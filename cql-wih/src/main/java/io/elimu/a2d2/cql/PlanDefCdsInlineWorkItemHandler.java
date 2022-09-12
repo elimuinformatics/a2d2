@@ -57,14 +57,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.client.impl.GenericClient;
 import ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor;
+import io.elimu.a2d2.exception.WorkItemHandlerException;
 
 public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 
+	private static Map<String, DecoratedPlanDefinitionProcessor> CACHED_PROCESSORS = new HashMap<>();
+	private static Map<String, PlanDefinition> CACHED_PLANDEFS = new HashMap<>();
+	
 	private FhirContext ctx;
 	private ClientFactory clientFactory;
 	private AdapterFactory adapterFactory;
@@ -90,7 +93,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		this.ctx = FhirContext.forR4Cached();
 		this.clientFactory = new ClientFactory(this.ctx);
 		this.adapterFactory = new AdapterFactory();
-		this.fhirTypeConverter = new FhirTypeConverterFactory().create(FhirVersionEnum.R4);
+		this.fhirTypeConverter = new FhirTypeConverterFactory().create(this.ctx.getVersion().getVersion());
 		this.cqlFhirParametersConverter = new CqlFhirParametersConverter(this.ctx, this.adapterFactory, this.fhirTypeConverter);
 		this.libraryVersionSelector = new LibraryVersionSelector(this.adapterFactory);
 		this.frlcpFactory = new FhirRestLibraryContentProviderFactory(this.clientFactory, this.adapterFactory, this.libraryVersionSelector);
@@ -98,22 +101,20 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		this.libraryContentProviderFactories.add(this.frlcpFactory);
 		this.libraryLoaderFactory = new LibraryContentProviderFactory(this.ctx, this.adapterFactory, this.libraryContentProviderFactories, this.libraryVersionSelector);
 		this.mrFactory = new FhirModelResolverFactory();
-		this.modelResolverFactories = new HashSet<>();
-		this.modelResolverFactories.add(this.mrFactory);
+		this.modelResolverFactories = Collections.singleton(this.mrFactory);
 		this.trpFactory = new FhirRestRetrieveProviderFactory(this.ctx, this.clientFactory);
 		this.retrieveProviderFactories = new HashSet<>();
 		this.retrieveProviderFactories.add(this.trpFactory);
 		this.dataProviderFactory = new DataProviderFactory(this.ctx, this.modelResolverFactories, this.retrieveProviderFactories);
-		this.terminologyProviderFactories = new HashSet<>();
-		this.terminologyProviderFactories.add(new FhirRestTerminologyProviderFactory(this.ctx, this.clientFactory));
+		this.terminologyProviderFactories = Collections.singleton(new FhirRestTerminologyProviderFactory(this.ctx, this.clientFactory));
 		this.terminologyProviderFactory = new TerminologyProviderFactory(this.ctx, this.terminologyProviderFactories);
 		this.endpointConverter = new EndpointConverter(this.adapterFactory);
 		this.libProcessor = new LibraryProcessor(this.ctx, this.cqlFhirParametersConverter, 
 				this.libraryLoaderFactory, this.dataProviderFactory, this.terminologyProviderFactory, 
 				this.endpointConverter, this.mrFactory, () -> new CqlEvaluatorBuilder());
-		this.operationParametersParser = new MyOperationsParametersParser(this.adapterFactory, this.fhirTypeConverter);
 		this.expressionEvaluator = new ExpressionEvaluator(this.ctx, this.cqlFhirParametersConverter, this.libraryLoaderFactory, this.dataProviderFactory, 
 				this.terminologyProviderFactory, this.endpointConverter, this.mrFactory, () -> new CqlEvaluatorBuilder());
+		this.operationParametersParser = new MyOperationsParametersParser(this.adapterFactory, this.fhirTypeConverter);
 	}
 	
 	@Override
@@ -132,10 +133,30 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		String userTaskContext = (String) workItem.getParameter("userTaskContext");
 		String setting = (String) workItem.getParameter("setting");
 		String settingContext = (String) workItem.getParameter("settingContext");
-		//TODO validate required fhirServerUrl
-		//TODO validate fhirTerminolgoyServerUrl or make it fhirServerUrl by default
-		//TODO validate required planDefinitionId or planDefinitionUrl
-		//TODO validate required patientId
+		List<String> missingItems = new ArrayList<>();
+		//validate required fhirServerUrl
+		if (isEmpty(fhirServerUrl)) {
+			missingItems.add("fhirServerUrl");
+		}
+		//validate fhirTerminolgoyServerUrl or make it fhirServerUrl by default
+		if (isEmpty(fhirTerminologyServerUrl)) {
+			if (!isEmpty(fhirServerUrl)) {
+				missingItems.add("fhirTerminologyServerUrl");
+			} else {
+				fhirTerminologyServerUrl = fhirServerUrl;
+			}
+		}
+		//validate required patientId
+		if (isEmpty(patientId)) {
+			missingItems.add("patientId");
+		}
+		//validate required planDefinitionId or planDefinitionUrl
+		if (isEmpty(planDefId) && isEmpty(planDefUrl)) {
+			missingItems.add("planDefinitionId|planDefinitionUrl");
+		}
+		if (!missingItems.isEmpty()) {
+			throw new WorkItemHandlerException("Missing items: " + missingItems);
+		}
 		String fhirServerAuth = (String) workItem.getParameter("fhirServerAuth");
 		String fhirTerminologyServerAuth = (String) workItem.getParameter("fhirTerminologyServerAuth");
 		Map<String, Object> prefetchData = new HashMap<>();
@@ -144,42 +165,57 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				prefetchData.put(key.replace("prefetch_", ""), workItem.getParameter(key));
 			}
 		}
-		GenericClient fhirClient = (GenericClient) FhirContext.forR4().newRestfulGenericClient(fhirServerUrl);
-		fhirClient.setDontValidateConformance(true);
-		fhirClient.setEncoding(EncodingEnum.JSON);
-		GenericClient fhirTerminologyClient = (GenericClient) FhirContext.forR4().newRestfulGenericClient(fhirTerminologyServerUrl);
-		fhirTerminologyClient.setDontValidateConformance(true);
-		fhirTerminologyClient.setEncoding(EncodingEnum.JSON);
-		if (fhirServerAuth != null && !"".equals(fhirServerAuth.trim())) {
-			fhirClient.registerInterceptor(new SimpleRequestHeaderInterceptor("Authorization", fhirServerAuth));
-		}
-		if (fhirTerminologyServerAuth != null && !"".equals(fhirTerminologyServerAuth.trim())) {
-			fhirTerminologyClient.registerInterceptor(new SimpleRequestHeaderInterceptor("Authorization", fhirTerminologyServerAuth));
-		}
-		PlanDefinition planDefinition = null;
-		if (planDefId != null) {
-			planDefinition = fhirClient.fetchResourceFromUrl(PlanDefinition.class, fhirServerUrl + "/PlanDefinition/" + planDefId);
-			if (planDefinition == null) {
-				//TODO error
-			}
+		DecoratedPlanDefinitionProcessor pdProcessor = null;
+		String key = null;
+		if (CACHED_PROCESSORS.containsKey(planDefId)) {
+			key = planDefId;
+			pdProcessor = CACHED_PROCESSORS.get(planDefId);
+		} else if (CACHED_PROCESSORS.containsKey(planDefUrl)) {
+			key = planDefUrl;
+			pdProcessor = CACHED_PROCESSORS.get(planDefUrl);
 		} else {
-			Bundle bundle = fhirClient.fetchResourceFromUrl(Bundle.class, fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
-			if (!bundle.getEntryFirstRep().hasResource()) {
-				//TODO error
+			GenericClient fhirClient = (GenericClient) FhirContext.forR4().newRestfulGenericClient(fhirServerUrl);
+			fhirClient.setDontValidateConformance(true);
+			fhirClient.setEncoding(EncodingEnum.JSON);
+			GenericClient fhirTerminologyClient = (GenericClient) FhirContext.forR4().newRestfulGenericClient(fhirTerminologyServerUrl);
+			fhirTerminologyClient.setDontValidateConformance(true);
+			fhirTerminologyClient.setEncoding(EncodingEnum.JSON);
+			if (fhirServerAuth != null && !"".equals(fhirServerAuth.trim())) {
+				fhirClient.registerInterceptor(new SimpleRequestHeaderInterceptor("Authorization", fhirServerAuth));
 			}
-			planDefinition = (PlanDefinition) bundle.getEntryFirstRep().getResource();
+			if (fhirTerminologyServerAuth != null && !"".equals(fhirTerminologyServerAuth.trim())) {
+				fhirTerminologyClient.registerInterceptor(new SimpleRequestHeaderInterceptor("Authorization", fhirTerminologyServerAuth));
+			}
+			PlanDefinition planDefinition = null;
+			if (planDefId != null) {
+				key = planDefId;
+				planDefinition = fhirClient.fetchResourceFromUrl(PlanDefinition.class, fhirServerUrl + "/PlanDefinition/" + planDefId);
+				if (planDefinition == null) {
+					throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
+				}
+				CACHED_PLANDEFS.put(key, planDefinition);
+			} else {
+				key = planDefUrl;
+				Bundle bundle = fhirClient.fetchResourceFromUrl(Bundle.class, fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
+				if (!bundle.getEntryFirstRep().hasResource()) {
+					throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
+				}
+				planDefinition = (PlanDefinition) bundle.getEntryFirstRep().getResource();
+				CACHED_PLANDEFS.put(key, planDefinition);
+			}
+			RestFhirDal fhirDal = (RestFhirDal) new FhirRestFhirDalFactory(this.clientFactory).create(
+				              fhirServerUrl, Collections.singletonList("Content-Type: application/json"));
+			ActivityDefinitionProcessor activityDefinitionProcessor = new ActivityDefinitionProcessor(this.ctx, fhirDal, this.libProcessor);
+			pdProcessor = new DecoratedPlanDefinitionProcessor(this.ctx, fhirDal, 
+					this.libProcessor, this.expressionEvaluator, activityDefinitionProcessor, this.operationParametersParser);
+			CACHED_PROCESSORS.put(key, pdProcessor);
 		}
-		RestFhirDal fhirDal = (RestFhirDal) new FhirRestFhirDalFactory(this.clientFactory).create(
-			              fhirServerUrl, Collections.singletonList("Content-Type: application/json"));
-		ActivityDefinitionProcessor activityDefinitionProcessor = new ActivityDefinitionProcessor(this.ctx, fhirDal, this.libProcessor);
-		DecoratedPlanDefinitionProcessor pdProcessor = new DecoratedPlanDefinitionProcessor(this.ctx, fhirDal, 
-				this.libProcessor, this.expressionEvaluator, activityDefinitionProcessor, this.operationParametersParser);
-		Endpoint terminologyEndpoint = new Endpoint().setAddress(fhirTerminologyClient.getServerBase())
+		Endpoint terminologyEndpoint = new Endpoint().setAddress(fhirTerminologyServerUrl)
 		        .setConnectionType(new Coding().setCode(Constants.HL7_FHIR_REST));
-		Endpoint dataEndpoint = new Endpoint().setAddress(fhirClient.getServerBase())
+		Endpoint dataEndpoint = new Endpoint().setAddress(fhirServerUrl)
 		        .setConnectionType(new Coding().setCode(Constants.HL7_FHIR_REST));
 		try {
-			CarePlan carePlan = pdProcessor.apply(planDefinition.getIdElement(), 
+			CarePlan carePlan = pdProcessor.apply(CACHED_PLANDEFS.get(key).getIdElement(), 
 				"Patient/"+patientId, encounterId == null ? null : "Encounter/" + encounterId, 
 				practitionerId == null ? null : "Practitioner/" + practitionerId,
 				organizationId == null ? null : "Organization/" + organizationId, 
@@ -193,6 +229,10 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		} finally {
 			manager.completeWorkItem(workItem.getId(), results);
 		}
+	}
+
+	private boolean isEmpty(String value) {
+		return value == null || "".equals(value.trim()) || "null".equalsIgnoreCase(value.trim());
 	}
 
 	private String asJson(List<CdsCard> cards) {

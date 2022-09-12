@@ -14,8 +14,10 @@ public class CqfInlineWIHTest {
 	public void testInlineCall() throws Exception {
 		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
-		workItem.setParameter("fhirServerUrl", "https://cqf-internal.elimuinformatics.com/fhir");
-		workItem.setParameter("fhirTerminologyServerUrl", "https://cqf-internal.elimuinformatics.com/fhir");
+		//workItem.setParameter("fhirServerUrl", "https://cqf-internal.elimuinformatics.com/fhir");
+		//workItem.setParameter("fhirTerminologyServerUrl", "https://cqf-internal.elimuinformatics.com/fhir");
+		workItem.setParameter("fhirServerUrl", "https://hapi.fhir.org/baseR4");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://hapi.fhir.org/baseR4");
 		workItem.setParameter("planDefinitionId", "ColorectalCancerScreeningCDS");
 		workItem.setParameter("patientId", "should-screen-ccs");
 		/*Patient patient = new Patient();

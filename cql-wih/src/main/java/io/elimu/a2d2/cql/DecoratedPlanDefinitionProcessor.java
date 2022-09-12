@@ -2,7 +2,6 @@ package io.elimu.a2d2.cql;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.CarePlan;
-import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DataRequirement;
 import org.hl7.fhir.r4.model.DomainResource;
@@ -35,12 +33,10 @@ import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.r4.model.PlanDefinition;
 import org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType;
-import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent;
 import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent;
 import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent;
 import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.RelatedArtifact;
 import org.hl7.fhir.r4.model.RequestGroup;
 import org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.r4.model.RequestGroup.RequestIntent;
@@ -50,7 +46,6 @@ import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Type;
 import org.hl7.fhir.r4.model.UriType;
-import org.opencds.cqf.cds.response.CdsCard;
 import org.opencds.cqf.cql.engine.runtime.DateTime;
 import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor;
 import org.opencds.cqf.cql.evaluator.expression.ExpressionEvaluator;
@@ -62,11 +57,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.fhirpath.FhirPathExecutionException;
 import ca.uhn.fhir.fhirpath.IFhirPath;
-import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.rest.api.IVersionSpecificBundleFactory;
 
 public class DecoratedPlanDefinitionProcessor {
   protected ActivityDefinitionProcessor activityDefinitionProcessor;
@@ -187,7 +179,6 @@ public class DecoratedPlanDefinitionProcessor {
   private CarePlan resolveActions(Session session) {
     Map<String, PlanDefinition.PlanDefinitionActionComponent> metConditions = new HashMap<String, PlanDefinition.PlanDefinitionActionComponent>();
     for (PlanDefinition.PlanDefinitionActionComponent action : session.planDefinition.getAction()) {
-      // TODO - Apply input/output dataRequirements?
       resolveAction(session, metConditions, action);
     }
 
@@ -384,18 +375,6 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
    */
   private Resource resolveTask(Session session, Task task, PlanDefinition.PlanDefinitionActionComponent action) {
     task.setId(new IdType(action.getId()));
-    if (!task.hasCode()) {
-      if (action.hasCode()) {
-        for (CodeableConcept actionCode : action.getCode()) {
-          Boolean foundExecutableTaskCode = false;
-          for (Coding actionCoding : actionCode.getCoding()) {
-            if (actionCoding.getSystem().equals("http://aphl.org/fhir/ecr/CodeSystem/executable-task-types")) {
-              foundExecutableTaskCode = true;
-            }
-          }
-        }
-      }
-    }
     if (action.hasRelatedAction()) {
         List<PlanDefinitionActionRelatedActionComponent> relatedActions = action.getRelatedAction();
         for (PlanDefinitionActionRelatedActionComponent relatedAction : relatedActions) {
@@ -467,12 +446,10 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
           }
         }
 
-        // TODO - likely need more date transformations
         if (result instanceof DateTime) {
           result = Date.from(((DateTime) result).getDateTime().toInstant());
         }
 
-        // TODO: Rename bundle
         if (dynamicValue.hasPath() && dynamicValue.getPath().equals("$this")) {
           session.carePlan = ((CarePlan) result);
          } else if (dynamicValue.hasPath() && (dynamicValue.getPath().startsWith("action") || dynamicValue.getPath().startsWith("%action"))) {
@@ -538,7 +515,6 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
 
         String libraryToBeEvaluated = ensureLibrary(session, condition.getExpression());
         String language = condition.getExpression().getLanguage();
-        IVersionSpecificBundleFactory bundleFactory = fhirContext.newBundleFactory();
         Object result = evaluateConditionOrDynamicValue(condition.getExpression().getExpression(), language, libraryToBeEvaluated, session, action.getInput());
         if (result == null && condition.getExpression().hasExtension(alternateExpressionExtension)) {
           Type alternateExpressionValue = condition.getExpression().getExtensionByUrl(alternateExpressionExtension)
@@ -599,12 +575,6 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
     }
   }
 
-  private String ensureStringResult(Object result) {
-    if (!(result instanceof StringType))
-      throw new RuntimeException("Result not instance of String");
-    return ((StringType) result).asStringValue();
-  }
-
   protected static String getResourceName(CanonicalType canonical) {
     if (canonical.hasValue()) {
       String id = canonical.getValue();
@@ -624,7 +594,6 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
     return component.hasValue() ? component.getValue() : component.getResource();
   }
   
-  // TODO: We don't have tests for this function. 
   protected Object evaluateConditionOrDynamicValue(String expression, String language, String libraryToBeEvaluated, Session session, List<DataRequirement> dataRequirements) {
     Parameters params = resolveInputParameters(dataRequirements);
     if (session.parameters != null && session.parameters instanceof Parameters) {
