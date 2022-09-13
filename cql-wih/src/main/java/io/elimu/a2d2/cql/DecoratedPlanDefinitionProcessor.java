@@ -69,6 +69,8 @@ public class DecoratedPlanDefinitionProcessor {
   protected FhirDal fhirDal;
   protected IFhirPath fhirPath;
 
+  private Map<String, Object> libraryResults = new HashMap<>();
+  
   private static final Logger logger = LoggerFactory.getLogger(DecoratedPlanDefinitionProcessor.class);
   private static final String alternateExpressionExtension = "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression";
 
@@ -599,13 +601,32 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
     if (session.parameters != null && session.parameters instanceof Parameters) {
       params.getParameter().addAll(((Parameters) session.parameters).getParameter());
     }
+    if (libraryResults.isEmpty()) {
+        Object libraryResult = libraryProcessor.evaluate(libraryToBeEvaluated, session.patientId,
+                session.parameters, session.contentEndpoint, session.terminologyEndpoint,
+                session.dataEndpoint, session.bundle, null);
+        if (libraryResult instanceof Parameters) {
+        	((Parameters) libraryResult).getParameter().forEach(param -> {
+        		if (param.hasName() && param.hasValue()) {
+        			libraryResults.put(param.getName(), param.getValue());
+        		} else if (param.hasName() && param.hasResource()) {
+        			libraryResults.put(param.getName(), param.getResource());
+        		}
+        	});
+        }
+    }
 
     Object result = null;
     switch (language) {
       case "text/cql":
       case "text/cql.expression":
       case "text/cql-expression": 
-        result = expressionEvaluator.evaluate(expression, params);
+	 String key = generateExpressionKey(expression, params);
+    	 if (libraryResults.containsKey(key)) {
+		result = libraryResults.get(key);
+	 } else {	
+	        result = expressionEvaluator.evaluate(expression, params);
+	 }
         break;
       case "text/cql-identifier":
       case "text/cql.identifier":
@@ -639,6 +660,18 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
       }
     }
     return result;
+  }
+
+  private String generateExpressionKey(String expression, Parameters params) {
+	  StringBuilder sb = new StringBuilder();
+	  for (ParametersParameterComponent param : params.getParameter()) {
+		  if (param.hasName() && param.hasValue()) {
+			  sb.append(param.getName()).append("=").append(param.getValue());
+		  } else if (param.hasName() && param.hasResource()) {
+			  sb.append(param.getName()).append("=>").append(param.getResource().getResourceType()).append("/").append(param.getResource().getId());
+		  }
+	  }
+	  return expression + ":" + sb.toString();
   }
 
   private Parameters resolveInputParameters(List<DataRequirement> dataRequirements) {
