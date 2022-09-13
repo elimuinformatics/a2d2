@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.cqframework.cql.elm.execution.Library;
+import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CarePlan;
 import org.hl7.fhir.r4.model.Coding;
@@ -25,8 +27,10 @@ import org.opencds.cqf.cds.response.CdsCard.Suggestions;
 import org.opencds.cqf.cds.response.CdsCard.Suggestions.Action;
 import org.opencds.cqf.cds.response.R4CarePlanToCdsCard;
 import org.opencds.cqf.cql.engine.exception.CqlException;
+import org.opencds.cqf.cql.engine.execution.CqlEngine;
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverter;
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverterFactory;
+import org.opencds.cqf.cql.evaluator.CqlOptions;
 import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor;
 import org.opencds.cqf.cql.evaluator.builder.Constants;
 import org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder;
@@ -44,6 +48,7 @@ import org.opencds.cqf.cql.evaluator.builder.terminology.FhirRestTerminologyProv
 import org.opencds.cqf.cql.evaluator.builder.terminology.TerminologyProviderFactory;
 import org.opencds.cqf.cql.evaluator.builder.terminology.TypedTerminologyProviderFactory;
 import org.opencds.cqf.cql.evaluator.cql2elm.util.LibraryVersionSelector;
+import org.opencds.cqf.cql.evaluator.engine.CqlEngineOptions;
 import org.opencds.cqf.cql.evaluator.expression.ExpressionEvaluator;
 import org.opencds.cqf.cql.evaluator.fhir.ClientFactory;
 import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory;
@@ -85,6 +90,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	private LibraryProcessor libProcessor;
 	private MyOperationsParametersParser operationParametersParser;
 	private ExpressionEvaluator expressionEvaluator;
+	private static HashMap<VersionedIdentifier, Library> libraryCache = new HashMap<>();
 
 	public PlanDefCdsInlineWorkItemHandler() {
 		this.ctx = FhirContext.forR4Cached();
@@ -108,12 +114,18 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		this.terminologyProviderFactories.add(new FhirRestTerminologyProviderFactory(this.ctx, this.clientFactory));
 		this.terminologyProviderFactory = new TerminologyProviderFactory(this.ctx, this.terminologyProviderFactories);
 		this.endpointConverter = new EndpointConverter(this.adapterFactory);
+		CqlOptions cqlOptions = new CqlOptions();
+		CqlEngineOptions cqlEngineOptions = new CqlEngineOptions();
+		cqlEngineOptions.setOptions(Collections.singleton(CqlEngine.Options.EnableExpressionCaching));
+		cqlOptions.setCqlEngineOptions(cqlEngineOptions);
 		this.libProcessor = new LibraryProcessor(this.ctx, this.cqlFhirParametersConverter, 
 				this.libraryLoaderFactory, this.dataProviderFactory, this.terminologyProviderFactory, 
-				this.endpointConverter, this.mrFactory, () -> new CqlEvaluatorBuilder());
+				this.endpointConverter, this.mrFactory,
+				() -> new CqlEvaluatorBuilder().withLibraryCache(libraryCache).withCqlOptions(cqlOptions));
 		this.operationParametersParser = new MyOperationsParametersParser(this.adapterFactory, this.fhirTypeConverter);
 		this.expressionEvaluator = new ExpressionEvaluator(this.ctx, this.cqlFhirParametersConverter, this.libraryLoaderFactory, this.dataProviderFactory, 
-				this.terminologyProviderFactory, this.endpointConverter, this.mrFactory, () -> new CqlEvaluatorBuilder());
+				this.terminologyProviderFactory, this.endpointConverter, this.mrFactory,
+				() -> new CqlEvaluatorBuilder().withLibraryCache(libraryCache).withCqlOptions(cqlOptions));
 	}
 	
 	@Override

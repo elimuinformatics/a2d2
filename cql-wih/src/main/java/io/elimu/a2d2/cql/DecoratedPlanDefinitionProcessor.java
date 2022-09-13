@@ -2,7 +2,6 @@ package io.elimu.a2d2.cql;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,12 +34,10 @@ import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.r4.model.PlanDefinition;
 import org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType;
-import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent;
 import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent;
 import org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent;
 import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.RelatedArtifact;
 import org.hl7.fhir.r4.model.RequestGroup;
 import org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent;
 import org.hl7.fhir.r4.model.RequestGroup.RequestIntent;
@@ -50,7 +47,6 @@ import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Type;
 import org.hl7.fhir.r4.model.UriType;
-import org.opencds.cqf.cds.response.CdsCard;
 import org.opencds.cqf.cql.engine.runtime.DateTime;
 import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor;
 import org.opencds.cqf.cql.evaluator.expression.ExpressionEvaluator;
@@ -62,10 +58,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.fhirpath.FhirPathExecutionException;
 import ca.uhn.fhir.fhirpath.IFhirPath;
-import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.IVersionSpecificBundleFactory;
 
 public class DecoratedPlanDefinitionProcessor {
@@ -623,6 +617,8 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
     ParametersParameterComponent component = first.isPresent() ? first.get() : null;
     return component.hasValue() ? component.getValue() : component.getResource();
   }
+
+  private Map<String, Object> libraryResults = new HashMap<>();
   
   // TODO: We don't have tests for this function. 
   protected Object evaluateConditionOrDynamicValue(String expression, String language, String libraryToBeEvaluated, Session session, List<DataRequirement> dataRequirements) {
@@ -631,20 +627,47 @@ private void resolveAction(Session session, Map<String, PlanDefinition.PlanDefin
       params.getParameter().addAll(((Parameters) session.parameters).getParameter());
     }
 
+    if (libraryResults.isEmpty()) {
+      Object libraryResult = libraryProcessor.evaluate(libraryToBeEvaluated, session.patientId,
+              session.parameters, session.contentEndpoint, session.terminologyEndpoint,
+              session.dataEndpoint, session.bundle, null);
+      if (libraryResult instanceof Parameters) {
+        ((Parameters) libraryResult).getParameter().forEach(
+                param -> {
+                  if (param.hasName() && param.hasValue()) {
+                    libraryResults.put(param.getName(), param.getValue());
+                  }
+                  else if (param.hasName() && param.hasResource()) {
+                    libraryResults.put(param.getName(), param.getResource());
+                  }
+                });
+      }
+    }
+
     Object result = null;
     switch (language) {
       case "text/cql":
       case "text/cql.expression":
-      case "text/cql-expression": 
-        result = expressionEvaluator.evaluate(expression, params);
+      case "text/cql-expression":
+        if (libraryResults.containsKey(expression)) {
+          result = libraryResults.get(expression);
+        }
+        else {
+          result = expressionEvaluator.evaluate(expression, params);
+        }
         break;
       case "text/cql-identifier":
       case "text/cql.identifier":
       case "text/cql.name":
-      case "text/cql-name": 
-        result = libraryProcessor.evaluate(libraryToBeEvaluated, session.patientId, session.parameters,
-            session.contentEndpoint, session.terminologyEndpoint, session.dataEndpoint, session.bundle, 
-            Collections.singleton(expression));
+      case "text/cql-name":
+        if (libraryResults.containsKey(expression)) {
+          result = libraryResults.get(expression);
+        }
+        else {
+          result = libraryProcessor.evaluate(libraryToBeEvaluated, session.patientId, session.parameters,
+                  session.contentEndpoint, session.terminologyEndpoint, session.dataEndpoint, session.bundle,
+                  Collections.singleton(expression));
+        }
         break;
       case "text/fhirpath":
         List<IBase> outputs;
