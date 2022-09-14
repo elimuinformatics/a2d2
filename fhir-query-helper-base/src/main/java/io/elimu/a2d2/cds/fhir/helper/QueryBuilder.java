@@ -26,9 +26,17 @@ public class QueryBuilder {
 		return this;
 	}
 	
+	public boolean hasParam(String paramName) {
+		return this.params.containsKey(paramName);
+	}
+	
 	public QueryBuilder resourceType(String resourceType) {
 		this.resourceType = resourceType;
 		return this;
+	}
+	
+	public String getResourceType() {
+		return resourceType;
 	}
 	
 	public QueryBuilder count(int count) {
