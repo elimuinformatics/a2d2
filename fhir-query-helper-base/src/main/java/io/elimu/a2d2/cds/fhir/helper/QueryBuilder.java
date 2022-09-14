@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class QueryBuilder {
 
+	private String id;
 	private boolean paging = true;
 	private Map<String, String> params = new HashMap<>();
 	private String resourceType;
@@ -24,6 +25,15 @@ public class QueryBuilder {
 	public QueryBuilder withParam(String paramName, String paramValue) {
 		this.params.put(paramName, paramValue);
 		return this;
+	}
+	
+	public QueryBuilder id(String id) {
+		this.id = id;
+		return this;
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 	public boolean hasParam(String paramName) {
