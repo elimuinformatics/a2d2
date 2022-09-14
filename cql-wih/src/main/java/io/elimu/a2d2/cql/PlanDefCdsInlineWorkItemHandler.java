@@ -199,14 +199,14 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			PlanDefinition planDefinition = null;
 			if (planDefId != null) {
 				key = planDefId;
-				planDefinition = fhirClient.fetchResourceFromUrl(PlanDefinition.class, fhirServerUrl + "/PlanDefinition/" + planDefId);
+				planDefinition = fhirTerminologyClient.fetchResourceFromUrl(PlanDefinition.class, fhirServerUrl + "/PlanDefinition/" + planDefId);
 				if (planDefinition == null) {
 					throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
 				}
 				CACHED_PLANDEFS.put(key, planDefinition);
 			} else {
 				key = planDefUrl;
-				Bundle bundle = fhirClient.fetchResourceFromUrl(Bundle.class, fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
+				Bundle bundle = fhirTerminologyClient.fetchResourceFromUrl(Bundle.class, fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
 				if (!bundle.getEntryFirstRep().hasResource()) {
 					throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
 				}
