@@ -429,7 +429,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			if (!avoidCache.get().booleanValue() && cacheService!= null && cacheService.containsKey(cacheKey)) {
 				retval = (FhirResponse<IBaseResource>) cacheService.get(cacheKey).getValue();
 			} else {
-				retval = getResourceList(resourceType, resourceQuery, usePath);
+				retval = getResourceList(resourceType, resourceQuery, usePath, true);
 				if(!avoidCache.get().booleanValue() && cacheService!= null && CacheUtil.isValidState(retval.getResponseStatusCode())) {
 					cacheService.put(cacheKey, new ResponseEvent<>(retval, RESPONSE_EVENT_TIMEOUT));
 				}
@@ -443,7 +443,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return new FhirResponse<>(null, -1, "not invoked");
 	}
 	
-	private FhirResponse<IBaseResource> getResourceList(String resourceType, String resourceQuery, boolean usePath) {
+	private FhirResponse<IBaseResource> getResourceList(String resourceType, String resourceQuery, boolean usePath, boolean paging) {
 		FhirResponse<List<IBaseResource>> resourceList = null;
 		if (ctx.getVersion().getVersion().equals(this.fhirVersionEnum)) {
 			if (usePath) {
@@ -451,7 +451,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 				List<IBaseResource> result = resp == null || resp.getResult() == null ? null : Arrays.asList(resp.getResult());
 				resourceList = new FhirResponse<List<IBaseResource>>(result, resp.getResponseStatusCode(), resp.getResponseStatusInfo());
 			} else {
-				resourceList = queryServer(resourceQuery);
+				resourceList = queryServer(resourceQuery, paging);
 			}
 		}
 		if(resourceList != null) {
@@ -467,7 +467,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		}
 	}
 
-	protected FhirResponse<List<IBaseResource>> getRetVal(String resourceQuery, FhirVersionEnum fhirVersion) {
+	protected FhirResponse<List<IBaseResource>> getRetVal(String resourceQuery, FhirVersionEnum fhirVersion, boolean paging) {
 		FhirResponse<List<IBaseResource>> retval = null;
 		String cacheKey = CacheUtil.getCacheKey(resourceQuery, interceptors);
 
@@ -475,7 +475,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			retval = (FhirResponse<List<IBaseResource>>) cacheService.get(cacheKey).getValue();
 		} else {
 			if (ctx.getVersion().getVersion().equals(fhirVersion)) {
-				retval = queryServer(resourceQuery);
+				retval = queryServer(resourceQuery, paging);
 			}
 			if (!avoidCache.get().booleanValue() && cacheService != null && retval != null
 					&& CacheUtil.isValidState(retval.getResponseStatusCode())) {
@@ -521,7 +521,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		try {
 			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "queryResources");
 			String resourceQuery = this.getResourceQuery(resourceType, subjectId, subjectRefAttribute, fhirQuery);
-			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum);
+			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum, true);
 		} catch (Exception e) {
 			log.error( ERROR_MSG + e.getMessage() + ". [" + e.getClass().getName() + "]");
 		} finally {
@@ -534,14 +534,45 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	 * Returns a list of Resources from a specific filtering query.
 	 * The return type is a {@link FhirResponse} wrapper for the HTTP response. Will contain a result and a response code.
 	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
-	 * @param resourceType the resourceType (i.e. Patient, Observation, etc)
-	 * @param subjectId the value of the main parameter to be used for filtering in the query
-	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
-	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
-	 * @param asyncId it will gput a parameter
-	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 * @param builder a {@link QueryBuilder} to construct the query, auth, paging and any other query parameters
+	 * @return the list of objects that is a result of invoking HTTP GET on the query built by QueryBUilder
 	 */
+	public FhirResponse<List<IBaseResource>> query(QueryBuilder builder) {
+		try {
+			if(!builder.useCache()) {
+				avoidCache.set(Boolean.TRUE);
+			}
+			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "queryResources");
+			String resourceQuery = builder.buildQuery(fhirUrl);
+			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum, builder.hasPaging());
+		} catch (Exception e) {
+			log.error( ERROR_MSG + e.getMessage() + ". [" + e.getClass().getName() + "]");
+		} finally {
+			PerformanceHelper.getInstance().endClock(QUERYINGSERVERHELPER, "queryResources");
+			if (!builder.useCache()) {
+				avoidCache.set(Boolean.FALSE);
+			}
+		}
+		return new FhirResponse<>(new ArrayList<>(), -1, "not invoked due to internal error");
+	}
 
+	/**
+	 * Creates a separate thread where a query to the FHIR server will be done.
+	 * The return type is a {@link FhirFuture} wrapper for the {@link FhirResponse} of that call. Will contain a result and a response code.
+	 * This method will cache the response for 5 minutes if called again with the same parameters and authentication headers. 
+	 * @param builder a {@link QueryBuilder} to construct the query, auth, paging and any other query parameters
+	 * @param asyncId a name for the Future to be returned
+	 * @return a {@link FhirFuture} with the asyncId as name, and ready to return the List of IBaseResource as result.
+	 */
+	public FhirFuture<FhirResponse<List<IBaseResource>>> queryAsync(QueryBuilder builder, String asyncId) {
+		Callable<FhirResponse<List<IBaseResource>>> callable = new Callable<FhirResponse<List<IBaseResource>>>() {
+			@Override
+			public FhirResponse<List<IBaseResource>> call() throws Exception {
+				return query(builder);
+			}
+		};
+		return new FhirFuture<>(asyncId, pool.submit(callable));
+	}
 	
 	/**
 	 * Creates a separate thread where a query to the FHIR server will be done.
@@ -594,7 +625,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		factory.setServerValidationMode(ServerValidationModeEnum.NEVER);
 	}
 
-	public abstract FhirResponse<List<IBaseResource>> queryServer(String resourceQuery);
+	public abstract FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, boolean paging);
 
 	public abstract FhirResponse<IBaseResource> fetchServer(final String resourceType, String resourceQuery);
 	

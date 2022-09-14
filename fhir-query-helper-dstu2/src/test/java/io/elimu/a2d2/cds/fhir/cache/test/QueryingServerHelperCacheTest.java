@@ -23,6 +23,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import io.elimu.a2d2.cds.fhir.cache.CacheUtil;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
@@ -84,13 +86,13 @@ public class QueryingServerHelperCacheTest {
 
 
 		doReturn(resourceQuery_1).when(queryingServerHelper).getResourceQuery(resourceType_1, subjectId_1, subjectRefAttribute_1, fhirQuery_1);
-		doReturn(retval_1).when(queryingServerHelper).queryServer(resourceQuery_1);
+		doReturn(retval_1).when(queryingServerHelper).queryServer(resourceQuery_1, true);
 
 		doReturn(resourceQuery_2).when(queryingServerHelper).getResourceQuery(resourceType_2, subjectId_2, subjectRefAttribute_2, fhirQuery_2);
-		doReturn(retval_2).when(queryingServerHelper).queryServer(resourceQuery_2);
+		doReturn(retval_2).when(queryingServerHelper).queryServer(resourceQuery_2, true);
 
 		doReturn(resourceQuery_3).when(queryingServerHelper).getResourceQuery(resourceType_3, subjectId_3, subjectRefAttribute_3, fhirQuery_3);
-		doReturn(retval_3).when(queryingServerHelper).queryServer(resourceQuery_3);
+		doReturn(retval_3).when(queryingServerHelper).queryServer(resourceQuery_3, true);
 	}
 
 	@Test
