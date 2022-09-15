@@ -127,7 +127,7 @@ public class OAuthHelperTest {
 		}
 		
 		@Override
-		public FhirResponse<List<IBaseResource>> queryServer(String resourceQuery) {
+		public FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, boolean paging) {
 			return new FhirResponse<List<IBaseResource>>(new ArrayList<IBaseResource>(), 200, "OK");
 		}
 

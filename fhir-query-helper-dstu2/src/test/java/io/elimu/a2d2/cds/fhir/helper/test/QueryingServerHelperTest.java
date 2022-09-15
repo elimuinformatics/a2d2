@@ -15,6 +15,7 @@
 package io.elimu.a2d2.cds.fhir.helper.test;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -35,6 +36,7 @@ import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import io.elimu.a2d2.cds.fhir.helper.FhirFuture;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
+import io.elimu.a2d2.cds.fhir.helper.QueryBuilder;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelper;
 
 public class QueryingServerHelperTest {
@@ -73,8 +75,52 @@ public class QueryingServerHelperTest {
 	}
 
 	@Test
+	public void testQSH() throws Exception {
+		String url = "https://api.logicahealth.org/cdssx/open";
+		String patientId = "SMART-1577780";
+		/*GenericClient client = (GenericClient) FhirContext.forDstu2().newRestfulGenericClient(url);
+		client.setDontValidateConformance(true);
+		client.setEncoding(EncodingEnum.JSON);*/
+		QueryingServerHelper qsh = new QueryingServerHelper(url);
+		FhirResponse<?> resp = qsh.getResourceByIdInPathResponse("Patient", patientId);
+		Assert.assertEquals(200, resp.getResponseStatusCode());
+		System.out.println(resp.getResult());
+		//client.registerInterceptor(new SimpleRequestHeaderInterceptor("Accept: */*"));
+		//client.registerInterceptor(new SimpleRequestHeaderInterceptor("Accept-Encoding: *;q=0"));
+		//client.registerInterceptor(new SimpleRequestHeaderInterceptor("Authorization: Basic dXNlcjpwYXNz"));
+		//Patient p = client.fetchResourceFromUrl(Patient.class, url + "/Patient/" + patientId);
+		//Assert.assertNotNull(p);
+		/*CloseableHttpClient client = HttpClientBuilder.create().build();
+		HttpGet get = new HttpGet(url + "/Patient/" + patientId);
+		get.setHeader("Accept", "*//*");
+		get.setHeader("Accept-Encoding", "*;q=0");
+		CloseableHttpResponse resp = client.execute(get);
+		Assert.assertEquals(200, resp.getStatusLine().getStatusCode());*/
+	}
+	
+	@Test
+	public void testQueryBuilder() {
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(FHIR2_URL + "/Patient?_count=1&_sort=-_lastUpdated", false);
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(FHIR2_URL + "/Observation?_count=2&_sort=-date", true);
+		FhirResponse<List<IBaseResource>> retval = queryingServerHelper.query(
+					new QueryBuilder().resourceType("Patient").
+					count(1).withParam("_sort", "-_lastUpdated").paging(false));
+		Assert.assertNotNull(retval);
+		Assert.assertEquals(200, retval.getResponseStatusCode());
+		Assert.assertNotNull(retval.getResult());
+
+		retval = queryingServerHelper.query(
+				new QueryBuilder().resourceType("Observation").
+				count(2).withParam("_sort", "-date"));
+		
+		Assert.assertNotNull(retval);
+		Assert.assertEquals(200, retval.getResponseStatusCode());
+		Assert.assertNotNull(retval.getResult());
+	}
+	
+	@Test
 	public void fhirQueryAsync() {
-		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any(), anyBoolean());
 		doReturn(fhirResponseObservation).when(queryingServerHelper).getResourceByIdResponse(any(), any());
 		long from = System.currentTimeMillis();
 		FhirFuture<FhirResponse<List<IBaseResource>>> f = queryingServerHelper.queryResourcesAsync("Observation",
@@ -95,7 +141,7 @@ public class QueryingServerHelperTest {
 
 	@Test
 	public void fhirQueryNoAuth() {
-		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any(), anyBoolean());
 		QueryingServerHelper qshNoAuth = new QueryingServerHelper("http://testURL/baseDstu2");
 		Assert.assertNotNull(qshNoAuth);
 		FhirResponse<List<IBaseResource>> iResourceList = queryingServerHelper.queryResourcesResponse("Observation",
@@ -105,7 +151,7 @@ public class QueryingServerHelperTest {
 
 	@Test
 	public void fhirQueryAndQueryPartTest() {
-		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any(), anyBoolean());
 		FhirResponse<List<IBaseResource>> iResourceList = queryingServerHelper.queryResourcesResponse("Observation",patient.getId().getIdPart(), null, IDENTIFIER);
 		Assert.assertNotNull(iResourceList);
 		doReturn(fhirResponsePatient).when(queryingServerHelper).getResourceByIdResponse(any(), any());
@@ -115,7 +161,7 @@ public class QueryingServerHelperTest {
 
 	@Test
 	public void fhirQueryTest() {
-		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any(), anyBoolean());
 		FhirResponse<List<IBaseResource>> iResourceList = queryingServerHelper.queryResourcesResponse("Patient", null, null, IDENTIFIER);
 		Assert.assertNotNull(iResourceList);
 	}
@@ -124,14 +170,14 @@ public class QueryingServerHelperTest {
 	public void queryPartTest() {
 		List<IBaseResource> NullIBaseResource = new ArrayList<IBaseResource>();
 		FhirResponse<List<IBaseResource>> fhirResponseNull = new FhirResponse<List<IBaseResource>>(NullIBaseResource, 200, "testing");
-		doReturn(fhirResponseNull).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponseNull).when(queryingServerHelper).queryServer(any(), anyBoolean());
 		FhirResponse<List<IBaseResource>> iResourceList = queryingServerHelper.queryResourcesResponse("Observation",patient.getId().getIdPart(), SUBJECT, null);
 		Assert.assertNotNull(iResourceList);
 	}
 
 	@Test
 	public void fhirQueryAndQueryPartTestWithNullFhirVersion() {
-		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any());
+		doReturn(fhirResponse).when(queryingServerHelper).queryServer(any(), anyBoolean());
 		doReturn(fhirResponseObservation).when(queryingServerHelper).getResourceByIdResponse(any(), any());
 		FhirResponse<List<IBaseResource>> iResourceList = queryingServerHelper.queryResourcesResponse("Observation",patient.getId().getIdPart(), SUBJECT, IDENTIFIER);
 		Assert.assertNotNull(iResourceList);

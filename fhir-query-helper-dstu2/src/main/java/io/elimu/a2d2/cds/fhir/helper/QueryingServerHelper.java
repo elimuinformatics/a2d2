@@ -90,7 +90,7 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 	}
 
 	@Override
-	public FhirResponse<List<IBaseResource>> queryServer(final String resourceQuery) {
+	public FhirResponse<List<IBaseResource>> queryServer(final String resourceQuery, boolean paging) {
 		FhirClientWrapper client = clients.next();
 		FhirResponse<List<IBaseResource>> resourceBundle = null;
 		log.debug("Fetching {} resources using client for version {} ", client.getFhirContext().getVersion().getVersion().name(),
@@ -102,7 +102,7 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 				Bundle bundle = client.fetchResourceFromUrl(Bundle.class, resourceQuery);
 				List<IBaseResource> retval = new LinkedList<>();
 				bundle.getEntry().forEach(e -> retval.add((IBaseResource) e.getResource()));
-				while (bundle.getLink("next") != null) {
+				while (paging && bundle.getLink("next") != null) {
 					final String url = bundle.getLink("next").getUrl();
 					log.debug("Invoking url {}", url);
 					bundle = client.fetchResourceFromUrl(Bundle.class, url);
