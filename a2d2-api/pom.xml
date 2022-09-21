@@ -56,6 +56,16 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct</artifactId>
+				<version>1.4.2.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.errorprone</groupId>
+				<artifactId>error_prone_annotations</artifactId>
+				<version>2.10.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-api</artifactId>
 				<version>${log4j.version}</version>
@@ -213,6 +223,11 @@
 					<artifactId>okhttp</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.elimu.a2d2</groupId>
+			<artifactId>cql-wih</artifactId>
+			<version>${internal.deps.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
