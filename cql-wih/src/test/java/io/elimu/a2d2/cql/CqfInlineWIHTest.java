@@ -61,6 +61,7 @@ public class CqfInlineWIHTest {
 		Assert.assertEquals("https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening", card.getSource().getUrl().toExternalForm());
 		
 		workItem.setParameter("patientId", "should-not-screen-ccs");
+		workItem.getResults().clear();
 		start = System.currentTimeMillis();
 		handler.executeWorkItem(workItem, manager);
 		time = System.currentTimeMillis() - start;
@@ -68,8 +69,9 @@ public class CqfInlineWIHTest {
 		
 		workItem.setParameter("context_patientId", "something-else");
 		workItem.setParameter("patientId", "something-else");
+		workItem.getResults().clear();
 		handler.executeWorkItem(workItem, manager);
 		Assert.assertNotNull(workItem.getResults());
-		Assert.assertNotNull(workItem.getResult("error"));
+		Assert.assertTrue(workItem.getResults().containsKey("error"));
 	}
 }
