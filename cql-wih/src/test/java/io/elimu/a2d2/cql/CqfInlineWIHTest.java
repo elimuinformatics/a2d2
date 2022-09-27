@@ -11,6 +11,25 @@ import org.opencds.cqf.cds.response.CdsCard.IndicatorCode;
 public class CqfInlineWIHTest {
 
 	@Test
+	public void testInlineGcPlanDef() throws Exception {
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		workItem.setParameter("fhirServerUrl", "https://hapi.fhir.org/baseR4");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://hapi.fhir.org/baseR4");
+		workItem.setParameter("planDefinitionUrl", "http://example.org/hello-cds-world");
+		workItem.setParameter("patientId", "should-screen-ccs");
+		workItem.setParameter("context_patientId", "should-screen-ccs");
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		long time = System.currentTimeMillis() - start;
+		System.out.println("Execution time: " + time);
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+	}
+	
+	@Test
 	public void testInlineCall() throws Exception {
 		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
@@ -74,4 +93,5 @@ public class CqfInlineWIHTest {
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertTrue(workItem.getResults().containsKey("error"));
 	}
+	
 }
