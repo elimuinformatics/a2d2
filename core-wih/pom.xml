@@ -33,7 +33,7 @@
 	<properties>
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<org.json.version>20211205</org.json.version>
-		<sping-web.version>5.3.21</sping-web.version>
+		<sping-web.version>5.3.23</sping-web.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
