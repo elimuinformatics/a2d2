@@ -26,8 +26,10 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(PlanDefCdsInlineWorkItemHandler.class);
 
-	private static Map<String, DecoratedPlanDefinitionProcessor> CACHED_PROCESSORS = new HashMap<>();
-	private static Map<String, Object> CACHED_PLANDEFS = new HashMap<>();
+	private static final long MAX_AGE_CACHE = Long.valueOf(System.getProperty("plandef.max.lifetime", "900000"));
+	
+	private static Map<String, TimeObject<DecoratedPlanDefinitionProcessor>> CACHED_PROCESSORS = new HashMap<>();
+	private static Map<String, TimeObject<Object>> CACHED_PLANDEFS = new HashMap<>();
 	private static HashMap<?, ?> LIBRARY_CACHE = new HashMap<>();
 	
 	private Object ctx;
@@ -206,13 +208,13 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			DecoratedPlanDefinitionProcessor pdProcessor = null;
 			String key = null;
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			if (CACHED_PROCESSORS.containsKey(planDefId)) {
+			if (CACHED_PROCESSORS.containsKey(planDefId) && !CACHED_PROCESSORS.get(planDefId).olderThan(MAX_AGE_CACHE)) {
 				key = planDefId;
-				pdProcessor = CACHED_PROCESSORS.get(planDefId);
+				pdProcessor = CACHED_PROCESSORS.get(planDefId).getValue();
 				LOG.debug("Processor already cached by planDefId key " + key);
-			} else if (CACHED_PROCESSORS.containsKey(planDefUrl)) {	
+			} else if (CACHED_PROCESSORS.containsKey(planDefUrl) && !CACHED_PROCESSORS.get(planDefUrl).olderThan(MAX_AGE_CACHE)) {	
 				key = planDefUrl;
-				pdProcessor = CACHED_PROCESSORS.get(planDefUrl);
+				pdProcessor = CACHED_PROCESSORS.get(planDefUrl).getValue();
 				LOG.debug("Processor already cached by planDefUrl key " + key);
 			} else {
 				LOG.debug("Creating PlanDefinitionProcessor...");
@@ -227,10 +229,10 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 					if (planDefinition == null) {
 						throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
 					}
-					CACHED_PLANDEFS.put(key, planDefinition);
+					CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
 					String url = (String) planDefinition.getClass().getMethod("getUrl").invoke(planDefinition);
 					if (url != null) {
-						CACHED_PLANDEFS.put(url, planDefinition);
+						CACHED_PLANDEFS.put(url, new TimeObject<>(planDefinition));
 					}
 					LOG.debug("PlanDefinition fetch " + fhirServerUrl + "/PlanDefinition/" + planDefId + " successful");
 				} else {
@@ -244,11 +246,11 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 						throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
 					}
 					planDefinition = firstRep.getClass().getMethod("getResource").invoke(firstRep);
-					CACHED_PLANDEFS.put(key, planDefinition);
+					CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
 					Object idObj = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
 					String id = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
 					if (id != null) {
-						CACHED_PLANDEFS.put(id, planDefinition);
+						CACHED_PLANDEFS.put(id, new TimeObject<>(planDefinition));
 					}
 					LOG.debug("PlanDefinition fetch " + fhirServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
 				}
@@ -261,7 +263,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 						getConstructor(ctxClass, fhirDalClass, libProcessorClass).newInstance(this.ctx, fhirDal, this.libProcessor);
 				pdProcessor = new DecoratedPlanDefinitionProcessor(this.ctx, fhirDal,
 						this.libProcessor, this.expressionEvaluator, activityDefinitionProcessor, this.operationParametersParser);
-				CACHED_PROCESSORS.put(key, pdProcessor);
+				CACHED_PROCESSORS.put(key, new TimeObject<>(pdProcessor));
 				LOG.debug("PlanDefinitionProcessor for key " + key + " created");
 			}
 			Class<?> endpointClass = cl.loadClass("org.hl7.fhir.r4.model.Endpoint");
@@ -275,7 +277,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			endpointClass.getMethod("setAddress", String.class).invoke(dataEndpoint, fhirServerUrl);
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(dataEndpoint, restCoding);
 
-			Object planIdType = CACHED_PLANDEFS.get(key).getClass().getMethod("getIdElement").invoke(CACHED_PLANDEFS.get(key));
+			Object planIdType = CACHED_PLANDEFS.get(key).getValue().getClass().getMethod("getIdElement").invoke(CACHED_PLANDEFS.get(key).getValue());
 			LOG.debug("PlanDefinitionProcessor apply call starting...");
 			Object carePlan = pdProcessor.apply(planIdType, 
 				"Patient/"+patientId, encounterId == null ? null : "Encounter/" + encounterId, 
