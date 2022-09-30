@@ -206,6 +206,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				}
 			}
 			DecoratedPlanDefinitionProcessor pdProcessor = null;
+			Object planDefinition = null;
 			String key = null;
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			if (CACHED_PROCESSORS.containsKey(planDefId) && !CACHED_PROCESSORS.get(planDefId).olderThan(MAX_AGE_CACHE)) {
@@ -220,12 +221,11 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				LOG.debug("Creating PlanDefinitionProcessor...");
 				Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
 				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth);
-				Object planDefinition = null;
 				if (planDefId != null) {
-					LOG.debug("Fetching PlanDefinition by ID: " + fhirServerUrl + "/PlanDefinition/" + planDefId);
+					LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
 					key = planDefId;
 					planDefinition = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirServerUrl + "/PlanDefinition/" + planDefId);
+							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
 					if (planDefinition == null) {
 						throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
 					}
@@ -234,12 +234,12 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 					if (url != null) {
 						CACHED_PLANDEFS.put(url, new TimeObject<>(planDefinition));
 					}
-					LOG.debug("PlanDefinition fetch " + fhirServerUrl + "/PlanDefinition/" + planDefId + " successful");
+					LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId + " successful");
 				} else {
-					LOG.debug("Fetching PlanDefinition by URL: " + fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
+					LOG.debug("Fetching PlanDefinition by URL: " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
 					key = planDefUrl;
 					Object bundle = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
+							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
 					Object firstRep = bundle.getClass().getMethod("getEntryFirstRep").invoke(bundle);
 					boolean hasRes = (boolean) firstRep.getClass().getMethod("hasResource").invoke(firstRep);
 					if (!hasRes) {
@@ -252,10 +252,15 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 					if (id != null) {
 						CACHED_PLANDEFS.put(id, new TimeObject<>(planDefinition));
 					}
-					LOG.debug("PlanDefinition fetch " + fhirServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
+					LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
 				}
 				Object fdFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.dal.FhirRestFhirDalFactory").getConstructor(this.clientFactory.getClass()).newInstance(this.clientFactory);
-				Object fhirDal = fdFactory.getClass().getMethod("create", String.class, List.class).invoke(fdFactory, fhirServerUrl, Collections.singletonList("Content-Type: application/json"));
+				List<String> headers = new ArrayList<>();
+				headers.add("Content-Type: application/json");
+				if (fhirTerminologyServerAuth != null) {
+					headers.add("Authorization: " + fhirTerminologyServerAuth);
+				}
+				Object fhirDal = fdFactory.getClass().getMethod("create", String.class, List.class).invoke(fdFactory, fhirTerminologyServerUrl, headers);
 				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
 				Class<?> fhirDalClass = cl.loadClass("org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal");
 				Class<?> libProcessorClass = cl.loadClass("org.opencds.cqf.cql.evaluator.library.LibraryProcessor");
@@ -273,19 +278,26 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			Object restCoding = codingClass.getConstructor().newInstance();
 			codingClass.getMethod("setCode", String.class).invoke(restCoding, "hl7-fhir-rest");
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(terminologyEndpoint, restCoding);
+			if (fhirTerminologyServerAuth != null) {
+				endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, "Authorization: " + fhirTerminologyServerAuth);
+			}
 			Object dataEndpoint = endpointClass.getConstructor().newInstance();
 			endpointClass.getMethod("setAddress", String.class).invoke(dataEndpoint, fhirServerUrl);
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(dataEndpoint, restCoding);
+			if (fhirServerAuth != null) {
+				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization: " + fhirServerAuth);
+			}
 
-			Object planIdType = CACHED_PLANDEFS.get(key).getValue().getClass().getMethod("getIdElement").invoke(CACHED_PLANDEFS.get(key).getValue());
+			planDefinition = CACHED_PLANDEFS.get(key).getValue();
+			Object planIdType = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
 			LOG.debug("PlanDefinitionProcessor apply call starting...");
-			Object carePlan = pdProcessor.apply(planIdType, 
+			Object carePlan = pdProcessor.apply(planDefinition, planIdType, 
 				"Patient/"+patientId, encounterId == null ? null : "Encounter/" + encounterId, 
 				practitionerId == null ? null : "Practitioner/" + practitionerId,
 				organizationId == null ? null : "Organization/" + organizationId, 
 				userType, userLanguage, userTaskContext, setting, settingContext, Boolean.TRUE, 
 				cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance(), 
-				Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, dataEndpoint, terminologyEndpoint);
+				Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, terminologyEndpoint, terminologyEndpoint);
 			LOG.debug("PlanDefinitionProcessor apply call done");
 			List<Object> cards = convert(carePlan);
 			results.put("cards", cards);

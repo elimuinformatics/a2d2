@@ -55,7 +55,7 @@ public class DecoratedPlanDefinitionProcessor {
 		throw new IllegalArgumentException(errorMessage);
 	}
 
-	public Object apply(Object theId, String patientId, String encounterId, String practitionerId,
+	public Object apply(Object paramPlanDefinition, Object theId, String patientId, String encounterId, String practitionerId,
 			String organizationId, String userType, String userLanguage, String userTaskContext, String setting,
 			String settingContext, Boolean mergeNestedCarePlans, Object parameters, Boolean useServerData,
 			Object bundle, Object prefetchData, Object dataEndpoint, Object contentEndpoint,
@@ -66,7 +66,7 @@ public class DecoratedPlanDefinitionProcessor {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> idTypeClass = cl.loadClass("org.hl7.fhir.instance.model.api.IIdType");
 		Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
-		Object basePlanDefinition = this.fhirDal.getClass().getMethod("read", idTypeClass).invoke(this.fhirDal, theId);
+		Object basePlanDefinition = paramPlanDefinition;
 		requireNonNull(basePlanDefinition, "Couldn't find PlanDefinition " + theId);
 		Object planDefinition = castOrThrow(basePlanDefinition, planDefClass,
 				"The planDefinition passed to FhirDal was not a valid instance of PlanDefinition.class").get();
@@ -332,7 +332,7 @@ public class DecoratedPlanDefinitionProcessor {
 		}
 		Object planDefinition = iterator.next();
 		Object idElement = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
-		carePlan = apply(idElement, session.patientId, session.encounterId,
+		carePlan = apply(planDefinition, idElement, session.patientId, session.encounterId,
 				session.practitionerId, session.organizationId, session.userType, session.userLanguage, session.userTaskContext,
 				session.setting, session.settingContext, session.mergeNestedCarePlans, session.parameters,
 				session.useServerData, session.bundle, session.prefetchData, session.dataEndpoint, session.contentEndpoint,
