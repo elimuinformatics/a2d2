@@ -21,7 +21,7 @@
 		<spring.version>5.3.23</spring.version>
 		<jackson.version.databind>2.12.6.1</jackson.version.databind>
 		<jackson.version>2.12.6</jackson.version>
-		<protobuf-java.version>3.19.4</protobuf-java.version>
+		<protobuf-java.version>3.19.6</protobuf-java.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
 		<cds.helper.version>0.0.13</cds.helper.version>
