@@ -292,13 +292,13 @@ public class DecoratedPlanDefinitionProcessor {
 								session.terminologyEndpoint, session.dataEndpoint);
 			} else {	
 				Object defStringValue = definition.getClass().getMethod("asStringValue").invoke(definition);
-				Iterable<?> iter = (Iterable<?>) fhirDal.getClass().getMethod("searchByUrl", String.class, String.class).invoke("ActivityDefinition", defStringValue);
+				Iterable<?> iter = (Iterable<?>) fhirDal.getClass().getMethod("searchByUrl", String.class, String.class).invoke(fhirDal, "ActivityDefinition", defStringValue);
 				Iterator<?> iterator = iter.iterator();
 				if (!iterator.hasNext()) {
 					throw new RuntimeException("No activity definition found for definition: " + definition);
 				}
 				Object activityDefinition = iterator.next();
-				Class<?> idtypeClass = cl.loadClass("org.hl7.fhir.r4.model.Idtype");
+				Class<?> idtypeClass = cl.loadClass("org.hl7.fhir.r4.model.IdType");
 				Class<?>[] paramTypes = new Class<?>[] { idtypeClass, String.class, String.class, String.class,
 					String.class, String.class, String.class, String.class, String.class,
 					String.class, iparamsClass, iresClass, iresClass, iresClass};
@@ -315,9 +315,9 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
-			rgAction.getClass().getMethod("addContained", resClass).invoke(rgAction, result);
+			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
 		} catch (Exception e) {
-			logger.error("ERROR: ActivityDefinition {} could not be applied and threw exception {}", definition, e.toString());
+			logger.error("ERROR: ActivityDefinition {} could not be applied and threw exception {}", definition, e.toString(), e);
 		}
 	}
 
