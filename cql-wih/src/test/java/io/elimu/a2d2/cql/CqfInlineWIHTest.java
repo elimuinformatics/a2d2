@@ -15,34 +15,6 @@ import io.elimu.a2d2.oauth.OAuthUtils;
 public class CqfInlineWIHTest {
 
 	@Test
-	public void testAzizPlan() throws Exception {
-		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
-		WorkItemImpl workItem = new WorkItemImpl();
-		workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
-		String clientSecret = "";
-		String clientId = "fhir4-terminology-api";
-		String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
-		String body = new BodyBuilder().addToBody("client_id", clientId).addToBody("client_secret", clientSecret).
-				addToBody("token_url", tokenUrl).addToBody("grant_type", "password").addToBody("username", "mdemaio").
-				addToBody("password", "gatica100kkkk").addToBody("scope", "offline_access").build();
-		Map<String, Object> results = OAuthUtils.authenticate(body, tokenUrl, clientId, clientSecret);
-		String token = (String) results.get("access_token");
-		workItem.setParameter("fhirTerminologyServerAuth", "Bearer " + token);
-		workItem.setParameter("fhirServerAuth", "Bearer " + token);
-		workItem.setParameter("planDefinitionId", "657");
-		workItem.setParameter("patientId", "141188");
-		workItem.setParameter("context_patientId", "141188");
-		NoOpWorkItemManager manager = new NoOpWorkItemManager();
-		long start = System.currentTimeMillis();
-		handler.executeWorkItem(workItem, manager);
-		long time = System.currentTimeMillis() - start;
-		System.out.println("Time to run 1st time (ms): " + time);
-		Assert.assertEquals(true, manager.isCompleted());
-		Assert.assertNotNull(workItem.getResults());
-	}
-	
-	@Test
 	public void testInlineCall() throws Exception {
 		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
