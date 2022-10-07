@@ -214,7 +214,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				if (planDefId != null) {
 					key = planDefId;
 					planDefinition = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirServerUrl + "/PlanDefinition/" + planDefId);
+							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
 					if (planDefinition == null) {
 						throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
 					}
@@ -222,7 +222,11 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				} else {
 					key = planDefUrl;
 					Object bundle = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirServerUrl + "/PlanDefinition?url=" + planDefUrl);
+							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
+					boolean hasEntry = (boolean) bundle.getClass().getMethod("hasEntry").invoke(bundle);
+					if (!hasEntry) {
+						throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
+					}
 					Object firstRep = bundle.getClass().getMethod("getEntryFirstRep").invoke(bundle);
 					boolean hasRes = (boolean) firstRep.getClass().getMethod("hasResource").invoke(firstRep);
 					if (hasRes) {
@@ -264,9 +268,9 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			List<Object> cards = convert(carePlan);
 			results.put("cards", cards);
 			results.put("cardsJson", asJson(cards));
-		} catch (RuntimeException e) {
+		} catch (RuntimeException e) {e.printStackTrace();//TODO remove
 			results.put("error", e.getMessage());
-		} catch (Exception e) {
+		} catch (Exception e) {e.printStackTrace();//TODO remove
 			results.put("error", e.getMessage());
 		} finally {
 			manager.completeWorkItem(workItem.getId(), results);

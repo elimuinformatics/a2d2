@@ -317,7 +317,7 @@ public class DecoratedPlanDefinitionProcessor {
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
 			rgAction.getClass().getMethod("addContained", resClass).invoke(rgAction, result);
 		} catch (Exception e) {
-			logger.error("ERROR: ActivityDefinition {} could not be applied and threw exception {}", definition, e.toString());
+			logger.error("ERROR: ActivityDefinition {} could not be applied and threw exception {}", definition, e.toString(), e);//TODO there is an error happening here with simple-gc-test
 		}
 	}
 
