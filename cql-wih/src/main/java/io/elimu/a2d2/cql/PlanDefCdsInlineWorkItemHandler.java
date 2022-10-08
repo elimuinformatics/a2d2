@@ -150,7 +150,6 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			oppClass.getDeclaredMethod("getValueChild", iparamsClass, String.class).setAccessible(true);
 			oppClass.getDeclaredMethod("getResourceChild", iparamsClass, String.class).setAccessible(true);
 		} catch (ReflectiveOperationException e) {
-			e.printStackTrace();
 			throw new RuntimeException("Cannot initialize " + getClass().getSimpleName(), e);
 		}
 	}

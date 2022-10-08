@@ -29,6 +29,9 @@ public class CqfInlineWIHTest {
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertNull(workItem.getResult("error"));		
 		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		Assert.assertNotNull(workItem.getResults());
 	}
 	
 	@Test
