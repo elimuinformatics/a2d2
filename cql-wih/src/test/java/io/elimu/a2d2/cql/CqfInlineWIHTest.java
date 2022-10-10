@@ -8,6 +8,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opencds.cqf.cds.response.CdsCard;
 import org.opencds.cqf.cds.response.CdsCard.IndicatorCode;
+import org.hl7.fhir.r4.model.PlanDefinition;
+import org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior;
+import org.hl7.fhir.r4.model.RequestGroup;
+import io.elimu.a2d2.oauth.BodyBuilder;
+import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
 
