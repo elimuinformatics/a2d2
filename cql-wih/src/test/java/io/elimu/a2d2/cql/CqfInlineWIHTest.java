@@ -15,6 +15,20 @@ import io.elimu.a2d2.oauth.OAuthUtils;
 public class CqfInlineWIHTest {
 
 	@Test
+	public void testReflection() throws Exception {
+		ClassLoader cl = getClass().getClassLoader();
+		PlanDefinition.PlanDefinitionActionComponent action = new PlanDefinition.PlanDefinitionActionComponent();
+		action.setSelectionBehavior(ActionSelectionBehavior.ANY);
+		Object act = new RequestGroup.RequestGroupActionComponent();
+		Class<?> asbClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition$ActionSelectionBehavior");
+		Class<?> rgasbClass = cl.loadClass("org.hl7.fhir.r4.model.RequestGroup$ActionSelectionBehavior");
+		Object actSelBehavior = action.getClass().getMethod("getSelectionBehavior").invoke(action);
+		Object actSelBehaviorName = asbClass.getMethod("name").invoke(actSelBehavior);
+		Object selBehavior = rgasbClass.getMethod("valueOf", String.class).invoke(null, actSelBehaviorName);
+		act.getClass().getMethod("setSelectionBehavior", rgasbClass).invoke(act, selBehavior);
+	}
+	
+	@Test
 	public void testInlineCall() throws Exception {
 		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
 		WorkItemImpl workItem = new WorkItemImpl();
