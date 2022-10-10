@@ -523,12 +523,12 @@ public class DecoratedPlanDefinitionProcessor {
 				Class<?> rgasbClass = cl.loadClass("org.hl7.fhir.r4.model.RequestGroup$ActionSelectionBehavior");
 				Object actSelBehavior = action.getClass().getMethod("getSelectionBehavior").invoke(action);
 				Object actSelBehaviorName = asbClass.getMethod("name").invoke(actSelBehavior);
-				Object selBehavior = rgasbClass.getMethod("valueOf", String.class).invoke(actSelBehaviorName);
-				act.getClass().getMethod("setSelectionBehavior", asbClass).invoke(act, selBehavior);
+				Object selBehavior = rgasbClass.getMethod("valueOf", String.class).invoke(null, actSelBehaviorName);
+				act.getClass().getMethod("setSelectionBehavior", rgasbClass).invoke(act, selBehavior);
 			}
 		}
 	}
-
+	
 	private Boolean meetsConditions(Session session, Object action) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
