@@ -8,6 +8,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opencds.cqf.cds.response.CdsCard;
 import org.opencds.cqf.cds.response.CdsCard.IndicatorCode;
+import org.hl7.fhir.r4.model.PlanDefinition;
+import org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior;
+import org.hl7.fhir.r4.model.RequestGroup;
+import io.elimu.a2d2.oauth.BodyBuilder;
+import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
 
@@ -32,6 +37,20 @@ public class CqfInlineWIHTest {
 		System.out.println("Time to run 1st time (ms): " + time);
 		Assert.assertEquals(true, manager.isCompleted());
 		Assert.assertNotNull(workItem.getResults());
+	}
+
+	@Test
+	public void testReflection() throws Exception {
+		ClassLoader cl = getClass().getClassLoader();
+		PlanDefinition.PlanDefinitionActionComponent action = new PlanDefinition.PlanDefinitionActionComponent();
+		action.setSelectionBehavior(ActionSelectionBehavior.ANY);
+		Object act = new RequestGroup.RequestGroupActionComponent();
+		Class<?> asbClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition$ActionSelectionBehavior");
+		Class<?> rgasbClass = cl.loadClass("org.hl7.fhir.r4.model.RequestGroup$ActionSelectionBehavior");
+		Object actSelBehavior = action.getClass().getMethod("getSelectionBehavior").invoke(action);
+		Object actSelBehaviorName = asbClass.getMethod("name").invoke(actSelBehavior);
+		Object selBehavior = rgasbClass.getMethod("valueOf", String.class).invoke(null, actSelBehaviorName);
+		act.getClass().getMethod("setSelectionBehavior", rgasbClass).invoke(act, selBehavior);
 	}
 	
 	@Test
