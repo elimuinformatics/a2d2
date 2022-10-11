@@ -266,7 +266,7 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
-			rgAction.getClass().getMethod("addContained", resClass).invoke(rgAction, result);
+			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("ERROR: Questionnaire {} could not be applied and threw exception {}", definition, e.toString());
@@ -281,8 +281,9 @@ public class DecoratedPlanDefinitionProcessor {
 		try {
 			String value = (String) definition.getClass().getMethod("getValue").invoke(definition);
 			boolean referenceToContained = value.startsWith("#");
+			Object activityDefinition = null;
 			if (referenceToContained) {
-				Object activityDefinition = resolveContained(session.planDefinition, value);
+				activityDefinition = resolveContained(session.planDefinition, value);
 				Class<?> actDefClass = cl.loadClass("org.hl7.fhir.r4.model.ActivityDefinition");
 				Class<?>[] paramTypes = new Class<?>[] {actDefClass, String.class, String.class, String.class, 
 					iparamsClass, iresClass, iresClass, iresClass};
@@ -297,7 +298,7 @@ public class DecoratedPlanDefinitionProcessor {
 				if (!iterator.hasNext()) {
 					throw new RuntimeException("No activity definition found for definition: " + definition);
 				}
-				Object activityDefinition = iterator.next();
+				activityDefinition = iterator.next();
 				Class<?> idtypeClass = cl.loadClass("org.hl7.fhir.r4.model.IdType");
 				Class<?>[] paramTypes = new Class<?>[] { idtypeClass, String.class, String.class, String.class,
 					String.class, String.class, String.class, String.class, String.class,
@@ -315,6 +316,11 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
+			Object kind = activityDefinition.getClass().getMethod("getKind").invoke(activityDefinition);
+			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, kind.getClass().getMethod("getDisplay").invoke(kind));
+			Object type = rgAction.getClass().getMethod("getType").invoke(rgAction);
+			Object coding = type.getClass().getMethod("addCoding").invoke(type);
+			coding.getClass().getMethod("setCode", String.class).invoke(coding, "fire-event");
 			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
 		} catch (Exception e) {
 			logger.error("ERROR: ActivityDefinition {} could not be applied and threw exception {}", definition, e.toString(), e);
@@ -344,7 +350,7 @@ public class DecoratedPlanDefinitionProcessor {
 		Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 		rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(carePlan));
-		rgAction.getClass().getMethod("addContained", resClass).invoke(rgAction, carePlan);
+		session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, carePlan);
 		List<?> instCanonical = (List<?>) carePlan.getClass().getMethod("getInstantiatesCanonical").invoke(carePlan);
 		for (Object c : instCanonical) {
 			Object valueString = c.getClass().getMethod("getValueAsString").invoke(c);
@@ -495,7 +501,13 @@ public class DecoratedPlanDefinitionProcessor {
 			}
 		}
 		if (somethingFound == true) {
-			Object act = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+			List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			Object act = null;
+			if (acts != null && !acts.isEmpty()) {
+				act = acts.get(acts.size() - 1);
+			} else {
+				act = session.requestGroup.getClass().getMethod("getActionFirstRep").invoke(session.requestGroup);
+			}
 			Object title = action.getClass().getMethod("getTitle").invoke(action);
 			Object description = action.getClass().getMethod("getDescription").invoke(action);
 			Object textEquivalent = action.getClass().getMethod("getTextEquivalent").invoke(action);
