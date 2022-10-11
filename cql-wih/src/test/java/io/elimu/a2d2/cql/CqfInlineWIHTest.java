@@ -5,6 +5,8 @@ import java.util.List;
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Assert;
 import org.junit.Ignore;
+import java.util.Map;
+
 import org.junit.Test;
 import org.opencds.cqf.cds.response.CdsCard;
 import org.opencds.cqf.cds.response.CdsCard.IndicatorCode;
@@ -117,5 +119,4 @@ public class CqfInlineWIHTest {
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertTrue(workItem.getResults().containsKey("error"));
 	}
-	
 }
