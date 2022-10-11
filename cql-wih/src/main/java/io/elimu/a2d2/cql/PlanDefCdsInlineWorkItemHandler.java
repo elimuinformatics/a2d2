@@ -218,7 +218,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				LOG.debug("Processor already cached by planDefUrl key " + key);
 			} else {
 				LOG.debug("Creating PlanDefinitionProcessor...");
-				Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
+				//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
 				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth);
 				if (planDefId != null) {
 					LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
@@ -286,7 +286,6 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			if (fhirServerAuth != null) {
 				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization: " + fhirServerAuth);
 			}
-
 			planDefinition = CACHED_PLANDEFS.get(key).getValue();
 			Object planIdType = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
 			LOG.debug("PlanDefinitionProcessor apply call starting...");
@@ -470,7 +469,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				}
 			}
 		}
-        return (List<Object>) cl.loadClass("org.opencds.cqf.cds.response.R4CarePlanToCdsCard").getMethod("convert", carePlan.getClass()).invoke(null, carePlan);
+		return CardCreator.convert(carePlan, cl);
 	}
 
 	private Object asParameters(Map<String, Object> prefetchData) throws ReflectiveOperationException {
