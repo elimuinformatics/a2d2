@@ -1,17 +1,17 @@
 package io.elimu.a2d2.cql;
 
+import java.util.HashMap;
 import java.util.List;
-
-import org.drools.core.process.instance.impl.WorkItemImpl;
-import org.junit.Assert;
-import org.junit.Ignore;
 import java.util.Map;
 
-import org.junit.Test;
+import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.hl7.fhir.r4.model.PlanDefinition;
 import org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior;
 import org.hl7.fhir.r4.model.RequestGroup;
 import org.json.simple.JSONObject;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import io.elimu.a2d2.cdsresponse.entity.Card;
 import io.elimu.a2d2.oauth.BodyBuilder;
@@ -45,13 +45,35 @@ public class CqfInlineWIHTest {
 		long start = System.currentTimeMillis();
 		handler.executeWorkItem(workItem, manager);
 		long time = System.currentTimeMillis() - start;
-		System.out.println("Execution time: " + time);
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertNull(workItem.getResult("error"));		
 		Assert.assertNotNull(workItem.getResult("cardsJson"));
 		System.out.println("Time to run 1st time (ms): " + time);
 		Assert.assertEquals(true, manager.isCompleted());
 		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNotNull(workItem.getResult("cards"));
+		List<?> cards = (List<?>) workItem.getResult("cards");
+		Assert.assertEquals(1, cards.size());
+		System.out.println("CARDS JSON");
+		System.out.println(workItem.getResult("cardsJson"));
+		
+		workItem.setParameter("patientId", "141188");
+		workItem.setParameter("context_patientId", "141188");
+		workItem.setResults(new HashMap<>());
+		manager = new NoOpWorkItemManager();
+		start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		time = System.currentTimeMillis() - start;
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 2nd time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNotNull(workItem.getResult("cards"));
+		cards = (List<?>) workItem.getResult("cards");
+		Assert.assertEquals(0, cards.size());
+		
 	}
 	
 	@Test

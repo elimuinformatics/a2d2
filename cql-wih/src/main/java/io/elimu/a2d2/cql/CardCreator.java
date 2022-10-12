@@ -76,6 +76,7 @@ public class CardCreator {
         	Object r4En = enumClass.getField("R4").get(null);
         	Object ctx = ctxClass.getMethod("forCached", enumClass).invoke(null, r4En);
             for (Object action : actionsList) {
+            	boolean isValidCard = false;
             	Class<?> r4actionClass = action.getClass();
             	Object parser = ctx.getClass().getMethod("newJsonParser").invoke(ctx);
             	jsonParserClass.getMethod("setPrettyPrint", boolean.class).invoke(parser, true);
@@ -83,14 +84,17 @@ public class CardCreator {
                 // basic
             	boolean hasTitle = (boolean) r4actionClass.getMethod("hasTitle").invoke(action);
                 if (hasTitle) {
+                	isValidCard = true;
                 	card.setSummary((String) r4actionClass.getMethod("getTitle").invoke(action));
                 }
                 boolean hasDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
                 if (hasDescription) {
+                	isValidCard = true;
                 	card.setDetail((String) r4actionClass.getMethod("getDescription").invoke(action));
                 }
                 boolean hasExtension2 = (boolean) r4actionClass.getMethod("hasExtension").invoke(action);
                 if (hasExtension2) {
+                	isValidCard = true;
                 	Object ext = r4actionClass.getMethod("getExtensionFirstRep").invoke(action);
                 	Object extValue = ext.getClass().getMethod("getValue").invoke(ext);
                 	card.setIndicator(String.valueOf(extValue));
@@ -101,6 +105,7 @@ public class CardCreator {
                 JSONObject source = new JSONObject();
                 card.setSource(source);
                 if (hasDoc) {
+                	isValidCard = true;
                     // Assuming first related artifact has everything
                 	Object documentation = r4actionClass.getMethod("getDocumentationFirstRep").invoke(action);
                     boolean hasDisplay = (boolean) documentation.getClass().getMethod("hasDisplay").invoke(documentation);
@@ -175,7 +180,9 @@ public class CardCreator {
                 if (!links.isEmpty()) {
                 	card.setLinks(links);
                 }
-                cards.add(card);
+                if (isValidCard) {
+                	cards.add(card);
+                }
             }
         }
 
