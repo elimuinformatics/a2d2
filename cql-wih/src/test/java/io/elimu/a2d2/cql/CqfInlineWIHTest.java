@@ -8,16 +8,52 @@ import org.junit.Ignore;
 import java.util.Map;
 
 import org.junit.Test;
-import org.opencds.cqf.cds.response.CdsCard;
-import org.opencds.cqf.cds.response.CdsCard.IndicatorCode;
 import org.hl7.fhir.r4.model.PlanDefinition;
 import org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior;
 import org.hl7.fhir.r4.model.RequestGroup;
+import org.json.simple.JSONObject;
+
+import io.elimu.a2d2.cdsresponse.entity.Card;
 import io.elimu.a2d2.oauth.BodyBuilder;
 import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
 
+	@Test
+	public void testAzizPlan() throws Exception {
+		if (System.getProperty("fhirUsername") == null || System.getProperty("fhirPassword") == null) {
+			return;
+		}
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+		String clientSecret = "";
+		String clientId = "fhir4-terminology-api";
+		String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
+		String body = new BodyBuilder().addToBody("client_id", clientId).addToBody("client_secret", clientSecret).
+				addToBody("token_url", tokenUrl).addToBody("grant_type", "password").addToBody("username", System.getProperty("fhirUsername")).
+				addToBody("password", System.getProperty("fhirPassword")).addToBody("scope", "offline_access").build();
+		Map<String, Object> results = OAuthUtils.authenticate(body, tokenUrl, clientId, clientSecret);
+		String token = (String) results.get("access_token");
+		workItem.setParameter("fhirTerminologyServerAuth", "Bearer " + token);
+		workItem.setParameter("fhirServerAuth", "Bearer " + token);
+		workItem.setParameter("planDefinitionId", "657");
+		workItem.setParameter("patientId", "436610");
+		workItem.setParameter("context_patientId", "436610");
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		long time = System.currentTimeMillis() - start;
+		System.out.println("Execution time: " + time);
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		Assert.assertNotNull(workItem.getResults());
+	}
+	
 	@Test
 	@Ignore //Ignoring because its failing the builds, someone is working on it. So, we are going to ignore it for now 
 	public void testInlineGcPlanDef() throws Exception {
@@ -92,19 +128,19 @@ public class CqfInlineWIHTest {
 		List<?> cards = (List<?>) workItem.getResult("cards");
 		Assert.assertNotNull(cards);
 		Assert.assertTrue(cards.size() > 0 );
-		CdsCard card = (CdsCard) cards.get(0);
+		Card card = (Card) cards.get(0);
 		Assert.assertNotNull(card);
 		Assert.assertNotNull(card.getSummary());
 		Assert.assertEquals("Recommend appropriate colorectal cancer screening", card.getSummary());
 		Assert.assertNotNull(card.getIndicator());
-		Assert.assertEquals(IndicatorCode.WARN, card.getIndicator());;
+		Assert.assertEquals("WARN", card.getIndicator());;
 		Assert.assertNotNull(card.getDetail());
 		Assert.assertEquals("Patient meets the inclusion criteria for appropriate colorectal cancer screening, but has no evidence of appropriate screening.", card.getDetail());
 		Assert.assertNotNull(card.getSource());
-		Assert.assertNotNull(card.getSource().getLabel());
-		Assert.assertEquals("U.S. Preventive Services Task Force Final Recommendation Statement Colorectal Cancer: Screening", card.getSource().getLabel());
-		Assert.assertNotNull(card.getSource().getUrl());
-		Assert.assertEquals("https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening", card.getSource().getUrl().toExternalForm());
+		Assert.assertNotNull(((JSONObject) card.getSource()).get("label"));
+		Assert.assertEquals("U.S. Preventive Services Task Force Final Recommendation Statement Colorectal Cancer: Screening", ((JSONObject) card.getSource()).get("label"));
+		Assert.assertNotNull(((JSONObject) card.getSource()).get("url"));
+		Assert.assertEquals("https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening", ((JSONObject) card.getSource()).get("url"));
 		
 		workItem.setParameter("patientId", "should-not-screen-ccs");
 		workItem.getResults().clear();

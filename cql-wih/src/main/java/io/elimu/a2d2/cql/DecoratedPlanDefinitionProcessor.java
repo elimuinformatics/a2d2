@@ -316,8 +316,8 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
-			Object kind = activityDefinition.getClass().getMethod("getKind").invoke(activityDefinition);
-			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, kind.getClass().getMethod("getDisplay").invoke(kind));
+			Object prefix = activityDefinition.getClass().getMethod("getDescription").invoke(activityDefinition);
+			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
 			Object type = rgAction.getClass().getMethod("getType").invoke(rgAction);
 			Object coding = type.getClass().getMethod("addCoding").invoke(type);
 			coding.getClass().getMethod("setCode", String.class).invoke(coding, "fire-event");

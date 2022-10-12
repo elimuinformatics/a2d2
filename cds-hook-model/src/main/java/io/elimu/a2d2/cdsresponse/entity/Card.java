@@ -29,6 +29,7 @@ public class Card implements Serializable {
 	private List<Suggestion> suggestions;
 	private Object source;
 	private Object decisions;
+	private String selectionBehavior;
 
 	public String getSummary() {
 		return summary;
@@ -98,5 +99,13 @@ public class Card implements Serializable {
 
 	public void setDecisions(Object decisions) {
 		this.decisions = decisions;
+	}
+	
+	public void setSelectionBehavior(String selectionBehavior) {
+		this.selectionBehavior = selectionBehavior;
+	}
+	
+	public String getSelectionBehavior() {
+		return selectionBehavior;
 	}
 }
