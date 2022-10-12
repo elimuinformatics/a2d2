@@ -23,6 +23,7 @@ public class LinkCard  implements Serializable {
 	private String label;
 	private String url;
 	private String type;
+	private String title;
 
 	public String getLabel() {
 		return label;
@@ -48,6 +49,14 @@ public class LinkCard  implements Serializable {
 		this.type = type;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -55,6 +64,7 @@ public class LinkCard  implements Serializable {
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
 
@@ -83,6 +93,12 @@ public class LinkCard  implements Serializable {
 			if (other.url != null)
 				return false;
 		} else if (!url.equals(other.url)) {
+			return false;
+		}
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title)) {
 			return false;
 		}
 		return true;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.json.simple.parser.ParseException;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
@@ -16,10 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
+import io.elimu.a2d2.cdsresponse.entity.Card;
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 
 public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
@@ -218,7 +217,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				LOG.debug("Processor already cached by planDefUrl key " + key);
 			} else {
 				LOG.debug("Creating PlanDefinitionProcessor...");
-				Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
+				//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
 				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth);
 				if (planDefId != null) {
 					LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
@@ -286,7 +285,6 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			if (fhirServerAuth != null) {
 				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization: " + fhirServerAuth);
 			}
-
 			planDefinition = CACHED_PLANDEFS.get(key).getValue();
 			Object planIdType = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
 			LOG.debug("PlanDefinitionProcessor apply call starting...");
@@ -298,9 +296,9 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance(), 
 				Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, terminologyEndpoint, terminologyEndpoint);
 			LOG.debug("PlanDefinitionProcessor apply call done");
-			List<Object> cards = convert(carePlan);
+			List<Card> cards = convert(carePlan);
 			results.put("cards", cards);
-			results.put("cardsJson", asJson(cards));
+			results.put("cardsJson", new Gson().toJson(cards));
 		} catch (RuntimeException e) {
 			LOG.warn("PlanDefinitionProcessor execution threw a RuntimeException. Returning error output", e);
 			results.put("error", e.getMessage());
@@ -331,129 +329,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		return value == null || "".equals(value.trim()) || "null".equalsIgnoreCase(value.trim());
 	}
 
-	private String asJson(List<Object> cards) throws ReflectiveOperationException {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Object parser = ctx.getClass().getMethod("newJsonParser").invoke(ctx);
-		List<String> retval = new ArrayList<>();
-		Class<?> cdsCardClass = cl.loadClass("org.opencds.cqf.cds.response.CdsCard");
-		if (cards != null) {
-			for (Object card : cards) {
-				JsonObject obj = new JsonObject();
-				Object detail = cdsCardClass.getMethod("getDetail").invoke(card);
-				if (detail != null) {
-					obj.add("detail", new JsonPrimitive(String.valueOf(detail)));
-				}
-				Object indicator = cdsCardClass.getMethod("getIndicator").invoke(card);
-				if (indicator != null) {
-					Object code = indicator.getClass().getField("code").get(indicator);
-					obj.add("indicator", new JsonPrimitive(String.valueOf(code)));
-				}
-				List<?> links = (List<?>) cdsCardClass.getMethod("getLinks").invoke(card);
-				if (links != null) {
-					JsonArray arr = new JsonArray();
-					for (Object link : links) {
-						Object appContext = link.getClass().getMethod("getAppContext").invoke(link);
-						boolean hasAppContext = (boolean) link.getClass().getMethod("hasAppContext").invoke(link);
-						JsonObject linkJson = new JsonObject();
-						if (hasAppContext) {
-							linkJson.add("appContext", new JsonPrimitive(String.valueOf(appContext)));
-						}
-						Object label = link.getClass().getMethod("getLabel").invoke(link);
-						boolean hasLabel = (boolean) link.getClass().getMethod("hasLabel").invoke(link);
-						if (hasLabel) {
-							linkJson.add("label", new JsonPrimitive(String.valueOf(label)));
-						}
-						Object type = link.getClass().getMethod("getType").invoke(link);
-						boolean hasType = (boolean) link.getClass().getMethod("hasType").invoke(link);
-						if (hasType) {
-							linkJson.add("type", new JsonPrimitive(String.valueOf(type)));
-						}
-						Object url = link.getClass().getMethod("getUrl").invoke(link);
-						boolean hasUrl = (boolean) link.getClass().getMethod("hasUrl").invoke(link);
-						if (hasUrl) {
-							String urlEF = (String) url.getClass().getMethod("toExternalForm").invoke(url);
-							linkJson.add("url", new JsonPrimitive(urlEF));
-						}
-						arr.add(linkJson);
-					}
-					obj.add("links", arr);
-				}
-				Object selectionBehavior = cdsCardClass.getMethod("getSelectionBehavior").invoke(card);
-				if (selectionBehavior != null) {
-					obj.add("selectionBehavior", new JsonPrimitive(String.valueOf(selectionBehavior)));
-				}
-				Object sourceOrig = cdsCardClass.getMethod("getSource").invoke(card);
-				if (sourceOrig != null) {
-					JsonObject source = new JsonObject();
-					Object icon = sourceOrig.getClass().getMethod("getIcon").invoke(sourceOrig);
-					if (icon != null) {
-						String iconEF = (String) icon.getClass().getMethod("toExternalForm").invoke(icon);
-						source.add("icon", new JsonPrimitive(iconEF));
-					}
-					Object label = sourceOrig.getClass().getMethod("getLabel").invoke(sourceOrig);
-					if (label != null) {
-						source.add("label", new JsonPrimitive(String.valueOf(label)));
-					}
-					Object url = sourceOrig.getClass().getMethod("getUrl").invoke(sourceOrig);
-					if (url != null) {
-						String urlEF = (String) url.getClass().getMethod("toExternalForm").invoke(url);
-						source.add("url", new JsonPrimitive(urlEF));
-					}
-					obj.add("source", source);
-				}
-				List<?> suggestions = (List<?>) cdsCardClass.getMethod("getSuggestions").invoke(card); 
-				if (suggestions != null) {
-					JsonArray arr = new JsonArray();
-					for (Object sug : suggestions) {
-						JsonObject sugJson = new JsonObject();
-						List<?> actions = (List<?>) sug.getClass().getMethod("getActions").invoke(sug);
-						if (actions != null) {
-							JsonArray actArray = new JsonArray();
-							for (Object a : actions) {
-								JsonObject ajson = new JsonObject();
-								Object description = a.getClass().getMethod("getDescription").invoke(a);
-								if (description != null) {
-									ajson.add("description", new JsonPrimitive(String.valueOf(description)));
-								}
-								Object type = a.getClass().getMethod("getType").invoke(a);
-								if (type != null) {
-									String typename = (String) type.getClass().getMethod("name").invoke(type);
-									ajson.add("type", new JsonPrimitive(String.valueOf(typename)));
-								}
-								Object resource = a.getClass().getMethod("getResource").invoke(a);
-								if (resource != null) {
-									String json = (String) parser.getClass().getMethod("encodeResourceToString", 
-											cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource")).invoke(parser, resource);
-									JsonObject jsonMap = new Gson().fromJson(json, JsonObject.class);
-									ajson.add("resource", jsonMap);
-								}
-								actArray.add(ajson);
-							}
-							sugJson.add("actions", actArray);
-						}
-						Object label = sug.getClass().getMethod("getLabel").invoke(sug);
-						if (label != null) {
-							sugJson.add("label", new JsonPrimitive(String.valueOf(label)));
-						}
-						Object uuid = sug.getClass().getMethod("getUuid").invoke(sug);
-						if (uuid != null) {
-							sugJson.add("uuid", new JsonPrimitive(String.valueOf(uuid)));
-						}
-						arr.add(sugJson);
-					}
-					obj.add("suggestions", arr);
-				}
-				Object summary = cdsCardClass.getMethod("getSummary").invoke(card);
-				if (summary != null) {
-					obj.add("summary", new JsonPrimitive(String.valueOf(summary)));
-				}
-				retval.add(new Gson().toJson(obj));
-			}
-		}
-		return retval.toString();
-	}
-
-	private List<Object> convert(Object carePlan) throws ReflectiveOperationException {
+	private List<Card> convert(Object carePlan) throws ParseException, ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader(); 
 		Class<?> reqGroupClass = cl.loadClass("org.hl7.fhir.r4.model.RequestGroup");
 		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
@@ -470,7 +346,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				}
 			}
 		}
-        return (List<Object>) cl.loadClass("org.opencds.cqf.cds.response.R4CarePlanToCdsCard").getMethod("convert", carePlan.getClass()).invoke(null, carePlan);
+		return CardCreator.convert(carePlan, cl);
 	}
 
 	private Object asParameters(Map<String, Object> prefetchData) throws ReflectiveOperationException {
