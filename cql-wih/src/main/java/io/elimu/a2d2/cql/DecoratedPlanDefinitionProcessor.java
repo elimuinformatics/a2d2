@@ -316,7 +316,10 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
-			Object prefix = activityDefinition.getClass().getMethod("getDescription").invoke(activityDefinition);
+			Object prefix = activityDefinition.getClass().getMethod("getTitle").invoke(activityDefinition);
+			if (prefix == null) {
+				prefix = activityDefinition.getClass().getMethod("getDescription").invoke(activityDefinition);
+			}
 			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
 			Object type = rgAction.getClass().getMethod("getType").invoke(rgAction);
 			Object coding = type.getClass().getMethod("addCoding").invoke(type);
@@ -432,7 +435,7 @@ public class DecoratedPlanDefinitionProcessor {
 	    return task;
 	}
 
-	private void resolveDynamicActions(Session session, Object action) throws ReflectiveOperationException {
+	private boolean resolveDynamicActions(Session session, Object action) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
 		Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
@@ -539,6 +542,7 @@ public class DecoratedPlanDefinitionProcessor {
 				act.getClass().getMethod("setSelectionBehavior", rgasbClass).invoke(act, selBehavior);
 			}
 		}
+		return somethingFound;
 	}
 	
 	private Boolean meetsConditions(Session session, Object action) throws ReflectiveOperationException {
