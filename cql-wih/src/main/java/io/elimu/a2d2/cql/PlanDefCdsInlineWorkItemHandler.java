@@ -29,7 +29,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	
 	private static Map<String, TimeObject<DecoratedPlanDefinitionProcessor>> CACHED_PROCESSORS = new HashMap<>();
 	private static Map<String, TimeObject<Object>> CACHED_PLANDEFS = new HashMap<>();
-	private static HashMap<?, ?> LIBRARY_CACHE = new HashMap<>();
+	private static Map<?, ?> LIBRARY_CACHE = new TimeoutMap<>(MAX_AGE_CACHE);
 	
 	private Object ctx;
 	private Object clientFactory;
