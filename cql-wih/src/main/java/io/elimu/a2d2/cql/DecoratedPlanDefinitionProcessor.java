@@ -509,7 +509,13 @@ public class DecoratedPlanDefinitionProcessor {
 			}
 		}
 		if (somethingFound == true) {
-			Object act = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+			List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			Object act = null;
+			if (acts != null && !acts.isEmpty()) {
+				act = acts.get(acts.size() - 1);
+			} else {
+				act = session.requestGroup.getClass().getMethod("getActionFirstRep").invoke(session.requestGroup);
+			}
 			Object title = action.getClass().getMethod("getTitle").invoke(action);
 			Object description = action.getClass().getMethod("getDescription").invoke(action);
 			Object textEquivalent = action.getClass().getMethod("getTextEquivalent").invoke(action);
