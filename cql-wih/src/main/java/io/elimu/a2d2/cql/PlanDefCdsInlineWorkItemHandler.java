@@ -256,7 +256,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				List<String> headers = new ArrayList<>();
 				headers.add("Content-Type: application/json");
 				if (fhirTerminologyServerAuth != null) {
-					headers.add("Authorization: " + fhirTerminologyServerAuth);
+					headers.add("Authorization:" + fhirTerminologyServerAuth);
 				}
 				Object fhirDal = fdFactory.getClass().getMethod("create", String.class, List.class).invoke(fdFactory, fhirTerminologyServerUrl, headers);
 				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
@@ -277,13 +277,13 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			codingClass.getMethod("setCode", String.class).invoke(restCoding, "hl7-fhir-rest");
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(terminologyEndpoint, restCoding);
 			if (fhirTerminologyServerAuth != null) {
-				endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, "Authorization: " + fhirTerminologyServerAuth);
+				endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, "Authorization:" + fhirTerminologyServerAuth);
 			}
 			Object dataEndpoint = endpointClass.getConstructor().newInstance();
 			endpointClass.getMethod("setAddress", String.class).invoke(dataEndpoint, fhirServerUrl);
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(dataEndpoint, restCoding);
 			if (fhirServerAuth != null) {
-				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization: " + fhirServerAuth);
+				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization:" + fhirServerAuth);
 			}
 			planDefinition = CACHED_PLANDEFS.get(key).getValue();
 			Object planIdType = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
@@ -300,9 +300,11 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			results.put("cards", cards);
 			results.put("cardsJson", new Gson().toJson(cards));
 		} catch (RuntimeException e) {
+			e.printStackTrace();
 			LOG.warn("PlanDefinitionProcessor execution threw a RuntimeException. Returning error output", e);
 			results.put("error", e.getMessage());
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOG.warn("PlanDefinitionProcessor execution threw an Exception. Returning error output", e);
 			results.put("error", e.getMessage());
 		} finally {
