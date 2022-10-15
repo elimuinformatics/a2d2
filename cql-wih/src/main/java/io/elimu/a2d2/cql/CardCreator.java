@@ -33,6 +33,7 @@ public class CardCreator {
 	@SuppressWarnings("unchecked")
     private static List<Card> _convert(Object requestGroup, ClassLoader cl) throws ParseException, ReflectiveOperationException {
     	List<Card> cards = new ArrayList<>();
+    	List<Suggestion> suggestions = new ArrayList<>();
     	// links
     	List<LinkCard> links = new ArrayList<>();
     	boolean hasExtension = (boolean) requestGroup.getClass().getMethod("hasExtension").invoke(requestGroup);
@@ -137,7 +138,6 @@ public class CardCreator {
                 }
 
                 // suggestions
-                List<Suggestion> suggestions = new ArrayList<>();
                 boolean hasPrefix = (boolean) r4actionClass.getMethod("hasPrefix").invoke(action);
                 if (hasPrefix) {
                 	Suggestion suggestion = new Suggestion();
@@ -173,8 +173,8 @@ public class CardCreator {
 	                    	actionsRet.put("resource", obj);
                     	}
                     }
-                    suggestions.add(suggestion);
                     suggestion.setActions(Arrays.asList(actionsRet));
+                    suggestions.add(suggestion);
                 }
                 card.setSuggestions(suggestions);
                 if (!links.isEmpty()) {
@@ -182,10 +182,13 @@ public class CardCreator {
                 }
                 if (isValidCard) {
                 	cards.add(card);
+                	suggestions = new ArrayList<>();
                 }
             }
         }
-
+        if (suggestions.size() > 0 && !cards.isEmpty()) {
+        	cards.get(cards.size() - 1).getSuggestions().addAll(suggestions);
+        }
         return cards;
     }
 }
