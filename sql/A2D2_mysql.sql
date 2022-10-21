@@ -1303,5 +1303,6 @@ create table TimerMappingInfo (
         primary key (id)
 );
 ALTER TABLE TimerMappingInfo ADD COLUMN info longblob;
-
+ALTER TABLE TimerMappingInfo ADD COLUMN processInstanceId bigint;
+ALTER TABLE TimerMappingInfo MODIFY timerId bigint NULL;
 commit;
