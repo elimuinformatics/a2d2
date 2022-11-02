@@ -34,7 +34,7 @@
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<org.json.version>20211205</org.json.version>
 		<sping-web.version>5.3.19</sping-web.version>
-		<jackson-databind.version>2.13.4</jackson-databind.version>
+		<jackson-databind.version>2.13.4.1</jackson-databind.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>

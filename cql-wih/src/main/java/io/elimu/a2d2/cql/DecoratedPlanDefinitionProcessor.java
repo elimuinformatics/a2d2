@@ -54,7 +54,7 @@ public class DecoratedPlanDefinitionProcessor {
 		}
 		throw new IllegalArgumentException(errorMessage);
 	}
-
+	
 	public Object apply(Object paramPlanDefinition, Object theId, String patientId, String encounterId, String practitionerId,
 			String organizationId, String userType, String userLanguage, String userTaskContext, String setting,
 			String settingContext, Boolean mergeNestedCarePlans, Object parameters, Boolean useServerData,
@@ -189,8 +189,8 @@ public class DecoratedPlanDefinitionProcessor {
 						String actionId = (String) relatedActionComponent.getClass().getMethod("getActionId").invoke(relatedActionComponent);
 						if (metConditions.containsKey(actionId)) {
 							metConditions.put(id, action);
-							resolveDefinition(session, action);
 							resolveDynamicActions(session, action);
+							resolveDefinition(session, action);
 						}
 					}
 				}
@@ -265,6 +265,11 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> anyResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IAnyResource");
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
+			Object prefix = result.getClass().getMethod("getTitle").invoke(result);
+			if (prefix == null) {
+				prefix = result.getClass().getMethod("getDescription").invoke(result);
+			}
+			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
 			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
 		} catch (Exception e) {
@@ -316,8 +321,11 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
-			Object kind = activityDefinition.getClass().getMethod("getKind").invoke(activityDefinition);
-			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, kind.getClass().getMethod("getDisplay").invoke(kind));
+			Object prefix = activityDefinition.getClass().getMethod("getTitle").invoke(activityDefinition);
+			if (prefix == null) {
+				prefix = activityDefinition.getClass().getMethod("getDescription").invoke(activityDefinition);
+			}
+			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
 			Object type = rgAction.getClass().getMethod("getType").invoke(rgAction);
 			Object coding = type.getClass().getMethod("addCoding").invoke(type);
 			coding.getClass().getMethod("setCode", String.class).invoke(coding, "fire-event");
@@ -432,7 +440,7 @@ public class DecoratedPlanDefinitionProcessor {
 	    return task;
 	}
 
-	private void resolveDynamicActions(Session session, Object action) throws ReflectiveOperationException {
+	private boolean resolveDynamicActions(Session session, Object action) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
 		Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
@@ -539,6 +547,7 @@ public class DecoratedPlanDefinitionProcessor {
 				act.getClass().getMethod("setSelectionBehavior", rgasbClass).invoke(act, selBehavior);
 			}
 		}
+		return somethingFound;
 	}
 	
 	private Boolean meetsConditions(Session session, Object action) throws ReflectiveOperationException {

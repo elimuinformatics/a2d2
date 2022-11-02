@@ -1606,5 +1606,6 @@ create table TimerMappingInfo (
         primary key (id)
 );
 ALTER TABLE TimerMappingInfo ADD COLUMN info oid;
-
+ALTER TABLE TimerMappingInfo ADD COLUMN processInstanceId int8;
+ALTER TABLE TimerMappingInfo ALTER COLUMN timerId DROP NOT NULL;
 commit;
