@@ -27,6 +27,7 @@
 	<url>https://www.elimu.io</url>
 
 	<properties>
+		<twilio.version>7.55.0</twilio.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -69,7 +70,7 @@
 		<dependency>
 		  <groupId>com.twilio.sdk</groupId>
 		  <artifactId>twilio</artifactId>
-		  <version>7.52.0</version>
+		  <version>${twilio.version}</version>
 		  <exclusions>
 		  	<exclusion>
                    		<groupId>com.fasterxml.jackson.core</groupId>
