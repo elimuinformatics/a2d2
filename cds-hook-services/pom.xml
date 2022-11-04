@@ -273,6 +273,12 @@
 		    <groupId>org.wildfly.security</groupId>
 		    <artifactId>wildfly-elytron</artifactId>
 		    <version>${wildfly-elytron.version}</version>
+		    <exclusions>
+			<exclusion>
+			    <groupId>org.apache.sshd</groupId>
+			    <artifactId>sshd-common</artifactId>
+			</exclusion>
+		    </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.inject</groupId>

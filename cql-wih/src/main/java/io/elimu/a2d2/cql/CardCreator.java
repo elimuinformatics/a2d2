@@ -30,7 +30,6 @@ public class CardCreator {
         return cards;
     }
 
-	@SuppressWarnings("unchecked")
     private static List<Card> _convert(Object requestGroup, ClassLoader cl) throws ParseException, ReflectiveOperationException {
     	List<Card> cards = new ArrayList<>();
     	List<Suggestion> suggestions = new ArrayList<>();
