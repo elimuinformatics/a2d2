@@ -50,6 +50,9 @@
 		<kotlin-stdlib.version>1.6.21</kotlin-stdlib.version>
 		<okio.version>3.1.0</okio.version>
 		<okhttp.version>4.9.3</okhttp.version>
+		<aws-java-sdk.version>1.12.334</aws-java-sdk.version>
+		<joda-time.version>2.10.6</joda-time.version>
+		<cloudwatchlogbackappender.version>2.1</cloudwatchlogbackappender.version>
 		<mysql-connector-java.version>8.0.29</mysql-connector-java.version>	
 	</properties>
 
@@ -851,8 +854,23 @@
 		<dependency>
 			<groupId>com.j256.cloudwatchlogbackappender</groupId>
 			<artifactId>cloudwatchlogbackappender</artifactId>
-			<version>1.11</version>
+			<version>${cloudwatchlogbackappender.version}</version>
 			<exclusions>
+				<exclusion>
+					<groupId>com.amazonaws</groupId>
+					<artifactId>aws-java-sdk-logs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.amazonaws</groupId>
+					<artifactId>aws-java-sdk-ec2</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-logs</artifactId>
+		    <version>${aws-java-sdk.version}</version>
+		    <exclusions>
 				<exclusion>
 					<groupId>joda-time</groupId>
 					<artifactId>joda-time</artifactId>
@@ -860,6 +878,22 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-ec2</artifactId>
+		    <version>${aws-java-sdk.version}</version>
+		    <exclusions>
+				<exclusion>
+					<groupId>joda-time</groupId>
+					<artifactId>joda-time</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>joda-time</groupId>
+		    <artifactId>joda-time</artifactId>
+		    <version>${joda-time.version}</version>
+		</dependency>				
 		<!--leave this for now as backward compatibility concerns, remove after 
 			fixing omnibus A2D2-584 -->
 		<dependency>
