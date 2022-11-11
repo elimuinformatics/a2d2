@@ -50,7 +50,7 @@ public class JWTAuthUtilTest {
 				+ "MDI5OGEzNDM3YzhhNzRlNTkwMWMzNDg2YjUifQ.X-LIMeBy_uhaHlTvixM6dyPR9VVdz8A"
 				+ "j2ulwgeOD3rY";
 		boolean value = JWTAuthUtil.isValidJwt(token, "test-service");
-		Assert.assertTrue(value);
+		Assert.assertFalse(value);
 	}
 
 	@Test
