@@ -8,6 +8,12 @@
       <cve>CVE-2016-1000027</cve>
    </suppress>
    <suppress>
+      file name: spring-security-crypto-5.7.5.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
+      <vulnerabilityName>CVE-2020-5408</vulnerabilityName>
+   </suppress>   
+   <suppress>
       <notes><![CDATA[
       file name: maven-core-3.3.9.jar
       False Positive: We use our own repository manager to govern the repositories used by our builds
