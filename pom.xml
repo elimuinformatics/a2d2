@@ -42,6 +42,7 @@
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<wildfly-elytron.version>2.0.0.Final</wildfly-elytron.version>
 		<org.json.version>20211205</org.json.version>
+		<commons-text.version>1.10.0</commons-text.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<kotlin-stdlib.version>1.6.20</kotlin-stdlib.version>

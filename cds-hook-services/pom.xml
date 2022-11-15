@@ -105,7 +105,16 @@
 					<groupId>org.apache.ant</groupId>
 					<artifactId>ant</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.apache.ant</groupId>
