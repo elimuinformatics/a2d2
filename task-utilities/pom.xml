@@ -17,7 +17,7 @@
 		<maven.version>3.8.4</maven.version>
 		<jsoup.version>1.15.3</jsoup.version>
 		<commons-text.version>1.10.0</commons-text.version>
-		<protobuf-java.version>3.19.6</protobuf-java.version>
+		<protobuf-java.version>3.21.8</protobuf-java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
