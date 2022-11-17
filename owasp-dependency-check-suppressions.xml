@@ -122,6 +122,27 @@
    </suppress>
    <suppress>
       <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.13.3)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+      <cve>CVE-2022-42003</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.13.3)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+      <cve>CVE-2022-42004</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-audit-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-audit@.*$</packageUrl>
+      <cve>CVE-2015-5186</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
       file name: jbpm-bpmn2-7.73.0.Final.jar
       ]]></notes>
       <packageUrl regex="true">^pkg:maven/org\.jbpm/jbpm\-bpmn2@.*$</packageUrl>
