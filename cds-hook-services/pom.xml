@@ -45,6 +45,12 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>service-daos</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>				
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
@@ -359,6 +365,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${snakeyaml.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -450,6 +467,10 @@
 				<exclusion>
 					<groupId>com.google.protobuf</groupId>
 					<artifactId>protobuf-java</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

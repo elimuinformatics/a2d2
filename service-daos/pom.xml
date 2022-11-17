@@ -71,7 +71,11 @@
 				<exclusion>
 					<groupId>org.springframework.data</groupId>
 					<artifactId>spring-data-jpa</artifactId>
-				</exclusion>		
+				</exclusion>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -93,7 +97,16 @@
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j-api</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${snakeyaml.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
