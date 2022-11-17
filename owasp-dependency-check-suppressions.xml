@@ -120,4 +120,11 @@
       <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml\-schemas@.*$</packageUrl>
       <cve>CVE-2022-26336</cve>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: jbpm-bpmn2-7.73.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.jbpm/jbpm\-bpmn2@.*$</packageUrl>
+      <vulnerabilityName>CVE-2019-14839</vulnerabilityName>
+   </suppress>
 </suppressions>
