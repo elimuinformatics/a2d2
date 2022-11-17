@@ -50,7 +50,7 @@ public class OAuth2WorkItemHandler implements WorkItemHandler {
 			missingValues.add("tokenUrl");
 		}
 		if (StringUtils.isEmpty(scope)) {
-			scope = "offline_access";
+			scope = "openid";
 		}
 		if (StringUtils.isEmpty(clientId)) {
 			missingValues.add("clientId");
