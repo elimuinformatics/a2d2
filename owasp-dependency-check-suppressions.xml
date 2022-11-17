@@ -141,4 +141,11 @@
       <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-audit@.*$</packageUrl>
       <cve>CVE-2015-5186</cve>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: jbpm-bpmn2-7.73.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.jbpm/jbpm\-bpmn2@.*$</packageUrl>
+      <vulnerabilityName>CVE-2019-14839</vulnerabilityName>
+   </suppress>
 </suppressions>
