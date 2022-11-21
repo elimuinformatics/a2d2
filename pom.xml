@@ -8,7 +8,7 @@
 
 	<properties>
 		<base.version>0.0.9-SNAPSHOT</base.version>
-		<jdk.version>1.8</jdk.version>
+		<jdk.version>11</jdk.version>
 		<kie.version>7.73.0.Final</kie.version>
 		<wb.kie.version>7.73.0.Final</wb.kie.version>
 		<junit.version>4.13.2</junit.version>
