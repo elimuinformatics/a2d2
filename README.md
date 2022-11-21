@@ -13,7 +13,7 @@ You will need to install the following:
 
 1. Git [(Download)](https://git-scm.com/)
 
-2. JDK 11 [(Download)](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+2. JDK 11 [(Download)](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
 
 3. Eclipse [(Download)](http://www.eclipse.org)
 
