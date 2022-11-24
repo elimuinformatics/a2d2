@@ -2,6 +2,7 @@ package io.elimu.a2d2.cql;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -198,9 +199,12 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			String fhirServerAuth = (String) workItem.getParameter("fhirServerAuth");
 			String fhirTerminologyServerAuth = (String) workItem.getParameter("fhirTerminologyServerAuth");
 			Map<String, Object> prefetchData = new HashMap<>();
+			Map<String, Object> contextData = new HashMap<>();
 			for (String key : workItem.getParameters().keySet()) {
 				if (key.startsWith("prefetch_")) {
 					prefetchData.put(key.replace("prefetch_", ""), workItem.getParameter(key));
+				} else if (key.startsWith("context_")) {
+					contextData.put(key.replace("context_", ""), workItem.getParameter(key));
 				}
 			}
 			DecoratedPlanDefinitionProcessor pdProcessor = null;
@@ -293,8 +297,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				practitionerId == null ? null : "Practitioner/" + practitionerId,
 				organizationId == null ? null : "Organization/" + organizationId, 
 				userType, userLanguage, userTaskContext, setting, settingContext, Boolean.TRUE, 
-				cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance(), 
-				Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, terminologyEndpoint, terminologyEndpoint);
+				asParameters(contextData), Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, 
+				terminologyEndpoint, terminologyEndpoint);
 			LOG.debug("PlanDefinitionProcessor apply call done");
 			List<Card> cards = convert(carePlan);
 			results.put("cards", cards);
@@ -355,12 +359,55 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object retval = cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance();
 		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
+		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
 		if (prefetchData != null) {
 			for (Map.Entry<String, Object> entry : prefetchData.entrySet()) {
 				if (resClass.isInstance(entry.getValue())) {
 					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
 					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
 					param.getClass().getMethod("setResource", resClass).invoke(param, entry.getValue());
+				} else if (entry.getValue() instanceof String) {
+					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
+					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
+					Class<?> strTypeClass = cl.loadClass("org.hl7.fhir.r4.model.StringType");
+					Object value = strTypeClass.getConstructor(String.class).newInstance(String.valueOf(entry.getValue()));
+					param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+				} else if (entry.getValue() instanceof Number) {
+					Number n = (Number) entry.getValue();
+					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
+					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
+					if (n.toString().indexOf(".") == -1) {
+						//integer
+						Class<?> intTypeClass = cl.loadClass("org.hl7.fhir.r4.model.IntegerType");
+						Object value = intTypeClass.getConstructor(int.class).newInstance(n.intValue());
+						param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+					} else {
+						//decimal
+						Class<?> decTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DecimalType");
+						Object value = decTypeClass.getConstructor(double.class).newInstance(n.doubleValue());
+						param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+					}
+				} else if (entry.getValue() instanceof Boolean) {
+					//boolean
+					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
+					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
+					Class<?> boolTypeClass = cl.loadClass("org.hl7.fhir.r4.model.BooleanType");
+					Object value = boolTypeClass.getConstructor(Boolean.class).newInstance(entry.getValue());
+					param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+				} else if (entry.getValue() instanceof Date) {
+					//datetime
+					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
+					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
+					Class<?> dateTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DateTimeType");
+					Object value = dateTypeClass.getConstructor(Date.class).newInstance(entry.getValue());
+					param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+				} else {
+					//log parameter type not handled: type
+					if (entry.getValue() == null ) {
+						LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': null");
+					} else {
+						LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': " + entry.getValue().getClass().getName());
+					}
 				}
 			}
 		}
