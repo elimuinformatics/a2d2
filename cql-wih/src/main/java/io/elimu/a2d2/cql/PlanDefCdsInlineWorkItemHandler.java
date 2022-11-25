@@ -381,16 +381,6 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 						Map.Entry<String, Object> mockEntry = hmap.entrySet().iterator().next();
 						addSingleParam(cl, retval, mockEntry, extension);
 					}
-					/*Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("addExtension", extClass).invoke(param, extension);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					for (Object item : col) {
-						if (resClass.isInstance(item)) {
-							Object part = param.getClass().getMethod("addPart").invoke(param);
-							part.getClass().getMethod("setResource", resClass).invoke(param, item);
-						}
-					}*/
 				} else {
 					addSingleParam(cl, retval, entry, null);
 				}
