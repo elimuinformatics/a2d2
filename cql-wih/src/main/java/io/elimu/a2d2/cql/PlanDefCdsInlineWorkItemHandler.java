@@ -1,12 +1,14 @@
 package io.elimu.a2d2.cql;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -358,60 +360,84 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	private Object asParameters(Map<String, Object> prefetchData) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object retval = cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance();
-		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
-		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
 		if (prefetchData != null) {
 			for (Map.Entry<String, Object> entry : prefetchData.entrySet()) {
-				if (resClass.isInstance(entry.getValue())) {
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					param.getClass().getMethod("setResource", resClass).invoke(param, entry.getValue());
-				} else if (entry.getValue() instanceof String) {
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					Class<?> strTypeClass = cl.loadClass("org.hl7.fhir.r4.model.StringType");
-					Object value = strTypeClass.getConstructor(String.class).newInstance(String.valueOf(entry.getValue()));
-					param.getClass().getMethod("setValue", typeClass).invoke(param, value);
-				} else if (entry.getValue() instanceof Number) {
-					Number n = (Number) entry.getValue();
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					if (n.toString().indexOf(".") == -1) {
-						//integer
-						Class<?> intTypeClass = cl.loadClass("org.hl7.fhir.r4.model.IntegerType");
-						Object value = intTypeClass.getConstructor(int.class).newInstance(n.intValue());
-						param.getClass().getMethod("setValue", typeClass).invoke(param, value);
-					} else {
-						//decimal
-						Class<?> decTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DecimalType");
-						Object value = decTypeClass.getConstructor(double.class).newInstance(n.doubleValue());
-						param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+				if (entry.getValue() instanceof Collection) {
+					//enter each element as a different ParameterComponent with same name
+					Collection<?> col = (Collection<?>) entry.getValue();
+					Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
+					Object extension = extClass.getConstructor().newInstance();
+					extClass.getMethod("setUrl", String.class).invoke(extension, "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-parameterDefinition");
+					Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
+					Class<?> paramDefClass = cl.loadClass("org.hl7.fhir.r4.model.ParameterDefinition");
+					Object paramDef = paramDefClass.getConstructor().newInstance();
+					paramDefClass.getMethod("setMin", int.class).invoke(paramDef, 0);
+					paramDefClass.getMethod("setMax", String.class).invoke(paramDef, String.valueOf(col.size()));
+					paramDefClass.getMethod("setType", String.class).invoke(paramDef, "item");
+					extClass.getMethod("setValue", typeClass).invoke(extension, paramDef);
+					for (Object item : col) {
+						Map<String, Object> hmap = new HashMap<>();
+						hmap.put(entry.getKey(), item);
+						Map.Entry<String, Object> mockEntry = hmap.entrySet().iterator().next();
+						addSingleParam(cl, retval, mockEntry, extension);
 					}
-				} else if (entry.getValue() instanceof Boolean) {
-					//boolean
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					Class<?> boolTypeClass = cl.loadClass("org.hl7.fhir.r4.model.BooleanType");
-					Object value = boolTypeClass.getConstructor(Boolean.class).newInstance(entry.getValue());
-					param.getClass().getMethod("setValue", typeClass).invoke(param, value);
-				} else if (entry.getValue() instanceof Date) {
-					//datetime
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					Class<?> dateTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DateTimeType");
-					Object value = dateTypeClass.getConstructor(Date.class).newInstance(entry.getValue());
-					param.getClass().getMethod("setValue", typeClass).invoke(param, value);
 				} else {
-					//log parameter type not handled: type
-					if (entry.getValue() == null ) {
-						LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': null");
-					} else {
-						LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': " + entry.getValue().getClass().getName());
-					}
+					addSingleParam(cl, retval, entry, null);
 				}
 			}
 		}
 		return retval;
+	}
+
+	private void addSingleParam(ClassLoader cl, Object retval, Entry<String, Object> entry, Object extension) throws ReflectiveOperationException {
+		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
+		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
+		Object param = null;
+		if (resClass.isInstance(entry.getValue()) || entry.getValue() instanceof String || entry.getValue() instanceof Number || entry.getValue() instanceof Boolean || entry.getValue() instanceof Date) {
+			param = retval.getClass().getMethod("addParameter").invoke(retval);
+			param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
+			if (extension != null) {
+				param.getClass().getMethod("addExtension", extension.getClass()).invoke(param, extension);
+			}
+		}
+		if (resClass.isInstance(entry.getValue())) {
+			param.getClass().getMethod("setResource", resClass).invoke(param, entry.getValue());
+		} else if (entry.getValue() instanceof String) {
+			Class<?> strTypeClass = cl.loadClass("org.hl7.fhir.r4.model.StringType");
+			Object value = strTypeClass.getConstructor(String.class).newInstance(String.valueOf(entry.getValue()));
+			param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+		} else if (entry.getValue() instanceof Number) {
+			Number n = (Number) entry.getValue();
+			if (n.toString().indexOf(".") == -1) {
+				//integer
+				Class<?> intTypeClass = cl.loadClass("org.hl7.fhir.r4.model.IntegerType");
+				Object value = intTypeClass.getConstructor(int.class).newInstance(n.intValue());
+				param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+			} else {
+				//decimal
+				Class<?> decTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DecimalType");
+				Object value = decTypeClass.getConstructor(double.class).newInstance(n.doubleValue());
+				param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+			}
+		} else if (entry.getValue() instanceof Boolean) {
+			//boolean
+			Class<?> boolTypeClass = cl.loadClass("org.hl7.fhir.r4.model.BooleanType");
+			Object value = boolTypeClass.getConstructor(Boolean.class).newInstance(entry.getValue());
+			param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+		} else if (entry.getValue() instanceof Date) {
+			//datetime
+			Class<?> dateTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DateTimeType");
+			Object value = dateTypeClass.getConstructor(Date.class).newInstance(entry.getValue());
+			param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+		} else {
+			//log parameter type not handled: type
+			if (entry.getValue() == null ) {
+				LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': null");
+			} else {
+				LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': " + entry.getValue().getClass().getName());
+			}
+		}
+
 	}
 
 	@Override
