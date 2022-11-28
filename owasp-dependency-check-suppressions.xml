@@ -120,4 +120,11 @@
       <packageUrl regex="true">^pkg:maven/org\.jbpm/jbpm\-bpmn2@.*$</packageUrl>
       <vulnerabilityName>CVE-2019-14839</vulnerabilityName>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: org.apache.sshd:sshd-common:2.7.0)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.sshd/sshd\-common@.*$</packageUrl>
+      <cve>CVE-2022-45047</cve>
+   </suppress>
 </suppressions>
