@@ -116,8 +116,6 @@ public class CqfInlineWIHTest {
 		rate.getType().addCoding().setSystem("http://terminology.hl7.org/CodeSystem/dose-rate-type").setCode("ordered").setDisplay("Ordered");
 		rate.getDoseQuantity().setValue(1).setUnit("ea").setSystem("http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm").setCode("OINT");
 		medRequests.add(medReq);
-		medRequests.add(new MedicationRequest().setId("1234555"));
-		medRequests.add(new MedicationRequest().setId("123477"));
 		workItem.setParameter("context_MedicationRequestsBeingPlaced", medRequests);
 		NoOpWorkItemManager manager = new NoOpWorkItemManager();
 		long start = System.currentTimeMillis();

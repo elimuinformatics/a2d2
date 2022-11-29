@@ -372,7 +372,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 					Class<?> paramDefClass = cl.loadClass("org.hl7.fhir.r4.model.ParameterDefinition");
 					Object paramDef = paramDefClass.getConstructor().newInstance();
 					paramDefClass.getMethod("setMin", int.class).invoke(paramDef, 0);
-					paramDefClass.getMethod("setMax", String.class).invoke(paramDef, String.valueOf(col.size()));
+					paramDefClass.getMethod("setMax", String.class).invoke(paramDef, String.valueOf(col.size() < 2 ? 2 : col.size()));
 					paramDefClass.getMethod("setType", String.class).invoke(paramDef, "item");
 					extClass.getMethod("setValue", typeClass).invoke(extension, paramDef);
 					for (Object item : col) {
