@@ -54,6 +54,7 @@
 		<joda-time.version>2.10.6</joda-time.version>
 		<jdk.version>11</jdk.version>
 		<spring-security.version>5.7.5</spring-security.version>
+		<postgresql.version>42.5.1</postgresql.version>
 		<cloudwatchlogbackappender.version>2.1</cloudwatchlogbackappender.version>
 		<mysql-connector-java.version>8.0.29</mysql-connector-java.version>	
 		<snakeyaml.version>1.33</snakeyaml.version>
@@ -823,7 +824,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.4.1</version>
+			<version>${postgresql.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
