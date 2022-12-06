@@ -90,8 +90,8 @@
       file name: snakeyaml-1.33.jar
       ]]></notes>
       <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-      <vulnerabilityName>CVE-2022-41854</vulnerabilityName>
-   </suppress>   
+      <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
+   </suppress>
    <suppress>
       <notes><![CDATA[
       file name: wildfly-elytron-2.0.0.Final.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.13.3)
