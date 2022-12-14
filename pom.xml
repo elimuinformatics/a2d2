@@ -405,11 +405,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>${h2.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>ca.uhn.hapi.fhir</groupId>
 				<artifactId>hapi-fhir-structures-dstu2</artifactId>
 				<version>${hapi.fhir.version}</version>
