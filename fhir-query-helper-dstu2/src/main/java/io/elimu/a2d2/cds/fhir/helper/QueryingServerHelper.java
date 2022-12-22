@@ -90,7 +90,7 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 	}
 
 	@Override
-	public FhirResponse<List<IBaseResource>> queryServer(final String resourceQuery, boolean paging) {
+	public FhirResponse<List<IBaseResource>> queryServer(final String resourceQuery, QueryBuilder builder) {
 		FhirClientWrapper client = clients.next();
 		FhirResponse<List<IBaseResource>> resourceBundle = null;
 		log.debug("Fetching {} resources using client for version {} ", client.getFhirContext().getVersion().getVersion().name(),
@@ -99,13 +99,13 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 			@Override
 			public List<IBaseResource> execute(FhirClientWrapper client) {
 				log.debug("Invoking url {}", resourceQuery);
-				Bundle bundle = client.fetchResourceFromUrl(Bundle.class, resourceQuery);
+				Bundle bundle = new FetchCallRetry<Bundle>(builder, b-> client.fetchResourceFromUrl(Bundle.class, resourceQuery)).retryRestCall(client);
 				List<IBaseResource> retval = new LinkedList<>();
 				bundle.getEntry().forEach(e -> retval.add((IBaseResource) e.getResource()));
-				while (paging && bundle.getLink("next") != null) {
+				while (builder.hasPaging() && bundle.getLink("next") != null) {
 					final String url = bundle.getLink("next").getUrl();
 					log.debug("Invoking url {}", url);
-					bundle = client.fetchResourceFromUrl(Bundle.class, url);
+					bundle = new FetchCallRetry<Bundle>(builder, b-> client.fetchResourceFromUrl(Bundle.class, url)).retryRestCall(client);
 					bundle.getEntry().forEach(e -> retval.add((IBaseResource) e.getResource()));
 				}
 				return retval;
