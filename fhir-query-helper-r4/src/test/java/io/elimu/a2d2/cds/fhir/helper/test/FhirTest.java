@@ -2,6 +2,7 @@ package io.elimu.a2d2.cds.fhir.helper.test;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +40,6 @@ public class FhirTest {
 	private static final String responseStatusInfo_2 = "responseStatusInfo - response first user_2";
 	FhirResponse<List<IBaseResource>> retval_2 = null;
 
-
 	@Before
 	public void setup() {
 		List<IBaseResource> iBaseList = new ArrayList<IBaseResource>();
@@ -55,8 +55,12 @@ public class FhirTest {
 		retval_1 = new FhirResponse<>(iBaseList, 200, responseStatusInfo_1);
 		retval_2 = new FhirResponse<>(iBaseList, 200, responseStatusInfo_2);
 
-		doReturn(retval_1).when(queryingServerHelper).queryServer(resourceQuery_1, false);
-		doReturn(retval_2).when(queryingServerHelper).queryServer(resourceQuery_2, true);
+		doReturn(retval_1).when(queryingServerHelper).queryServer(eq(resourceQuery_1), eq(new QueryBuilder().
+				resourceType("MedicationAdministration").
+				count(1).withParam("_sort", "-_lastUpdated").paging(false)));
+		doReturn(retval_2).when(queryingServerHelper).queryServer(resourceQuery_2, new QueryBuilder().paging(true));
+		doReturn(retval_2).when(queryingServerHelper).queryServer(eq(resourceQuery_2), eq(new QueryBuilder().
+				resourceType("Observation").count(2).withParam("_sort", "-date")));
 	}
 	
 	@Test

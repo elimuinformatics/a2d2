@@ -36,6 +36,7 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
+import io.elimu.a2d2.cds.fhir.helper.QueryBuilder;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelperBase;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelperBase.FhirVersionAbs;
 import io.elimu.a2d2.genericmodel.NamedDataObject;
@@ -127,7 +128,7 @@ public class OAuthHelperTest {
 		}
 		
 		@Override
-		public FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, boolean paging) {
+		public FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, QueryBuilder builder) {
 			return new FhirResponse<List<IBaseResource>>(new ArrayList<IBaseResource>(), 200, "OK");
 		}
 
