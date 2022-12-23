@@ -81,7 +81,7 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 			HttpMethod method = getMethod(workItem);
 
 			int retries = Integer.valueOf(System.getProperty("http.invoke.retries", "3"));
-			int delay = Integer.valueOf(System.getProperty("http.invoke.retrydelay", "5000"));
+			int delay = Integer.valueOf(System.getProperty("http.invoke.retrydelay", "1000"));
 			String sRetries = String.valueOf(workItem.getParameter(RETRIES_PARAM));
 			if (sRetries != null && !"null".equals(sRetries)) {
 				retries = Integer.valueOf(sRetries);
@@ -153,6 +153,7 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 						success = true;
 					} else {
 						count++;
+						Thread.sleep(getDelay(count, delay));
 						logger.warn("We had a return status code" + response.getStatusCodeValue() + "so we will retry (this was attempt " + count + ")");
 					}
 				} catch (RestManageException rme) {
@@ -163,7 +164,7 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 					resp.setBody(rme.getMessage());			
 					resp.addHeaderValue("ErrorMessage", rme.getStatusText());
 					workItemResult.put(SERVICE_RESPONSE, resp);
-					Thread.sleep(delay * count);
+					Thread.sleep(getDelay(count, delay));
 				} catch (Exception ex2) {
 					count++;
 					logger.warn("We had an error when invoking the url " + url, ex2);
@@ -172,7 +173,7 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 					resp.setResponseCode(500);
 					resp.addHeaderValue("ErrorMessage", ex2.getMessage());
 					workItemResult.put(SERVICE_RESPONSE, resp);
-					Thread.sleep(delay * count);
+					Thread.sleep(getDelay(count, delay));
 				}
 			}
 
@@ -188,6 +189,14 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 
 	}
 
+	private int getDelay(int count, int delay) {
+		if (count == 2) {
+			delay *= 3;
+		} else if (count >= 3) {
+			delay *= 5;
+		}
+		return delay;
+	}
 
 	private ServiceResponse createServiceResponse(ResponseEntity<?> response) {
 		ServiceResponse serviceResponse = new ServiceResponse();

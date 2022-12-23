@@ -25,7 +25,7 @@ public class FetchCallRetry<T> {
 		while (count < retries && !success) {
 			try {
 				if (count > 0) {
-					Thread.sleep(delay * count);
+					Thread.sleep(getDelay(count, delay));
 				}
 				T retval = function.apply(null);
 				if (client.getTracker().getResponseStatusCode() < 500) {
@@ -40,5 +40,14 @@ public class FetchCallRetry<T> {
 			}
 		}
 		throw new RuntimeException("After " + count + " retries, invocation of clal still failed");
+	}
+
+	public int getDelay(int count, int delay) {
+		if (count == 2) {
+			delay *= 3;
+		} else if (count >= 3) {
+			delay *= 5;
+		}
+		return delay;
 	}
 }

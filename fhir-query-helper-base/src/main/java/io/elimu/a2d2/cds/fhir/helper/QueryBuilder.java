@@ -12,7 +12,7 @@ public class QueryBuilder {
 	private int count;
 	private boolean useCache = true;
 	private int retries = Integer.valueOf(System.getProperty("http.invoke.retries", "3"));
-	private int delay = Integer.valueOf(System.getProperty("http.invoke.retrydelay", "5000"));
+	private int delay = Integer.valueOf(System.getProperty("http.invoke.retrydelay", "1000"));
 	
 	public QueryBuilder withRetries(int retries) {
 		this.retries = retries;
