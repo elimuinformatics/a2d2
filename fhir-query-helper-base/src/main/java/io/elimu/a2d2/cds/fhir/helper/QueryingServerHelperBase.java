@@ -494,7 +494,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	 * @param subjectId the value of the main parameter to be used for filtering in the query
 	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
 	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
-	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&amp;{fhirQuery}
 	 */
 	public FhirResponse<List<IBaseResource>> queryResourcesResponseNoCache(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery) {
@@ -514,7 +514,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	 * @param subjectId the value of the main parameter to be used for filtering in the query
 	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
 	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
-	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&amp;{fhirQuery}
 	 */
 	public FhirResponse<List<IBaseResource>> queryResourcesResponse(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery) {

@@ -55,6 +55,11 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 
 	/**
 	 * @deprecated (in favor of queryResourcesResponse)
+	 * @param resourceType the FHIR resource type to find
+	 * @param subjectId the main parameter value to search by 
+	 * @param subjectRefAttribute the main parameter name to search by
+	 * @param fhirQuery any extra parameters needed
+	 * @return a list of resources matching the search conditions
 	 */
 	@Deprecated
 	public List<IBaseResource> queryResources(String resourceType, String subjectId, String subjectRefAttribute,
@@ -64,6 +69,9 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 	
 	/**
 	 * @deprecated (in favor of getResourceByIdResponse)
+	 * @param resourceType the FHIR resource type to find
+	 * @param resourceId the FHIR id of the resource to be searched
+	 * @return the IBaseResource instance of the fetch content, or null
 	 */
 	@Deprecated
 	public IBaseResource getResourceById(String resourceType, String resourceId) {
