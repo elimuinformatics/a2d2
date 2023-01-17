@@ -118,6 +118,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+    		<groupId>org.apache.tomcat.embed</groupId>
+    		<artifactId>tomcat-embed-core</artifactId>
+    		<version>9.0.71</version>
+		</dependency>
+		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-text</artifactId>
 		    <version>${commons-text.version}</version>
@@ -466,6 +471,10 @@
 				<exclusion>
 					<groupId>org.yaml</groupId>
 					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-core</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
