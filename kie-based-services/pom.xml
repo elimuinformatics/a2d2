@@ -181,11 +181,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-   			<groupId>org.apache.tomcat.embed</groupId>
-    		<artifactId>tomcat-embed-core</artifactId>
-    		<version>9.0.71</version>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
 			<version>1.0.3</version>
@@ -467,10 +462,6 @@
 					<groupId>org.yaml</groupId>
 					<artifactId>snakeyaml</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-core</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -571,10 +562,6 @@
 				<exclusion>
 					<groupId>org.ow2.asm</groupId>
     					<artifactId>asm</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.junit.jupiter</groupId>
-    					<artifactId>junit-jupiter-api</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
