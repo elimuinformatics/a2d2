@@ -181,11 +181,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-   			<groupId>org.apache.tomcat.embed</groupId>
-    		<artifactId>tomcat-embed-core</artifactId>
-    		<version>9.0.71</version>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
 			<version>1.0.3</version>
@@ -467,10 +462,6 @@
 					<groupId>org.yaml</groupId>
 					<artifactId>snakeyaml</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-core</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -573,10 +564,6 @@
     					<artifactId>asm</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.junit.jupiter</groupId>
-    					<artifactId>junit-jupiter-api</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.slf4j</groupId>
     					<artifactId>slf4j-api</artifactId>
 				</exclusion>
@@ -609,21 +596,6 @@
 		    <groupId>org.apiguardian</groupId>
 		    <artifactId>apiguardian-api</artifactId>
 		    <version>${apiguardian.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-    			<artifactId>junit-jupiter-api</artifactId>
-    			<version>5.7.2</version>
-    			<exclusions>
-    				<exclusion>
-    					<groupId>org.junit.platform</groupId>
-    					<artifactId>junit-platform-commons</artifactId>
-    				</exclusion>
-    				<exclusion>
-    					<groupId>org.apiguardian</groupId>
-    					<artifactId>apiguardian-api</artifactId>
-    				</exclusion>
-    			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

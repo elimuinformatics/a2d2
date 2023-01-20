@@ -42,7 +42,7 @@
 		<tomcat-embed-websocket.version>9.0.68</tomcat-embed-websocket.version>
 		<spring.version>5.3.24</spring.version>
 		<resteasy-client.version>4.7.2.Final</resteasy-client.version>
-		<tomcat-embed-core.version>9.0.71</tomcat-embed-core.version>
+		<tomcat-embed-core.version>9.0.68</tomcat-embed-core.version>
 		<log4j.version>2.17.1</log4j.version>
 		<logback-classic.version>1.2.10</logback-classic.version>
 		<logback-core.version>1.2.9</logback-core.version>
@@ -230,10 +230,6 @@
 					<groupId>com.squareup.okhttp3</groupId>
 					<artifactId>okhttp</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-core</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -298,10 +294,6 @@
 				<exclusion>
 					<groupId>com.squareup.okhttp3</groupId>
 					<artifactId>okhttp</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-core</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
