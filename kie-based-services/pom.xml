@@ -598,6 +598,21 @@
 		    <version>${apiguardian.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+    			<artifactId>junit-jupiter-api</artifactId>
+    			<version>5.7.2</version>
+    			<exclusions>
+    				<exclusion>
+    					<groupId>org.junit.platform</groupId>
+    					<artifactId>junit-platform-commons</artifactId>
+    				</exclusion>
+    				<exclusion>
+    					<groupId>org.apiguardian</groupId>
+    					<artifactId>apiguardian-api</artifactId>
+    				</exclusion>
+    			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
