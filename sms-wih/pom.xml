@@ -80,10 +80,6 @@
                    		<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
              		</exclusion>
-             		<exclusion>
-				<groupId>com.fasterxml.jackson.core</groupId>
-    		        	<artifactId>jackson-core</artifactId>
-			</exclusion>
 		  </exclusions>
 		</dependency>
 		<dependency>
@@ -94,10 +90,6 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
 			<version>4.4.10</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-    			<artifactId>jackson-core</artifactId>
 		</dependency>
 	</dependencies>
 	<parent>

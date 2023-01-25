@@ -103,10 +103,6 @@
 					<artifactId>jackson-annotations</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-core</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
 				</exclusion>
@@ -413,10 +409,6 @@
 				<exclusion>
 					<groupId>com.fasterxml</groupId>
 					<artifactId>classmate</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-core</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.jboss.logging</groupId>
