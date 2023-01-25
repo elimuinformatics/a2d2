@@ -99,10 +99,6 @@
 					<artifactId>cxf-core</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
 				</exclusion>
@@ -407,16 +403,8 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>com.fasterxml</groupId>
-					<artifactId>classmate</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.jboss.logging</groupId>
 					<artifactId>jboss-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -545,27 +533,12 @@
 					<groupId>org.junit.platform</groupId>
 					<artifactId>junit-platform-commons</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apiguardian</groupId>
-					<artifactId>apiguardian-api</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 		    <groupId>org.junit.platform</groupId>
 		    <artifactId>junit-platform-commons</artifactId>
 		    <version>${junit-platform-commons.version}</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>org.apiguardian</groupId>
-		    		<artifactId>apiguardian-api</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
-		<dependency>
-		    <groupId>org.apiguardian</groupId>
-		    <artifactId>apiguardian-api</artifactId>
-		    <version>${apiguardian.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -575,10 +548,6 @@
     				<exclusion>
     					<groupId>org.junit.platform</groupId>
     					<artifactId>junit-platform-commons</artifactId>
-    				</exclusion>
-    				<exclusion>
-    					<groupId>org.apiguardian</groupId>
-    					<artifactId>apiguardian-api</artifactId>
     				</exclusion>
     			</exclusions>
 		</dependency>

@@ -81,7 +81,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
+					<artifactId>jackson-core</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
@@ -168,7 +168,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
+					<artifactId>jackson-core</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
@@ -384,7 +384,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
+					<artifactId>jackson-core</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
