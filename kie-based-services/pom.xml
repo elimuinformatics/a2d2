@@ -127,10 +127,6 @@
     					<artifactId>plexus-cipher</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.apache.maven.wagon</groupId>
     					<artifactId>wagon-provider-api</artifactId>
 				</exclusion>
@@ -403,10 +399,6 @@
 					<artifactId>jboss-logging</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-aop</artifactId>
 				</exclusion>
@@ -518,10 +510,6 @@
     					<artifactId>asm</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-core</artifactId>
 				</exclusion>
@@ -561,10 +549,6 @@
 			<artifactId>btm</artifactId>
 			<version>2.1.4</version>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -572,10 +556,6 @@
 			<artifactId>quartz</artifactId>
 			<scope>test</scope>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -605,10 +585,6 @@
 				<exclusion>
 					<groupId>org.aspectj</groupId>
     					<artifactId>aspectjweaver</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.springframework</groupId>
