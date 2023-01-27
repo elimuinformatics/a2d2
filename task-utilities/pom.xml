@@ -111,10 +111,6 @@
 					<artifactId>maven-aether-provider</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.freemarker</groupId>
 					<artifactId>freemarker</artifactId>
 				</exclusion>

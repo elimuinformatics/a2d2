@@ -333,10 +333,6 @@
 			<artifactId>jbpm-workitems-rest</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.slf4j</groupId>
     					<artifactId>jcl-over-slf4j</artifactId>
 				</exclusion>
