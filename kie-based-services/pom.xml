@@ -460,8 +460,6 @@
     					<artifactId>asm</artifactId>
 				</exclusion>
 				<exclusion>
-				</exclusion>
-				<exclusion>
 					<groupId>org.junit.platform</groupId>
 					<artifactId>junit-platform-commons</artifactId>
 				</exclusion>
