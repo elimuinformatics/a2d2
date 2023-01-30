@@ -458,8 +458,6 @@
 				<exclusion>
 					<groupId>org.ow2.asm</groupId>
     					<artifactId>asm</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.junit.platform</groupId>
 					<artifactId>junit-platform-commons</artifactId>
 				</exclusion>
