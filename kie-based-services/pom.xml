@@ -455,10 +455,6 @@
 					<groupId>org.ow2.asm</groupId>
     					<artifactId>asm</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.junit.platform</groupId>
-					<artifactId>junit-platform-commons</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -470,12 +466,6 @@
 			<groupId>org.junit.jupiter</groupId>
     			<artifactId>junit-jupiter-api</artifactId>
     			<version>5.8.2</version>
-    			<exclusions>
-    				<exclusion>
-    					<groupId>org.junit.platform</groupId>
-    					<artifactId>junit-platform-commons</artifactId>
-    				</exclusion>
-    			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
