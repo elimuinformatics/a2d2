@@ -34,9 +34,11 @@ public class RuntimeManagerHelper {
 			GenericService _service = RunningServices.getInstance().get(serviceName);
 			if (_service instanceof GenericKieBasedService) {
 				GenericKieBasedService service = (GenericKieBasedService) _service;
-				for (org.kie.api.definition.process.Process p : service.getKieBase().getProcesses()) {
-					if (p.getId().equalsIgnoreCase(processId)) {
-						return RuntimeManagerRegistry.get().getManager(service.getId());
+				if (service.getKieBase() != null && service.getKieBase().getProcesses() != null) {
+					for (org.kie.api.definition.process.Process p : service.getKieBase().getProcesses()) {
+						if (p.getId().equalsIgnoreCase(processId)) {
+							return RuntimeManagerRegistry.get().getManager(service.getId());
+						}
 					}
 				}
 			}
