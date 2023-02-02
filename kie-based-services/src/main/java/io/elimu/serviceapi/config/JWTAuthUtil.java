@@ -1,5 +1,6 @@
 package io.elimu.serviceapi.config;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -8,15 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.KeyFactory;
 import java.security.PublicKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.ECFieldF2m;
-import java.security.spec.ECFieldFp;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
-import java.security.spec.EllipticCurve;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import io.elimu.genericapi.service.GenericKieBasedService;
 import io.elimu.genericapi.service.RunningServices;
-import okhttp3.internal.platform.BouncyCastlePlatform;
 
 public class JWTAuthUtil {
 
@@ -70,9 +68,13 @@ public class JWTAuthUtil {
 			//Ensure the jku value, if present, matches the request and validates the signature
 			String jku = jwt.getHeaderClaim("jku") == null ? null : jwt.getHeaderClaim("jku").asString();
 			List<String> validJku = getConfigPropertyAsString(serviceProperties, "jwtValidJku");
-			if (jku == null || validJku.isEmpty() || !isValidKey(jwt)) {
+			String presetKey = getConfigProperty(serviceProperties, "jwtValidPresetKeys");
+			if (presetKey != null && !isValidKeyWithJKU(jwt, presetKey)) {
+				return false;
+			} else if (jku == null || validJku.isEmpty() || !isValidKeyWithJKU(jwt, presetKey)) {
 				return false;
 			}
+			//Ensure the key value. If presetn, matches the request and validates the signature
 			//Ensure that the tenant value exists in the CDS Service's allowlist of trusted tenants (may not be applicable to all CDS Services).
 			String tenant =jwt.getClaim("tenant") == null ? null : jwt.getClaim("tenant").asString();  
 			List<String> validTenants = getConfigPropertyAsString(serviceProperties, "jwtValidTenant");
@@ -87,8 +89,13 @@ public class JWTAuthUtil {
 		}
 	}
 	
-	private static boolean isValidKey(DecodedJWT jwt) {
-		PublicKey key = getPublicKey(jwt.getHeaderClaim("jku").asString(), jwt.getAlgorithm());
+	private static boolean isValidKeyWithJKU(DecodedJWT jwt, String presetKey) {
+		PublicKey key = null;
+		if (presetKey == null || "".equals(presetKey)) {
+			key = getPublicKey(jwt.getHeaderClaim("jku").asString(), jwt.getAlgorithm());
+		} else {
+			key = buildKey(presetKey);
+		}
 		JWTVerifier verifier = null;
 		if (jwt.getAlgorithm().startsWith("RS")) {
 			verifier = JWT.require(Algorithm.RSA256(new SimpleRSAKeyProvider((RSAPublicKey) key))).build();
@@ -104,6 +111,19 @@ public class JWTAuthUtil {
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+	
+	private static PublicKey buildKey(String presetKey) {
+		try {
+			byte[] key = org.apache.commons.codec.binary.Base64.decodeBase64(presetKey);
+			ByteArrayInputStream fileInputStream = new ByteArrayInputStream(key);
+			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			X509Certificate cert = (X509Certificate)cf.generateCertificate(fileInputStream);
+			return cert.getPublicKey();
+		} catch (Exception e) {
+			LOGGER.warn("Couldnt read preset key", e);
+			return null;
 		}
 	}
 
@@ -164,10 +184,6 @@ public class JWTAuthUtil {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(new String(Base64.decodeBase64("Sm3mLE-n1zYNla_aiE3cb3nZsL51RbC7ysw3q8aJLxGm-hx79RPMYpITDjp7kgzy")));
-	}
-	
 	private static byte[] pad(byte[] bs) {
 		if (bs.length == 8) {
 			return bs;
@@ -187,7 +203,7 @@ public class JWTAuthUtil {
 		return retval;
 	}
 
-	private static List<String> getConfigPropertyAsString(Properties serviceProperties, String key) {
+	private static String getConfigProperty(Properties serviceProperties, String key) {
 		String config = serviceProperties.getProperty(key);
 		if (config == null) {
 			config = serviceProperties.getProperty("proc.var." + key + ".value");
@@ -195,6 +211,11 @@ public class JWTAuthUtil {
 		if (config == null) {
 			config = "";
 		}
+		return config;
+	}
+	
+	private static List<String> getConfigPropertyAsString(Properties serviceProperties, String key) {
+		String config = getConfigProperty(serviceProperties, key);
 		List<String> valid = new ArrayList<>(Arrays.asList(config.split(",")));
 		if (valid.contains("")) {
 			valid.remove("");
