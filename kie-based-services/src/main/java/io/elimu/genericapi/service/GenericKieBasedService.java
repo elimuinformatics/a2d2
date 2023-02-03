@@ -187,7 +187,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 	}
 	
 	private String getClient(ServiceRequest request) {
-		String auth = request.getHeader("Authorization");
+		String auth = request.getHeader("authorization");
 		if (auth == null) {
 			if ("*".equals(getDefaultCustomer())) {
 				return "default";
