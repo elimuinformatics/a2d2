@@ -12,7 +12,7 @@ public class ConfigAPIProcessVariableInitHelper extends ProcessVariableInitHelpe
 
 	public Map<String, Object> initVariables(ServiceRequest request, String client, Dependency dep, Properties config) {
 		Map<String, Object> serviceProperty = super.initVariables(dep);
-		String env = AppContextUtils.getInstance().getProfileName();
+		String env = System.getProperty("configApiEnv");
 		String appName = config.getProperty("kie.project.appname");
 		if (appName == null || "".equals(appName.trim())) {
 			appName = dep.getArtifactId();
