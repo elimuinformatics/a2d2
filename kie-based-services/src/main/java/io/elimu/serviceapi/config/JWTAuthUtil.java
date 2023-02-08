@@ -68,10 +68,12 @@ public class JWTAuthUtil {
 			//Ensure the jku value, if present, matches the request and validates the signature
 			String jku = jwt.getHeaderClaim("jku") == null ? null : jwt.getHeaderClaim("jku").asString();
 			List<String> validJku = getConfigPropertyAsString(serviceProperties, "jwtValidJku");
-			String presetKey = getConfigProperty(serviceProperties, "jwtValidPresetKeys");
-			if (presetKey != null && !isValidKeyWithJKU(jwt, presetKey)) {
-				return false;
-			} else if (jku == null || validJku.isEmpty() || !isValidKeyWithJKU(jwt, presetKey)) {
+			List<String> presetKeys = getConfigPropertyAsString(serviceProperties, "jwtValidPresetKeys");
+			if (presetKeys != null && !presetKeys.isEmpty()) {
+				if(!isValidKeyWithJKU(jwt, presetKeys.get(validIss.indexOf(iss)))) {
+					return false;
+				}
+			} else if (jku == null || validJku.isEmpty() || !isValidKeyWithJKU(jwt, presetKeys.get(validIss.indexOf(iss)))) {
 				return false;
 			}
 			//Ensure the key value. If presetn, matches the request and validates the signature
@@ -91,7 +93,7 @@ public class JWTAuthUtil {
 	
 	private static boolean isValidKeyWithJKU(DecodedJWT jwt, String presetKey) {
 		PublicKey key = null;
-		if (presetKey == null || "".equals(presetKey)) {
+		if (presetKey == null || "".equals(presetKey) || "invalid".equalsIgnoreCase(presetKey)) {
 			key = getPublicKey(jwt.getHeaderClaim("jku").asString(), jwt.getAlgorithm());
 		} else {
 			key = buildKey(presetKey);
