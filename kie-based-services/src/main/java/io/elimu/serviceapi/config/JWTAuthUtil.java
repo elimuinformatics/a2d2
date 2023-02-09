@@ -46,6 +46,7 @@ public class JWTAuthUtil {
 	
 	public static boolean isValidJwt(String jwtToken, String serviceId) {
 		try {
+			LOGGER.debug("Parsing token " + jwtToken);
 			DecodedJWT jwt = JWT.decode(jwtToken.replace("Bearer", "").trim());
 			GenericKieBasedService service = serviceId == null ? null : (GenericKieBasedService) RunningServices.getInstance().get(serviceId);
 			Properties serviceProperties = service == null ? new Properties() : service.getConfig();
@@ -86,7 +87,7 @@ public class JWTAuthUtil {
 			//Future: Ensure that the jti value doesn't exist in the short-term storage of JWTs previously processed by this CDS Service.
 			return true;
 		} catch (Exception e) {
-			LOGGER.warn("Couldn't parse JWT token: " + e.getMessage());
+			LOGGER.warn("Couldn't parse JWT token: " + e.getMessage(), e);
 			return false;
 		}
 	}
