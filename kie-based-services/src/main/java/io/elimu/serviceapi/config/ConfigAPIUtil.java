@@ -45,8 +45,6 @@ public class ConfigAPIUtil {
 		try {
 			uri = new URI(builder.toUriString());
 		} catch (URISyntaxException e1) {
-		Map<String, Object> errorResponse = new HashMap<>();
-		errorResponse.put("message", e1.getMessage());
 		LOG.error ("Error while fetching configuration from Config-api ", e1);
 		}
 		String url = uri.toString();
