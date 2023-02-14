@@ -202,11 +202,19 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			String fhirTerminologyServerAuth = (String) workItem.getParameter("fhirTerminologyServerAuth");
 			Map<String, Object> prefetchData = new HashMap<>();
 			Map<String, Object> contextData = new HashMap<>();
+			Map<String, String> patientHeaderData = new HashMap<>();
+			Map<String, String> terminologyHeaderData = new HashMap<>();
 			for (String key : workItem.getParameters().keySet()) {
 				if (key.startsWith("prefetch_")) {
 					prefetchData.put(key.replace("prefetch_", ""), workItem.getParameter(key));
 				} else if (key.startsWith("context_")) {
 					contextData.put(key.replace("context_", ""), workItem.getParameter(key));
+				} else if (key.startsWith("fhirServer_header_")) {
+					patientHeaderData.put(key.replace("fhirServer_header_", "").replaceAll("__", "-"), 
+							String.valueOf(workItem.getParameter(key)));
+				} else if (key.startsWith("fhirTerminologyServer_header_")) {
+					terminologyHeaderData.put(key.replace("fhirTerminologyServer_header_", "").replaceAll("__", "-"), 
+							String.valueOf(workItem.getParameter(key)));
 				}
 			}
 			DecoratedPlanDefinitionProcessor pdProcessor = null;
@@ -223,8 +231,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				LOG.debug("Processor already cached by planDefUrl key " + key);
 			} else {
 				LOG.debug("Creating PlanDefinitionProcessor...");
-				//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
-				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth);
+				//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth, patientHeaderData); 
+				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth, terminologyHeaderData);
 				if (planDefId != null) {
 					LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
 					key = planDefId;
@@ -264,6 +272,11 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				if (fhirTerminologyServerAuth != null) {
 					headers.add("Authorization:" + fhirTerminologyServerAuth);
 				}
+				if (terminologyHeaderData != null && !terminologyHeaderData.isEmpty()) {
+					for (String headerName : terminologyHeaderData.keySet()) {
+						headers.add(headerName + ": " + terminologyHeaderData.get(headerName));
+					}
+				}
 				Object fhirDal = fdFactory.getClass().getMethod("create", String.class, List.class).invoke(fdFactory, fhirTerminologyServerUrl, headers);
 				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
 				Class<?> fhirDalClass = cl.loadClass("org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal");
@@ -285,11 +298,21 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			if (fhirTerminologyServerAuth != null) {
 				endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, "Authorization:" + fhirTerminologyServerAuth);
 			}
+			if (terminologyHeaderData != null && !terminologyHeaderData.isEmpty()) {
+				for (String headerName : terminologyHeaderData.keySet()) {
+					endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, headerName + ": " + terminologyHeaderData.get(headerName));
+				}
+			}
 			Object dataEndpoint = endpointClass.getConstructor().newInstance();
 			endpointClass.getMethod("setAddress", String.class).invoke(dataEndpoint, fhirServerUrl);
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(dataEndpoint, restCoding);
 			if (fhirServerAuth != null) {
 				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization:" + fhirServerAuth);
+			}
+			if (patientHeaderData != null && !patientHeaderData.isEmpty()) {
+				for (String headerName : patientHeaderData.keySet()) {
+					endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, headerName + ": " + patientHeaderData.get(headerName));
+				}
 			}
 			planDefinition = CACHED_PLANDEFS.get(key).getValue();
 			Object planIdType = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
@@ -318,7 +341,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		}
 	}
 
-	private Object initClient(String fhirServerUrl, String auth) throws ReflectiveOperationException {
+	private Object initClient(String fhirServerUrl, String auth, Map<String, String> headerData) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object fhirClient = ctx.getClass().getMethod("newRestfulGenericClient", String.class).invoke(ctx, fhirServerUrl);
 		fhirClient.getClass().getMethod("setDontValidateConformance", boolean.class).invoke(fhirClient, true);
@@ -329,6 +352,14 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			Object interceptor = cl.loadClass("ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor").
 					getConstructor(String.class, String.class).newInstance("Authorization", auth);
 			fhirClient.getClass().getMethod("registerInterceptor", Object.class).invoke(fhirClient, interceptor);
+		} 
+		if (headerData != null && !headerData.isEmpty()) {
+			for (String key : headerData.keySet()) {
+				String value = headerData.get(key);
+				Object interceptor = cl.loadClass("ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor").
+						getConstructor(String.class, String.class).newInstance(key, value);
+				fhirClient.getClass().getMethod("registerInterceptor", Object.class).invoke(fhirClient, interceptor);
+			}
 		}
 		return fhirClient;
 	}
