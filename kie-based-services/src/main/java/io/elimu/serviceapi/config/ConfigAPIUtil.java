@@ -1,5 +1,7 @@
 package io.elimu.serviceapi.config;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,6 +12,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +40,14 @@ public class ConfigAPIUtil {
 		if (token == null) {
 			return retval;
 		}
-		String url = configApiUrl + "/" + client + "/" + environment + "/" + appName;
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(configApiUrl).pathSegment(client, environment,appName);
+		URI uri = null;
+		try {
+			uri = new URI(builder.toUriString());
+		} catch (URISyntaxException e1) {
+		LOG.error ("Error while fetching configuration from Config-api ", e1);
+		}
+		String url = uri.toString();
 		CachedResult result = CACHE.get(url);
 		if (result != null && !result.isOld()) {
 			retval.putAll(result.getVariables());
