@@ -128,7 +128,7 @@
 		<dependency>
 		    <groupId>org.jboss.resteasy</groupId>
 		    <artifactId>resteasy-core</artifactId>
-		    <version>5.0.1.Final</version>
+		    <version>6.2.2.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kie.server</groupId>
@@ -400,6 +400,10 @@
 				<exclusion>
    					<groupId>org.dom4j</groupId>
     				 	<artifactId>dom4j</artifactId> 
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss</groupId>
+					<artifactId>jandex</artifactId>
 				</exclusion>
 			</exclusions>
 			<scope>test</scope>
