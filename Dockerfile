@@ -4,12 +4,6 @@ WORKDIR /usr/src
 
 COPY . /usr/src
 
-ARG NEXUS_PASSWORD
-ARG NEXUS_USERNAME
-
-ENV NEXUS_PASSWORD $NEXUS_PASSWORD
-ENV NEXUS_USERNAME $NEXUS_USERNAME
-
 RUN mvn clean install -DskipTests --settings=./a2d2-settings.xml
 RUN for file in /usr/src/services/*; do mvn clean install -f "$file" --settings=a2d2-settings.xml -Dmaven.repo.local=client_repo;   done 
 
