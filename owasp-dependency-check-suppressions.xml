@@ -136,6 +136,34 @@
    </suppress>
    <suppress>
       <notes><![CDATA[
+      file name: wildfly-elytron-credential-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-credential@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-password-impl-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-password\-impl@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-realm-ldap-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-realm\-ldap@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-x500-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-x500@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
       file name: snakeyaml-1.33.jar
       ]]></notes>
       <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
