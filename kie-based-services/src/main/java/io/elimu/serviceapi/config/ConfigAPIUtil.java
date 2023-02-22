@@ -31,6 +31,7 @@ public class ConfigAPIUtil {
 	private final static Map<String, CachedResult> CACHE = new HashMap<>();
 	
 	public Map<String, Object> getConfig(ServiceRequest request, String environment, String client, String appName) {
+		LOG.info("Started fetching configuration from Config-api ");
 		Map<String, Object> retval = new HashMap<>();
 		String configApiUrl = System.getProperty("configApiUrl");
 		if (configApiUrl == null) {
@@ -44,17 +45,20 @@ public class ConfigAPIUtil {
 		URI uri = null;
 		try {
 			uri = new URI(builder.toUriString());
+			LOG.info("Config-api URL builded successfully");
 		} catch (URISyntaxException e1) {
 		LOG.error ("Error while fetching configuration from Config-api ", e1);
 		}
 		String url = uri.toString();
 		CachedResult result = CACHE.get(url);
 		if (result != null && !result.isOld()) {
+			LOG.info("Fetching configuration of config-api from CACHE");
 			retval.putAll(result.getVariables());
 		} else {
 			try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
 				HttpGet get = new HttpGet(url);
 				get.addHeader(AUTH_HEADER, BEARER_PREFIX + token);
+				LOG.info("Fetching configuration of config-api from SERVER");
 				HttpResponse response = httpclient.execute(get);
 				if (response.getStatusLine().getStatusCode() == 200) {
 					JsonNode data = new ObjectMapper().readTree(response.getEntity().getContent());
