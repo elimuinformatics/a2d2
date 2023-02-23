@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -27,6 +28,7 @@ public class ConfigAPIUtil {
 
 	private static final String AUTH_HEADER = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
+	private static final int CONFIG_GET_TIMEOUT = Integer.valueOf(System.getProperty("configApiConnectTimeout", "10000"));
 	
 	private final static Map<String, CachedResult> CACHE = new HashMap<>();
 	
@@ -55,7 +57,11 @@ public class ConfigAPIUtil {
 			LOG.info("Fetching configuration of config-api from CACHE");
 			retval.putAll(result.getVariables());
 		} else {
-			try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			RequestConfig config = RequestConfig.custom()
+					.setConnectTimeout(CONFIG_GET_TIMEOUT)
+					.setConnectionRequestTimeout(CONFIG_GET_TIMEOUT)
+					.setSocketTimeout(CONFIG_GET_TIMEOUT).build();
+			try (CloseableHttpClient httpclient = HttpClientBuilder.create().setDefaultRequestConfig(config).build()) {
 				HttpGet get = new HttpGet(url);
 				get.addHeader(AUTH_HEADER, BEARER_PREFIX + token);
 				LOG.info("Fetching configuration of config-api from SERVER");
