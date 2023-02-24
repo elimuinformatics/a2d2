@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --tag a2d2-build:latest
+      run: docker build . --tag elimuinformatics/a2d2:latest
    
     - name: Login to Docker Hub
       with:
@@ -21,5 +21,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Publish the Docker image
-      run: docker push . --tag a2d2-build:latest
+      run: docker push . --tag elimuinformatics/a2d2:latest
       
