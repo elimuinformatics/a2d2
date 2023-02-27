@@ -7,25 +7,22 @@ on:
     branches:
       - main
       
-jobs:
-         
+jobs:        
   build-login-publish:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-
     steps:
     
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
    
-    - name: Login to Docker Hub
-      with:
+      - name: Login to Docker Hub
+        with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-    - name: building docker image
-      run: docker build -t elimuinformatics/a2d2:${GITHUB_REF##*/} -t elimuinformatics/a2d2:latest .
+      - name: building docker image
+        run: docker build -t elimuinformatics/a2d2:${GITHUB_REF##*/} -t elimuinformatics/a2d2:latest .
 
-    - name: Publish the Docker image
-      run: docker push . --tag elimuinformatics/a2d2:${GITHUB_REF##*/} --tag elimuinformatics/a2d2:latest
-      
+      - name: Publish the Docker image
+        run: docker push . --tag elimuinformatics/a2d2:${GITHUB_REF##*/} --tag elimuinformatics/a2d2:latest
