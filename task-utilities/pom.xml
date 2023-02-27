@@ -21,14 +21,15 @@
 		<protobuf-java.version>3.21.8</protobuf-java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<plexus-utils.version>3.5.0</plexus-utils.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-    			<groupId>org.codehaus.plexus</groupId>
-    			<artifactId>plexus-utils</artifactId>
-    			<version>3.5.0</version>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-utils</artifactId>
+				<version>${plexus-utils.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
