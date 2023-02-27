@@ -22,8 +22,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      - name: building docker image
-        run: docker build -t elimuinformatics/a2d2:${GITHUB_REF##*/} -t elimuinformatics/a2d2:latest .
-
-      - name: Publish the Docker image
-        run: docker push . --tag elimuinformatics/a2d2:${GITHUB_REF##*/} --tag elimuinformatics/a2d2:latest
+      - name: build image
+        run: docker build -t elimuinformatics/a2d2:latest .
+      
+      - name: tag image with commit id
+        run: docker image tag elimuinformatics/a2d2:latest elimuinformatics/a2d2:${GITHUB_REF##*/} 
+        
+      - name: push latest
+        run: docker push elimuinformatics/a2d2:latest
+      
+      - name: push with Version id
+        run: docker push elimuinformatics/a2d2:${GITHUB_REF##*/}
