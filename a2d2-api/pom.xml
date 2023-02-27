@@ -58,7 +58,8 @@
 		<cloudwatchlogbackappender.version>2.1</cloudwatchlogbackappender.version>
 		<mysql-connector-java.version>8.0.29</mysql-connector-java.version>	
 		<snakeyaml.version>1.33</snakeyaml.version>
-		<xstream.version>1.4.20</xstream.version>		
+		<xstream.version>1.4.20</xstream.version>
+		<plexus-utils.version>3.5.0</plexus-utils.version>		
 	</properties>
 
 	<dependencyManagement>
@@ -96,7 +97,7 @@
 			<dependency>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-utils</artifactId>
-				<version>3.4.1</version>
+				<version>${plexus-utils.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.sisu</groupId>

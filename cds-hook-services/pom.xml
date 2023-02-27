@@ -27,6 +27,7 @@
 
 	<properties>
 		<ant.version>1.10.11</ant.version>
+		<plexus-utils.version>3.5.0</plexus-utils.version>
 	</properties>
 
 	<dependencyManagement>
@@ -349,6 +350,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+    		<groupId>org.codehaus.plexus</groupId>
+    		<artifactId>plexus-utils</artifactId>
+    		<version>${plexus-utils.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>${snakeyaml.version}</version>
@@ -428,6 +434,10 @@
 				<exclusion>
 					<groupId>org.yaml</groupId>
 					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-utils</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
