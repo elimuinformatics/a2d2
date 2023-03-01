@@ -5,7 +5,7 @@ on:
     tags:
       - '*'
     branches:
-      - main
+      - Publish-docker-image-using-github-actions
       
 jobs:        
   build-login-publish:
@@ -25,11 +25,11 @@ jobs:
       - name: build image
         run: docker build -t elimuinformatics/a2d2:latest .
         
-      - name: tag image with version id
-        run: docker image tag elimuinformatics/a2d2:latest elimuinformatics/a2d2:${GITHUB_REF##*/}
-        
       - name: push latest
         run: docker push elimuinformatics/a2d2:latest
+        
+      - name: tag image with version id
+        run: docker image tag elimuinformatics/a2d2:latest elimuinformatics/a2d2:${GITHUB_REF##*/}
       
       - name: push with Version id
         run: docker push elimuinformatics/a2d2:${GITHUB_REF##*/}
