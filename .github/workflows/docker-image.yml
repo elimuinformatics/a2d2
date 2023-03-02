@@ -5,7 +5,7 @@ on:
     tags:
       - '*'
     branches:
-      - Publish-docker-image-using-github-actions
+      - main
       
 jobs:        
   build-login-publish:
