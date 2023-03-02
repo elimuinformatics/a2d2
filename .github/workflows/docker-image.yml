@@ -28,5 +28,8 @@ jobs:
       - name: tag image with version id
         run: docker image tag elimuinformatics/a2d2:latest elimuinformatics/a2d2:${GITHUB_REF##*/}
       
+      - name: push latest image
+        run: docker push elimuinformatics/a2d2:latest
+
       - name: push image with Version id
         run: docker push elimuinformatics/a2d2:${GITHUB_REF##*/}
