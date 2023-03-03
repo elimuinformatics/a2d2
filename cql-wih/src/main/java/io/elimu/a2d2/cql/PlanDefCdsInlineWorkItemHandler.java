@@ -163,6 +163,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		String fhirTerminologyServerUrl = (String) workItem.getParameter("fhirTerminologyServerUrl");
 		String planDefId = (String) workItem.getParameter("planDefinitionId");
 		String planDefUrl = (String) workItem.getParameter("planDefinitionUrl");
+		String planDefJson = (String) workItem.getParameter("planDefinitionJson");
 		String patientId = (String) workItem.getParameter("patientId");
 		String encounterId = (String) workItem.getParameter("encounterId");
 		String practitionerId = (String) workItem.getParameter("practitionerId");
@@ -190,8 +191,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			missingItems.add("patientId");
 		}
 		//validate required planDefinitionId or planDefinitionUrl
-		if (isEmpty(planDefId) && isEmpty(planDefUrl)) {
-			missingItems.add("planDefinitionId|planDefinitionUrl");
+		if (isEmpty(planDefId) && isEmpty(planDefUrl) && isEmpty(planDefJson)) {
+			missingItems.add("planDefinitionId|planDefinitionUrl|planDefinitionJson");
 		}
 		if (!missingItems.isEmpty()) {
 			throw new WorkItemHandlerException("Missing items: " + missingItems);
@@ -230,41 +231,51 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				pdProcessor = CACHED_PROCESSORS.get(planDefUrl).getValue();
 				LOG.debug("Processor already cached by planDefUrl key " + key);
 			} else {
-				LOG.debug("Creating PlanDefinitionProcessor...");
-				//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth, patientHeaderData); 
-				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth, terminologyHeaderData);
-				if (planDefId != null) {
-					LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
-					key = planDefId;
-					planDefinition = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
-					if (planDefinition == null) {
-						throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
-					}
+				if (!isEmpty(planDefJson)) {
+					Object parser = this.ctx.getClass().getMethod("newJsonParser").invoke(this.ctx);
+					Class<?> parserClass = cl.loadClass("ca.uhn.fhir.parser.IParser");
+					Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
+					planDefinition = parserClass.getMethod("parseResource",  Class.class, String.class).invoke(parser, planDefClass, planDefJson);
+					Object idObj = planDefClass.getMethod("getIdElement").invoke(planDefinition);
+					key = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
 					CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
-					String url = (String) planDefinition.getClass().getMethod("getUrl").invoke(planDefinition);
-					if (url != null) {
-						CACHED_PLANDEFS.put(url, new TimeObject<>(planDefinition));
-					}
-					LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId + " successful");
 				} else {
-					LOG.debug("Fetching PlanDefinition by URL: " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
-					key = planDefUrl;
-					Object bundle = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
-					Object firstRep = bundle.getClass().getMethod("getEntryFirstRep").invoke(bundle);
-					boolean hasRes = (boolean) firstRep.getClass().getMethod("hasResource").invoke(firstRep);
-					if (!hasRes) {
-						throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
+					LOG.debug("Creating PlanDefinitionProcessor...");
+					//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth, patientHeaderData); 
+					Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth, terminologyHeaderData);
+					if (planDefId != null) {
+						LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
+						key = planDefId;
+						planDefinition = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
+								invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
+						if (planDefinition == null) {
+							throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
+						}
+						CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
+						String url = (String) planDefinition.getClass().getMethod("getUrl").invoke(planDefinition);
+						if (url != null) {
+							CACHED_PLANDEFS.put(url, new TimeObject<>(planDefinition));
+						}
+						LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId + " successful");
+					} else {
+						LOG.debug("Fetching PlanDefinition by URL: " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
+						key = planDefUrl;
+						Object bundle = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
+								invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
+						Object firstRep = bundle.getClass().getMethod("getEntryFirstRep").invoke(bundle);
+						boolean hasRes = (boolean) firstRep.getClass().getMethod("hasResource").invoke(firstRep);
+						if (!hasRes) {
+							throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
+						}
+						planDefinition = firstRep.getClass().getMethod("getResource").invoke(firstRep);
+						CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
+						Object idObj = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
+						String id = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
+						if (id != null) {
+							CACHED_PLANDEFS.put(id, new TimeObject<>(planDefinition));
+						}
+						LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
 					}
-					planDefinition = firstRep.getClass().getMethod("getResource").invoke(firstRep);
-					CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
-					Object idObj = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
-					String id = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
-					if (id != null) {
-						CACHED_PLANDEFS.put(id, new TimeObject<>(planDefinition));
-					}
-					LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
 				}
 				Object fdFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.dal.FhirRestFhirDalFactory").getConstructor(this.clientFactory.getClass()).newInstance(this.clientFactory);
 				List<String> headers = new ArrayList<>();
