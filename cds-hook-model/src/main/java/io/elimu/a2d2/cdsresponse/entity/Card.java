@@ -18,10 +18,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.simple.JSONObject;
+
 public class Card implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private String uuid;
 	private String summary;
 	private String detail;
 	private String indicator;
@@ -30,7 +33,16 @@ public class Card implements Serializable {
 	private Object source;
 	private Object decisions;
 	private String selectionBehavior;
+	private List<JSONObject> overrideReasons;
 
+	public String getUuid() {
+		return uuid;
+	}
+	
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	
 	public String getSummary() {
 		return summary;
 	}
@@ -107,5 +119,13 @@ public class Card implements Serializable {
 	
 	public String getSelectionBehavior() {
 		return selectionBehavior;
+	}
+	
+	public List<JSONObject> getOverrideReasons() {
+		return overrideReasons;
+	}
+	
+	public void setOverrideReasons(List<JSONObject> overrideReasons) {
+		this.overrideReasons = overrideReasons;
 	}
 }
