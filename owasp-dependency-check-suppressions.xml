@@ -190,4 +190,11 @@
       <packageUrl regex="true">^pkg:maven/org\.jboss\.resteasy/resteasy\-core@.*$</packageUrl>
       <vulnerabilityName>CVE-2023-0482</vulnerabilityName>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: json-20220924.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
+      <cve>CVE-2022-45688</cve>
+   </suppress>
 </suppressions>
