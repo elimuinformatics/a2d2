@@ -778,18 +778,21 @@ public class DecoratedPlanDefinitionProcessor {
 			}
 		}
 		Map<String, Object> allresults = evaluatedCqlResults.get();
-		if (allresults.containsKey(libraryToBeEvaluated)) {
-			Object value = allresults.get(libraryToBeEvaluated);
-			if (!allresults.containsKey(libraryToBeEvaluated + "_multiple")) {
+		Object idTypeObj = cl.loadClass("org.hl7.fhir.r4.model.IdType").getConstructor(String.class).newInstance(libraryToBeEvaluated);
+		String libName = (String) idTypeObj.getClass().getMethod("getIdPart").invoke(idTypeObj);
+		if (allresults.containsKey(libName)) {
+			Object value = allresults.get(libName);
+			if (!allresults.containsKey(libName + "_multiple")) {
 				List<Object> list = new ArrayList<>();
 				list.add(result);
-				allresults.put(libraryToBeEvaluated + "_multiple", true);
+				allresults.put(libName, list);
+				allresults.put(libName + "_multiple", true);
 			} else {
 				List<Object> list = (List<Object>) value;
 				list.add(result);
 			}
 		} else {
-			allresults.put(libraryToBeEvaluated, result);
+			allresults.put(libName, result);
 		}
 		return result;
 	}
