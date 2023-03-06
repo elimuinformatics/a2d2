@@ -150,7 +150,9 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				params.put("serviceRequest", request);
 				params.put("serviceResponse", defaultResponse());
 				params.put("defaultCustomer", getDefaultCustomer());
-				params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, getClient(request), getDependency(), getConfig()));
+                                String providedClient = getClient(request);
+                                params.put("configApiClient", providedClient);
+                                params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {
@@ -187,7 +189,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 	}
 	
 	private String getClient(ServiceRequest request) {
-		String auth = request.getHeader("Authorization");
+		String auth = request.getHeader("authorization");
 		if (auth == null) {
 			if ("*".equals(getDefaultCustomer())) {
 				return "default";

@@ -34,7 +34,6 @@
             </repositories>
         </profile>
     </profiles>
-
     <servers>
         <server>
             <id>nexus-repo</id>
@@ -52,7 +51,6 @@
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
     </servers>
-
     <activeProfiles>
       <activeProfile>default</activeProfile>
     </activeProfiles>

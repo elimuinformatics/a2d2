@@ -23,8 +23,10 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.client.api.IRestfulClientFactory;
+import io.elimu.a2d2.cds.fhir.helper.FetchCallRetry;
 import io.elimu.a2d2.cds.fhir.helper.FhirClientWrapper;
 import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
+import io.elimu.a2d2.cds.fhir.helper.QueryBuilder;
 import io.elimu.a2d2.cds.fhir.helper.QueryingCallback;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelperBase;
 
@@ -53,6 +55,11 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 
 	/**
 	 * @deprecated (in favor of queryResourcesResponse)
+	 * @param resourceType the FHIR resource type to find
+	 * @param subjectId the main parameter value to search by 
+	 * @param subjectRefAttribute the main parameter name to search by
+	 * @param fhirQuery any extra parameters needed
+	 * @return a list of resources matching the search conditions
 	 */
 	@Deprecated
 	public List<IBaseResource> queryResources(String resourceType, String subjectId, String subjectRefAttribute,
@@ -62,6 +69,9 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 
 	/**
 	 * @deprecated (in favor of getResourceByIdResponse)
+	 * @param resourceType the FHIR resource type to find
+	 * @param resourceId the FHIR id of the resource to be searched
+	 * @return the IBaseResource instance of the fetch content, or null
 	 */
 	@Deprecated
 	public IBaseResource getResourceById(String resourceType, String resourceId) {
@@ -96,7 +106,7 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 	}
 	
 	@Override
-	public FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, boolean paging) {
+	public FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, QueryBuilder builder) {
 		FhirClientWrapper client = clients.next();
 		FhirResponse<List<IBaseResource>> resourceBundle = null;
 		log.debug("Fetching {} resources using client for version {} ", client.getFhirContext().getVersion().getVersion().name(),
@@ -105,13 +115,13 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 			@Override
 			public List<IBaseResource> execute(FhirClientWrapper client) {
 				log.debug("Invoking url {}", resourceQuery);
-				Bundle bundle = client.fetchResourceFromUrl(Bundle.class, resourceQuery);
+				Bundle bundle = new FetchCallRetry<Bundle>(builder, b -> client.fetchResourceFromUrl(Bundle.class, resourceQuery)).retryRestCall(client);
 				List<IBaseResource> retval = new LinkedList<>();
 				bundle.getEntry().forEach(e -> retval.add((IBaseResource) e.getResource()));
-				while (paging && bundle.getLink("next") != null) {
+				while (builder.hasPaging() && bundle.getLink("next") != null) {
 					final String url = bundle.getLink("next").getUrl();
 					log.debug("Invoking url {}", url);
-					bundle = client.fetchResourceFromUrl(Bundle.class, url);
+					bundle = new FetchCallRetry<Bundle>(builder, b -> client.fetchResourceFromUrl(Bundle.class, url)).retryRestCall(client);
 					bundle.getEntry().forEach(e -> retval.add((IBaseResource) e.getResource()));
 				}
 				return retval;

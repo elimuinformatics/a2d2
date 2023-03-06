@@ -57,7 +57,9 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 		});
 
 		http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				.addFilter(filter).authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
+				.addFilter(filter).addFilter(new JWTAuthFilter("/services/")).authorizeRequests()
+				.antMatchers(HttpMethod.OPTIONS).permitAll()
+				.antMatchers("/api/jwt/**").authenticated()
 				.antMatchers("/api/**").authenticated().anyRequest().permitAll();
 		
 	}

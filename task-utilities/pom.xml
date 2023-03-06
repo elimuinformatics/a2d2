@@ -16,9 +16,12 @@
 		<freemarker.version>2.3.30</freemarker.version>
 		<maven.version>3.8.4</maven.version>
 		<jsoup.version>1.15.3</jsoup.version>
-		<protobuf-java.version>3.19.6</protobuf-java.version>
+		<commons-text.version>1.10.0</commons-text.version>
+		<jdk.version>11</jdk.version>
+		<protobuf-java.version>3.21.8</protobuf-java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<plexus-utils.version>3.5.0</plexus-utils.version>
 	</properties>
 
 	<dependencyManagement>
@@ -77,6 +80,11 @@
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>${plexus-utils.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.3.3</version>
@@ -109,14 +117,6 @@
 					<artifactId>maven-aether-provider</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-core</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.freemarker</groupId>
 					<artifactId>freemarker</artifactId>
 				</exclusion>
@@ -143,6 +143,10 @@
 				<exclusion>
 					<groupId>com.google.protobuf</groupId>
 					<artifactId>protobuf-java</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-utils</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -196,7 +200,17 @@
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
+		    <scope>test</scope>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
@@ -222,8 +236,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>

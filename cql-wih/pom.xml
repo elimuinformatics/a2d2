@@ -32,9 +32,8 @@
 
 	<properties>
 		<mixpanel.version>1.4.4</mixpanel.version>
-		<org.json.version>20211205</org.json.version>
-		<sping-web.version>5.3.19</sping-web.version>
-		<jackson-databind.version>2.13.4</jackson-databind.version>
+		<org.json.version>20220924</org.json.version>
+		<jackson-databind.version>2.13.5</jackson-databind.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
@@ -49,10 +48,6 @@
 			<artifactId>evaluator.plandefinition</artifactId>
 			<version>1.4.4</version>
 			<exclusions>
-        			<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>jcl-over-slf4j</artifactId>
@@ -69,6 +64,10 @@
 					<groupId>org.antlr</groupId>
 					<artifactId>antlr4-runtime</artifactId>
 				</exclusion>
+        			<exclusion>
+        				<groupId>ca.uhn.hapi.fhir</groupId>
+        				<artifactId>org.hl7.fhir.r5</artifactId>
+        			</exclusion>
 			</exclusions>
 			<scope>test</scope>
 		</dependency>
@@ -154,11 +153,17 @@
 			<version>5.5.7</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
 				</exclusion>
 			</exclusions>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
+		    <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
@@ -176,12 +181,6 @@
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.r4</artifactId>
 			<version>5.5.7</version>
-			<exclusions>
-        			<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
-			</exclusions>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -209,10 +208,6 @@
 			<artifactId>engine</artifactId>
 			<version>1.5.7</version>
 			<exclusions>
-        			<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>jakarta.activation</groupId>
 					<artifactId>jakarta.activation-api</artifactId>
@@ -283,10 +278,6 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>
 			<exclusions>
-        			<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>commons-codec</groupId>
     					<artifactId>commons-codec</artifactId>

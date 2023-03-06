@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.elimu.genericapi.service.GenericKieBasedService;
+import io.elimu.genericapi.service.GenericService;
 import io.elimu.genericapi.service.RunningServices;
 
 public class RuntimeManagerHelper {
@@ -30,10 +31,15 @@ public class RuntimeManagerHelper {
 	
 	public static RuntimeManager findRuntimeManagerByProcessId(String processId) {
 		for (String serviceName : RunningServices.getInstance().serviceNames()) {
-			GenericKieBasedService service = (GenericKieBasedService) RunningServices.getInstance().get(serviceName);
-			for (org.kie.api.definition.process.Process p : service.getKieBase().getProcesses()) {
-				if (p.getId().equalsIgnoreCase(processId)) {
-					return RuntimeManagerRegistry.get().getManager(service.getId());
+			GenericService _service = RunningServices.getInstance().get(serviceName);
+			if (_service instanceof GenericKieBasedService) {
+				GenericKieBasedService service = (GenericKieBasedService) _service;
+				if (service.getKieBase() != null && service.getKieBase().getProcesses() != null) {
+					for (org.kie.api.definition.process.Process p : service.getKieBase().getProcesses()) {
+						if (p.getId().equalsIgnoreCase(processId)) {
+							return RuntimeManagerRegistry.get().getManager(service.getId());
+						}
+					}
 				}
 			}
 		}

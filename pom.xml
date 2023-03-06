@@ -8,23 +8,22 @@
 
 	<properties>
 		<base.version>0.0.9-SNAPSHOT</base.version>
-		<jdk.version>1.8</jdk.version>
-		<kie.version>7.71.0.Final</kie.version>
-		<wb.kie.version>7.71.0.Final</wb.kie.version>
+		<jdk.version>11</jdk.version>
+		<kie.version>7.73.0.Final</kie.version>
+		<wb.kie.version>7.73.0.Final</wb.kie.version>
 		<junit.version>4.13.2</junit.version>
 		<hapi.fhir.version>5.6.0</hapi.fhir.version>
 		<hapi.fhir.utilities.version>5.5.7</hapi.fhir.utilities.version>
 		<json-simple.version>1.1.1</json-simple.version>
-		<h2.version>2.1.210</h2.version>
 		<hibernate.version>5.4.24.Final</hibernate.version>
-		<spring.boot.starter.version>2.7.4</spring.boot.starter.version>
-		<spring.version>5.3.23</spring.version>
-		<jackson.version.databind>2.13.4</jackson.version.databind>
-		<jackson.version>2.12.6</jackson.version>
-		<protobuf-java.version>3.19.6</protobuf-java.version>
+		<spring.boot.starter.version>2.7.7</spring.boot.starter.version>
+		<spring.version>5.3.24</spring.version>
+		<jackson.version.databind>2.13.5</jackson.version.databind>
+		<jackson.version>2.13.5</jackson.version>
+		<protobuf-java.version>3.21.8</protobuf-java.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
-		<cds.helper.version>0.0.13</cds.helper.version>
+		<cds.helper.version>0.0.14</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
 		<jacoco.version>0.8.7</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
@@ -34,17 +33,21 @@
 		<httpcore.version>4.4.13</httpcore.version>
 		<gson.version>2.8.9</gson.version>
 		<maven.version>3.8.4</maven.version>
-		<log4j.version>2.17.1</log4j.version>
-		<junit-platform-commons.version>1.8.1</junit-platform-commons.version>
+		<sshd-common.version>2.9.2</sshd-common.version>
+		<log4j.version>2.17.2</log4j.version>
+		<junit-platform-commons.version>1.8.2</junit-platform-commons.version>
 		<apiguardian.version>1.1.2</apiguardian.version>
-		<netty.version>4.1.77.Final</netty.version>
+		<netty.version>4.1.86.Final</netty.version>
 		<mixpanel.version>1.4.4</mixpanel.version>
-		<org.json.version>20211205</org.json.version>
+		<wildfly-elytron.version>2.0.0.Final</wildfly-elytron.version>
+		<org.json.version>20220924</org.json.version>
+		<commons-text.version>1.10.0</commons-text.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<kotlin-stdlib.version>1.6.20</kotlin-stdlib.version>
 		<okio.version>3.1.0</okio.version>
 		<okhttp.version>4.9.3</okhttp.version>
+		<snakeyaml.version>1.33</snakeyaml.version>
 	</properties>
 
 	<modules>
@@ -122,7 +125,7 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.32</version>
+				<version>1.7.36</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
@@ -402,11 +405,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>${h2.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>ca.uhn.hapi.fhir</groupId>
 				<artifactId>hapi-fhir-structures-dstu2</artifactId>
 				<version>${hapi.fhir.version}</version>
@@ -499,7 +497,7 @@
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<version>1.4.19</version>
+				<version>1.4.20</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -509,7 +507,7 @@
 			<dependency>
 				<groupId>org.jboss.logging</groupId>
 				<artifactId>jboss-logging</artifactId>
-				<version>3.4.1.Final</version>
+				<version>3.5.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
@@ -632,7 +630,7 @@
 			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>7.2.1</version>
+				<version>8.1.1</version>
 				<configuration>
 					<skipProvidedScope>true</skipProvidedScope>
 					<skipRuntimeScope>true</skipRuntimeScope>

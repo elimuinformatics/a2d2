@@ -25,7 +25,7 @@
 	</parent>
 
 	<artifactId>fhir-query-helper-dstu2</artifactId>
-	<version>0.0.13</version>
+	<version>0.0.14</version>
 	<packaging>jar</packaging>
 	<description>CDS Helper</description>
 
@@ -38,6 +38,17 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu2</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -63,8 +74,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>
 		</plugins>

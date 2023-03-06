@@ -1,15 +1,19 @@
 package io.elimu.serviceapi.config;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,10 +28,12 @@ public class ConfigAPIUtil {
 
 	private static final String AUTH_HEADER = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
+	private static final int CONFIG_GET_TIMEOUT = Integer.valueOf(System.getProperty("configApiConnectTimeout", "10000"));
 	
 	private final static Map<String, CachedResult> CACHE = new HashMap<>();
 	
 	public Map<String, Object> getConfig(ServiceRequest request, String environment, String client, String appName) {
+		LOG.info("Started fetching configuration from Config-api ");
 		Map<String, Object> retval = new HashMap<>();
 		String configApiUrl = System.getProperty("configApiUrl");
 		if (configApiUrl == null) {
@@ -37,14 +43,28 @@ public class ConfigAPIUtil {
 		if (token == null) {
 			return retval;
 		}
-		String url = configApiUrl + "/" + client + "/" + environment + "/" + appName;
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(configApiUrl).pathSegment(client, environment,appName);
+		URI uri = null;
+		try {
+			uri = new URI(builder.toUriString());
+			LOG.info("Config-api URL builded successfully");
+		} catch (URISyntaxException e1) {
+		LOG.error ("Error while fetching configuration from Config-api ", e1);
+		}
+		String url = uri.toString();
 		CachedResult result = CACHE.get(url);
 		if (result != null && !result.isOld()) {
+			LOG.info("Fetching configuration of config-api from CACHE");
 			retval.putAll(result.getVariables());
 		} else {
-			try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			RequestConfig config = RequestConfig.custom()
+					.setConnectTimeout(CONFIG_GET_TIMEOUT)
+					.setConnectionRequestTimeout(CONFIG_GET_TIMEOUT)
+					.setSocketTimeout(CONFIG_GET_TIMEOUT).build();
+			try (CloseableHttpClient httpclient = HttpClientBuilder.create().setDefaultRequestConfig(config).build()) {
 				HttpGet get = new HttpGet(url);
 				get.addHeader(AUTH_HEADER, BEARER_PREFIX + token);
+				LOG.info("Fetching configuration of config-api from SERVER");
 				HttpResponse response = httpclient.execute(get);
 				if (response.getStatusLine().getStatusCode() == 200) {
 					JsonNode data = new ObjectMapper().readTree(response.getEntity().getContent());

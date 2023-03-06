@@ -26,7 +26,7 @@
 	</parent>
 
 	<artifactId>fhir-query-helper-r4</artifactId>
-	<version>0.0.13</version>
+	<version>0.0.14</version>
 	<packaging>jar</packaging>
 	<description>CDS Helper R4</description>
 
@@ -44,7 +44,16 @@
 					<groupId>com.squareup.okhttp3</groupId>
 					<artifactId>okhttp</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

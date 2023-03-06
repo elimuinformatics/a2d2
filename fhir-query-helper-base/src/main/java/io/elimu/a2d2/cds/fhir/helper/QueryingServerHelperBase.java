@@ -429,7 +429,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			if (!avoidCache.get().booleanValue() && cacheService!= null && cacheService.containsKey(cacheKey)) {
 				retval = (FhirResponse<IBaseResource>) cacheService.get(cacheKey).getValue();
 			} else {
-				retval = getResourceList(resourceType, resourceQuery, usePath, true);
+				retval = getResourceList(resourceType, resourceQuery, usePath, new QueryBuilder().paging(true));
 				if(!avoidCache.get().booleanValue() && cacheService!= null && CacheUtil.isValidState(retval.getResponseStatusCode())) {
 					cacheService.put(cacheKey, new ResponseEvent<>(retval, RESPONSE_EVENT_TIMEOUT));
 				}
@@ -443,7 +443,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		return new FhirResponse<>(null, -1, "not invoked");
 	}
 	
-	private FhirResponse<IBaseResource> getResourceList(String resourceType, String resourceQuery, boolean usePath, boolean paging) {
+	private FhirResponse<IBaseResource> getResourceList(String resourceType, String resourceQuery, boolean usePath, QueryBuilder qb) {
 		FhirResponse<List<IBaseResource>> resourceList = null;
 		if (ctx.getVersion().getVersion().equals(this.fhirVersionEnum)) {
 			if (usePath) {
@@ -451,7 +451,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 				List<IBaseResource> result = resp == null || resp.getResult() == null ? null : Arrays.asList(resp.getResult());
 				resourceList = new FhirResponse<List<IBaseResource>>(result, resp.getResponseStatusCode(), resp.getResponseStatusInfo());
 			} else {
-				resourceList = queryServer(resourceQuery, paging);
+				resourceList = queryServer(resourceQuery, qb);
 			}
 		}
 		if(resourceList != null) {
@@ -467,7 +467,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		}
 	}
 
-	protected FhirResponse<List<IBaseResource>> getRetVal(String resourceQuery, FhirVersionEnum fhirVersion, boolean paging) {
+	protected FhirResponse<List<IBaseResource>> getRetVal(String resourceQuery, FhirVersionEnum fhirVersion, QueryBuilder qb) {
 		FhirResponse<List<IBaseResource>> retval = null;
 		String cacheKey = CacheUtil.getCacheKey(resourceQuery, interceptors);
 
@@ -475,7 +475,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			retval = (FhirResponse<List<IBaseResource>>) cacheService.get(cacheKey).getValue();
 		} else {
 			if (ctx.getVersion().getVersion().equals(fhirVersion)) {
-				retval = queryServer(resourceQuery, paging);
+				retval = queryServer(resourceQuery, qb);
 			}
 			if (!avoidCache.get().booleanValue() && cacheService != null && retval != null
 					&& CacheUtil.isValidState(retval.getResponseStatusCode())) {
@@ -494,7 +494,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	 * @param subjectId the value of the main parameter to be used for filtering in the query
 	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
 	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
-	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&amp;{fhirQuery}
 	 */
 	public FhirResponse<List<IBaseResource>> queryResourcesResponseNoCache(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery) {
@@ -514,14 +514,14 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 	 * @param subjectId the value of the main parameter to be used for filtering in the query
 	 * @param subjectRefAttribute the name of the main parameter to be used for filtering in the query
 	 * @param fhirQuery if more parameters are needed to filter, they are added here in the structure of an HTTP query
-	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&{fhirQuery}
+	 * @return the list of objects that is a result of invoking HTTP GET {baseurl}/{resourceType}?{subjectRefAttribute}={subjectId}&amp;{fhirQuery}
 	 */
 	public FhirResponse<List<IBaseResource>> queryResourcesResponse(String resourceType, String subjectId,
 			String subjectRefAttribute, String fhirQuery) {
 		try {
 			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "queryResources");
 			String resourceQuery = this.getResourceQuery(resourceType, subjectId, subjectRefAttribute, fhirQuery);
-			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum, true);
+			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum, new QueryBuilder().paging(true));
 		} catch (Exception e) {
 			log.error( ERROR_MSG + e.getMessage() + ". [" + e.getClass().getName() + "]");
 		} finally {
@@ -544,7 +544,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			}
 			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "queryResources");
 			String resourceQuery = builder.buildQuery(fhirUrl);
-			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum, builder.hasPaging());
+			return (resourceQuery == null) ? null : getRetVal(resourceQuery, this.fhirVersionEnum, builder);
 		} catch (Exception e) {
 			log.error( ERROR_MSG + e.getMessage() + ". [" + e.getClass().getName() + "]");
 		} finally {
@@ -625,7 +625,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		factory.setServerValidationMode(ServerValidationModeEnum.NEVER);
 	}
 
-	public abstract FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, boolean paging);
+	public abstract FhirResponse<List<IBaseResource>> queryServer(String resourceQuery, QueryBuilder builder);
 
 	public abstract FhirResponse<IBaseResource> fetchServer(final String resourceType, String resourceQuery);
 	
