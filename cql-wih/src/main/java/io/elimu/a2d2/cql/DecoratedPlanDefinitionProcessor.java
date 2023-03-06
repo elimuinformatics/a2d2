@@ -277,10 +277,12 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			Object prefix = result.getClass().getMethod("getTitle").invoke(result);
+			Object desc = result.getClass().getMethod("getDescription").invoke(result);
 			if (prefix == null) {
-				prefix = result.getClass().getMethod("getDescription").invoke(result);
+				prefix = desc;
 			}
 			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
+			rgAction.getClass().getMethod("setDescription", String.class).invoke(rgAction, desc);
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
 			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
 		} catch (Exception e) {
@@ -547,11 +549,21 @@ public class DecoratedPlanDefinitionProcessor {
 				}
 			}
 			boolean hasDocumentation = (boolean) action.getClass().getMethod("hasDocumentation").invoke(action);
+			Object publisher = session.planDefinition.getClass().getMethod("getPublisher").invoke(session.planDefinition);
 			if (hasDocumentation) {
 				Class<?> relArtClass = cl.loadClass("org.hl7.fhir.r4.model.RelatedArtifact");
 				Object docFirstRep = action.getClass().getMethod("getDocumentationFirstRep").invoke(action);
+				Object label = docFirstRep.getClass().getMethod("getLabel").invoke(docFirstRep);
+				if (label == null) {
+					label = publisher;
+					docFirstRep.getClass().getMethod("setLabel", String.class).invoke(docFirstRep, label);
+				}
 				act.getClass().getMethod("addDocumentation", relArtClass).invoke(act, docFirstRep);
+			} else if (publisher != null) {
+				Object doc = act.getClass().getMethod("addDocumentation").invoke(act);
+				doc.getClass().getMethod("setLabel", String.class).invoke(doc, publisher);
 			}
+			
 			boolean hasSelectionBehavior = (boolean) action.getClass().getMethod("hasSelectionBehavior").invoke(action);
 			if (hasSelectionBehavior) {
 				Class<?> asbClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition$ActionSelectionBehavior");
