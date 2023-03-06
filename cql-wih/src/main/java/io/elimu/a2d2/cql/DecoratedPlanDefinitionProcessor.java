@@ -31,6 +31,12 @@ public class DecoratedPlanDefinitionProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DecoratedPlanDefinitionProcessor.class);
 	private static final String alternateExpressionExtension = "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression";
 
+	private ThreadLocal<Map<String, Object>> evaluatedCqlResults = new ThreadLocal<>() {
+		protected Map<String, Object> initialValue() {
+			return new HashMap<>();
+		}
+	};
+	
 	public DecoratedPlanDefinitionProcessor(Object fhirContext, Object fhirDal, Object libraryProcessor, Object expressionEvaluator,
 			Object activityDefinitionProcessor, Object operationParametersParser) throws ReflectiveOperationException {
 		requireNonNull(fhirContext, "fhirContext can not be null");
@@ -63,6 +69,7 @@ public class DecoratedPlanDefinitionProcessor {
 
 		// warn if prefetchData exists
 		// if no data anywhere blow up
+		evaluatedCqlResults.get().clear();
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> idTypeClass = cl.loadClass("org.hl7.fhir.instance.model.api.IIdType");
 		Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
@@ -124,6 +131,10 @@ public class DecoratedPlanDefinitionProcessor {
 	    return cl.loadClass("org.opencds.cqf.cql.evaluator.fhir.helper.ContainedHelper").getMethod("liftContainedResourcesToParent", drClass).invoke(null, resolveActions(session));
 	}
 
+	public Map<String, Object> getEvaluatedCqlResults() {
+		return new HashMap<>(evaluatedCqlResults.get());
+	}
+	
 	private Object convertGoal(Object goal) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> goalClass = cl.loadClass("org.hl7.fhir.r4.model.Goal");
@@ -765,6 +776,20 @@ public class DecoratedPlanDefinitionProcessor {
 			if (paramsClass.isInstance(result)) {
 				result = getParameterComponentByName(result, expression);
 			}
+		}
+		Map<String, Object> allresults = evaluatedCqlResults.get();
+		if (allresults.containsKey(libraryToBeEvaluated)) {
+			Object value = allresults.get(libraryToBeEvaluated);
+			if (!allresults.containsKey(libraryToBeEvaluated + "_multiple")) {
+				List<Object> list = new ArrayList<>();
+				list.add(result);
+				allresults.put(libraryToBeEvaluated + "_multiple", true);
+			} else {
+				List<Object> list = (List<Object>) value;
+				list.add(result);
+			}
+		} else {
+			allresults.put(libraryToBeEvaluated, result);
 		}
 		return result;
 	}
