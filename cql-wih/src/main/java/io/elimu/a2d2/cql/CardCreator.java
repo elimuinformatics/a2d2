@@ -145,9 +145,13 @@ public class CardCreator {
                     // Assuming first related artifact has everything
                 	Object documentation = r4actionClass.getMethod("getDocumentationFirstRep").invoke(action);
                     boolean hasDisplay = (boolean) documentation.getClass().getMethod("hasDisplay").invoke(documentation);
+                    boolean hasLabel = (boolean) documentation.getClass().getMethod("hasLabel").invoke(documentation);
                     if (hasDisplay) {
                     	Object display = documentation.getClass().getMethod("getDisplay").invoke(documentation);
                     	source.put("label", display);
+                    } else if (hasLabel) {
+                    	Object label = documentation.getClass().getMethod("getLabel").invoke(documentation);
+                    	source.put("label", label);
                     }
                     boolean hasUrl = (boolean) documentation.getClass().getMethod("hasUrl").invoke(documentation);
                     if (hasUrl) {

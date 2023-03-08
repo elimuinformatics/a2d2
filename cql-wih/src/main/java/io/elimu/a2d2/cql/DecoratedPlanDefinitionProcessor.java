@@ -31,6 +31,12 @@ public class DecoratedPlanDefinitionProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DecoratedPlanDefinitionProcessor.class);
 	private static final String alternateExpressionExtension = "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression";
 
+	private ThreadLocal<Map<String, Object>> evaluatedCqlResults = new ThreadLocal<>() {
+		protected Map<String, Object> initialValue() {
+			return new HashMap<>();
+		}
+	};
+	
 	public DecoratedPlanDefinitionProcessor(Object fhirContext, Object fhirDal, Object libraryProcessor, Object expressionEvaluator,
 			Object activityDefinitionProcessor, Object operationParametersParser) throws ReflectiveOperationException {
 		requireNonNull(fhirContext, "fhirContext can not be null");
@@ -63,6 +69,7 @@ public class DecoratedPlanDefinitionProcessor {
 
 		// warn if prefetchData exists
 		// if no data anywhere blow up
+		evaluatedCqlResults.get().clear();
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> idTypeClass = cl.loadClass("org.hl7.fhir.instance.model.api.IIdType");
 		Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
@@ -124,6 +131,10 @@ public class DecoratedPlanDefinitionProcessor {
 	    return cl.loadClass("org.opencds.cqf.cql.evaluator.fhir.helper.ContainedHelper").getMethod("liftContainedResourcesToParent", drClass).invoke(null, resolveActions(session));
 	}
 
+	public Map<String, Object> getEvaluatedCqlResults() {
+		return new HashMap<>(evaluatedCqlResults.get());
+	}
+	
 	private Object convertGoal(Object goal) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> goalClass = cl.loadClass("org.hl7.fhir.r4.model.Goal");
@@ -266,10 +277,12 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			Object prefix = result.getClass().getMethod("getTitle").invoke(result);
+			Object desc = result.getClass().getMethod("getDescription").invoke(result);
 			if (prefix == null) {
-				prefix = result.getClass().getMethod("getDescription").invoke(result);
+				prefix = desc;
 			}
 			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
+			rgAction.getClass().getMethod("setDescription", String.class).invoke(rgAction, desc);
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
 			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
 		} catch (Exception e) {
@@ -536,11 +549,21 @@ public class DecoratedPlanDefinitionProcessor {
 				}
 			}
 			boolean hasDocumentation = (boolean) action.getClass().getMethod("hasDocumentation").invoke(action);
+			Object publisher = session.planDefinition.getClass().getMethod("getPublisher").invoke(session.planDefinition);
 			if (hasDocumentation) {
 				Class<?> relArtClass = cl.loadClass("org.hl7.fhir.r4.model.RelatedArtifact");
 				Object docFirstRep = action.getClass().getMethod("getDocumentationFirstRep").invoke(action);
+				Object label = docFirstRep.getClass().getMethod("getLabel").invoke(docFirstRep);
+				if (label == null) {
+					label = publisher;
+					docFirstRep.getClass().getMethod("setLabel", String.class).invoke(docFirstRep, label);
+				}
 				act.getClass().getMethod("addDocumentation", relArtClass).invoke(act, docFirstRep);
+			} else if (publisher != null) {
+				Object doc = act.getClass().getMethod("addDocumentation").invoke(act);
+				doc.getClass().getMethod("setLabel", String.class).invoke(doc, publisher);
 			}
+			
 			boolean hasSelectionBehavior = (boolean) action.getClass().getMethod("hasSelectionBehavior").invoke(action);
 			if (hasSelectionBehavior) {
 				Class<?> asbClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition$ActionSelectionBehavior");
@@ -765,6 +788,23 @@ public class DecoratedPlanDefinitionProcessor {
 			if (paramsClass.isInstance(result)) {
 				result = getParameterComponentByName(result, expression);
 			}
+		}
+		Map<String, Object> allresults = evaluatedCqlResults.get();
+		Object idTypeObj = cl.loadClass("org.hl7.fhir.r4.model.IdType").getConstructor(String.class).newInstance(libraryToBeEvaluated);
+		String keyName = (String) idTypeObj.getClass().getMethod("getIdPart").invoke(idTypeObj) + "_" + expression;
+		if (allresults.containsKey(keyName)) {
+			Object value = allresults.get(keyName);
+			if (!allresults.containsKey(keyName + "_multiple")) {
+				List<Object> list = new ArrayList<>();
+				list.add(result);
+				allresults.put(keyName, list);
+				allresults.put(keyName + "_multiple", true);
+			} else {
+				List<Object> list = (List<Object>) value;
+				list.add(result);
+			}
+		} else {
+			allresults.put(keyName, result);
 		}
 		return result;
 	}

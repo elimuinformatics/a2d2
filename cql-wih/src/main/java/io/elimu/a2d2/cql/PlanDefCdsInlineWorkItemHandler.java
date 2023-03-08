@@ -335,6 +335,13 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				userType, userLanguage, userTaskContext, setting, settingContext, Boolean.TRUE, 
 				asParameters(contextData), Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, 
 				terminologyEndpoint, terminologyEndpoint);
+			Map<String, Object> cqlResults = pdProcessor.getEvaluatedCqlResults();
+			//populate CQL results
+			if (cqlResults != null) {
+				for (String cqlResultKey : cqlResults.keySet()) {
+					results.put("cql_" + cqlResultKey, cqlResults.get(cqlResultKey));
+				}
+			}
 			LOG.debug("PlanDefinitionProcessor apply call done");
 			List<Card> cards = convert(carePlan);
 			results.put("cards", cards);
