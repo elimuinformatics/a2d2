@@ -46,7 +46,6 @@ import org.springframework.stereotype.Service;
 import io.elimu.a2d2.cdsmodel.Dependency;
 import io.elimu.a2d2.process.ServiceUtils;
 import io.elimu.cdshookapi.entity.CDSService;
-import io.elimu.genericapi.service.GenericKieBasedService;
 import io.elimu.genericapi.service.GenericTempService;
 import io.elimu.genericapi.service.RunningServices;
 import io.elimu.service.dao.jpa.CDSServiceRepository;
@@ -90,9 +89,6 @@ public class ServiceHelper {
 			//we first put a placeholder for startup
 			cdsRepo.findAllGeneric().forEach(info -> RunningServices.getInstance().register(new GenericTempService(info.getServiceData(), info.getDefaultCustomer())));
 			executor.execute(() -> {
-				// we now have two types of services: generic services and kie services
-				// then we start every one
-				Iterable<ServiceInfo> allServices = cdsRepo.findAllGeneric();
 				log.info("Starting all services");
 				int index = 1;
 				int count = cdsRepo.countAllGeneric();
@@ -108,9 +104,9 @@ public class ServiceHelper {
 
 	private void initializeKieService(String dep, String client) {
 		try {
-			RunningServices.getInstance().downloadDependency(new Dependency(dep));
-			RunningServices.getInstance()
-			.register(new GenericKieBasedService(dep, client));
+			Dependency depObj = new Dependency(dep);
+			RunningServices.getInstance().downloadDependency(depObj);
+			RunningServices.getInstance().restartService(depObj);
 		} catch (Throwable e) { //this has to capture any type of Throwable. Do not change to Exception
 			log.error("Couldn't initialize service '" + dep + "'", e);
 		}

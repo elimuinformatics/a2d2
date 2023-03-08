@@ -25,21 +25,21 @@ public interface CacheService<T> {
 
 	/**
 	 *
-	 * @param key
-	 * @return
+	 * @param key key to fetch
+	 * @return value associated with key
 	 */
 	T get(String key);
 
 	/**
 	 *
-	 * @param key
-	 * @param value
+	 * @param key key to use
+	 * @param value value to store
 	 */
 	void put(String key, T value);
 
 	/**
 	 *
-	 * @param key
+	 * @param key key to remove
 	 */
 	void delete(String key);
 
@@ -50,27 +50,27 @@ public interface CacheService<T> {
 
 	/**
 	 *
-	 * @param key
-	 * @return
+	 * @param key key to search
+	 * @return true if the key has a value assigned
 	 */
 	boolean containsKey(String key);
 
 	/**
 	 *
-	 * @param key
-	 * @return
+	 * @param key key to search
+	 * @return true if the key is new (not old cached value)
 	 */
 	boolean isNewKey(String key);
 
 	/**
 	 *
-	 * @return
+	 * @return length of the cache (in items count)
 	 */
 	long length();
 
 	/**
 	 *
-	 * @return
+	 * @return type of cache
 	 */
 	CACHE_TYPE getCacheType();
 

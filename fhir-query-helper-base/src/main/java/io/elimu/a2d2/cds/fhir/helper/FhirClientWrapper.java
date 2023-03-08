@@ -28,6 +28,7 @@ public class FhirClientWrapper {
 	
 	private final IGenericClient wrap;
 	private boolean inUse = false;
+	private RequestDataInterceptor tracker;
 	
 	public FhirClientWrapper(IGenericClient client) {
 		this.wrap = client;
@@ -43,10 +44,20 @@ public class FhirClientWrapper {
 
 	public void registerInterceptor(IClientInterceptor theInterceptor) {
 		wrap.registerInterceptor(theInterceptor);
+		if (theInterceptor instanceof RequestDataInterceptor) {
+			this.tracker = (RequestDataInterceptor) theInterceptor;
+		}
 	}
 
 	public void unregisterInterceptor(IClientInterceptor theInterceptor) {
 		wrap.unregisterInterceptor(theInterceptor);
+		if (theInterceptor instanceof RequestDataInterceptor) {
+			this.tracker = null;
+		}
+	}
+
+	public RequestDataInterceptor getTracker() {
+		return tracker;
 	}
 
 	public IGenericClient unwrap() {

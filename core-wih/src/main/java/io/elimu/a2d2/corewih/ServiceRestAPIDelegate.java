@@ -49,6 +49,7 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 	private static final String HEADER_VALUE_PARAM = "header_value_";
 	private static final String BODY_VALUE_PARAM = "body_value_";
 	private static final String PARAM_VALUE_PARAM = "param_value_";
+	private static final String RETRIES_PARAM = "retries";
 	private static final String SERVICE_RESPONSE = "serviceResponse";
 	private static final String STRICT_REDIRECT_PARAM = "strictRedirect";
 
@@ -79,6 +80,13 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 			ClientRequest clientRequest = (ClientRequest) workItem.getParameter(CLIENT_REQUEST);
 			HttpMethod method = getMethod(workItem);
 
+			int retries = Integer.valueOf(System.getProperty("http.invoke.retries", "3"));
+			int delay = Integer.valueOf(System.getProperty("http.invoke.retrydelay", "1000"));
+			String sRetries = String.valueOf(workItem.getParameter(RETRIES_PARAM));
+			if (sRetries != null && !"null".equals(sRetries)) {
+				retries = Integer.valueOf(sRetries);
+			}
+			
 			if(method == null) {
 				logger.debug("method is null");
 				throw new WorkItemHandlerException("Service Request method is null");
@@ -128,36 +136,47 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 			HttpEntity<?> entity = new HttpEntity<>(body, headers);
 			logger.debug("Prepared http entity");
 			ResponseEntity<?> response = null;
-			try {
-				response = restTemplate.exchange(url + parameter,
-					method,
-					entity,
-					String.class);
-				logger.debug("Received response");
-			} catch (RestManageException rme) {
-				logger.warn("We had an error (code: " + rme.getStatusCode()+ ") when invoking the url " + url + ".", rme.getMessage());
-				ServiceResponse resp = new ServiceResponse();
-				resp.setResponseCode(rme.getStatusCode());
-				resp.setBody(rme.getMessage());			
-				resp.addHeaderValue("ErrorMessage", rme.getStatusText());
-				workItemResult.put(SERVICE_RESPONSE, resp);
-				manager.completeWorkItem(workItem.getId(), workItemResult);
-				return;
-			} catch (Exception ex2) {
-				logger.warn("We had an error when invoking the url " + url, ex2);
-				ServiceResponse resp = new ServiceResponse();
-				resp.setBody(ex2.getMessage());
-				resp.setResponseCode(500);
-				resp.addHeaderValue("ErrorMessage", ex2.getMessage());
-				workItemResult.put(SERVICE_RESPONSE, resp);
-				manager.completeWorkItem(workItem.getId(), workItemResult);
-				return;
+			boolean success = false;
+			int count = 0;
+			while (count < retries && !success) {
+				try {
+					response = restTemplate.exchange(url + parameter,
+						method,
+						entity,
+						String.class);
+					logger.debug("Received response");
+					ServiceResponse serviceResponse = createServiceResponse(response);
+					logger.trace("Body received is " + response.getBody());
+					logger.trace("Code reason received is " + response.getStatusCode().getReasonPhrase());
+					workItemResult.put(SERVICE_RESPONSE, serviceResponse);
+					if (response.getStatusCodeValue() < 500) {
+						success = true;
+					} else {
+						count++;
+						Thread.sleep(getDelay(count, delay));
+						logger.warn("We had a return status code" + response.getStatusCodeValue() + "so we will retry (this was attempt " + count + ")");
+					}
+				} catch (RestManageException rme) {
+					count++;
+					logger.warn("We had an error (code: " + rme.getStatusCode()+ ") when invoking the url " + url + ".", rme.getMessage());
+					ServiceResponse resp = new ServiceResponse();
+					resp.setResponseCode(rme.getStatusCode());
+					resp.setBody(rme.getMessage());			
+					resp.addHeaderValue("ErrorMessage", rme.getStatusText());
+					workItemResult.put(SERVICE_RESPONSE, resp);
+					Thread.sleep(getDelay(count, delay));
+				} catch (Exception ex2) {
+					count++;
+					logger.warn("We had an error when invoking the url " + url, ex2);
+					ServiceResponse resp = new ServiceResponse();
+					resp.setBody(ex2.getMessage());
+					resp.setResponseCode(500);
+					resp.addHeaderValue("ErrorMessage", ex2.getMessage());
+					workItemResult.put(SERVICE_RESPONSE, resp);
+					Thread.sleep(getDelay(count, delay));
+				}
 			}
 
-			ServiceResponse serviceResponse = createServiceResponse(response);
-			logger.trace("Body received is " + response.getBody());
-			logger.trace("Code reason received is " + response.getStatusCode().getReasonPhrase());
-			workItemResult.put(SERVICE_RESPONSE, serviceResponse);
 			manager.completeWorkItem(workItem.getId(), workItemResult);
 
 			logger.trace("Service Rest API completed for   " + url );
@@ -170,6 +189,14 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 
 	}
 
+	private int getDelay(int count, int delay) {
+		if (count == 2) {
+			delay *= 3;
+		} else if (count >= 3) {
+			delay *= 5;
+		}
+		return delay;
+	}
 
 	private ServiceResponse createServiceResponse(ResponseEntity<?> response) {
 		ServiceResponse serviceResponse = new ServiceResponse();

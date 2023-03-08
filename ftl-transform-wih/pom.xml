@@ -33,6 +33,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<ant.version>1.10.11</ant.version>
+		<plexus-utils.version>3.5.0</plexus-utils.version>
 	</properties>
 
 	<dependencies>
@@ -77,7 +78,17 @@
 					<groupId>commons-codec</groupId>
    			 		<artifactId>commons-codec</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
+		    <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.kie</groupId>
@@ -87,10 +98,6 @@
 				<exclusion>
 					<groupId>commons-codec</groupId>
    			 		<artifactId>commons-codec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-   			 		<artifactId>slf4j-api</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.mvel</groupId>
@@ -113,10 +120,6 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
-   			 		<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
    			 		<artifactId>jcl-over-slf4j</artifactId>
 				</exclusion>
 				<exclusion>
@@ -130,30 +133,6 @@
 				<exclusion>
 					<groupId>io.elimu.a2d2</groupId>
 					<artifactId>generic-model</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-tx</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-context</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-aop</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-jdbc</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.ant</groupId>
@@ -199,42 +178,12 @@
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>service-daos</artifactId>
 			<version>${project.parent.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-tx</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-context</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-aop</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-jdbc</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<scope>test</scope>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-   			 		<artifactId>slf4j-api</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -242,10 +191,6 @@
 			<artifactId>cds-hook-model</artifactId>
 			<version>${project.parent.version}</version>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-   			 		<artifactId>slf4j-api</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -256,7 +201,7 @@
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-utils</artifactId>
-			<version>3.4.1</version>
+			<version>${plexus-utils.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>

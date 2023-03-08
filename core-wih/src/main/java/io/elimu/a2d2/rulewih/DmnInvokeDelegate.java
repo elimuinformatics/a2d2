@@ -38,8 +38,9 @@ public class DmnInvokeDelegate implements WorkItemHandler {
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
 		Map<String, Object> results = workItem.getResults();
+		KieSession ksession = kbase.newKieSession(null, env);
 		try {
-			DMNRuntime runtime = kbase.newKieSession(null, env).getKieRuntime(DMNRuntime.class);
+			DMNRuntime runtime = ksession.getKieRuntime(DMNRuntime.class);
 			DMNContext context = DMNFactory.newContext();
 			for (Map.Entry<String, Object> entry : workItem.getParameters().entrySet()) {
 				if (entry.getKey().startsWith("dmninput_")) {
@@ -84,6 +85,8 @@ public class DmnInvokeDelegate implements WorkItemHandler {
 		} catch (Exception e) {
 			results.put("exception", e);
 			manager.completeWorkItem(workItem.getId(), results);
+		} finally {
+			ksession.dispose();
 		}
 	}
 

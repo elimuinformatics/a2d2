@@ -1,11 +1,14 @@
 package io.elimu.a2d2.cql;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -160,6 +163,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		String fhirTerminologyServerUrl = (String) workItem.getParameter("fhirTerminologyServerUrl");
 		String planDefId = (String) workItem.getParameter("planDefinitionId");
 		String planDefUrl = (String) workItem.getParameter("planDefinitionUrl");
+		String planDefJson = (String) workItem.getParameter("planDefinitionJson");
 		String patientId = (String) workItem.getParameter("patientId");
 		String encounterId = (String) workItem.getParameter("encounterId");
 		String practitionerId = (String) workItem.getParameter("practitionerId");
@@ -187,8 +191,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			missingItems.add("patientId");
 		}
 		//validate required planDefinitionId or planDefinitionUrl
-		if (isEmpty(planDefId) && isEmpty(planDefUrl)) {
-			missingItems.add("planDefinitionId|planDefinitionUrl");
+		if (isEmpty(planDefId) && isEmpty(planDefUrl) && isEmpty(planDefJson)) {
+			missingItems.add("planDefinitionId|planDefinitionUrl|planDefinitionJson");
 		}
 		if (!missingItems.isEmpty()) {
 			throw new WorkItemHandlerException("Missing items: " + missingItems);
@@ -198,9 +202,20 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			String fhirServerAuth = (String) workItem.getParameter("fhirServerAuth");
 			String fhirTerminologyServerAuth = (String) workItem.getParameter("fhirTerminologyServerAuth");
 			Map<String, Object> prefetchData = new HashMap<>();
+			Map<String, Object> contextData = new HashMap<>();
+			Map<String, String> patientHeaderData = new HashMap<>();
+			Map<String, String> terminologyHeaderData = new HashMap<>();
 			for (String key : workItem.getParameters().keySet()) {
 				if (key.startsWith("prefetch_")) {
 					prefetchData.put(key.replace("prefetch_", ""), workItem.getParameter(key));
+				} else if (key.startsWith("context_")) {
+					contextData.put(key.replace("context_", ""), workItem.getParameter(key));
+				} else if (key.startsWith("fhirServer_header_")) {
+					patientHeaderData.put(key.replace("fhirServer_header_", "").replaceAll("__", "-"), 
+							String.valueOf(workItem.getParameter(key)));
+				} else if (key.startsWith("fhirTerminologyServer_header_")) {
+					terminologyHeaderData.put(key.replace("fhirTerminologyServer_header_", "").replaceAll("__", "-"), 
+							String.valueOf(workItem.getParameter(key)));
 				}
 			}
 			DecoratedPlanDefinitionProcessor pdProcessor = null;
@@ -216,47 +231,62 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				pdProcessor = CACHED_PROCESSORS.get(planDefUrl).getValue();
 				LOG.debug("Processor already cached by planDefUrl key " + key);
 			} else {
-				LOG.debug("Creating PlanDefinitionProcessor...");
-				//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth); 
-				Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth);
-				if (planDefId != null) {
-					LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
-					key = planDefId;
-					planDefinition = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
-					if (planDefinition == null) {
-						throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
-					}
+				if (!isEmpty(planDefJson)) {
+					Object parser = this.ctx.getClass().getMethod("newJsonParser").invoke(this.ctx);
+					Class<?> parserClass = cl.loadClass("ca.uhn.fhir.parser.IParser");
+					Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
+					planDefinition = parserClass.getMethod("parseResource",  Class.class, String.class).invoke(parser, planDefClass, planDefJson);
+					Object idObj = planDefClass.getMethod("getIdElement").invoke(planDefinition);
+					key = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
 					CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
-					String url = (String) planDefinition.getClass().getMethod("getUrl").invoke(planDefinition);
-					if (url != null) {
-						CACHED_PLANDEFS.put(url, new TimeObject<>(planDefinition));
-					}
-					LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId + " successful");
 				} else {
-					LOG.debug("Fetching PlanDefinition by URL: " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
-					key = planDefUrl;
-					Object bundle = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
-							invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
-					Object firstRep = bundle.getClass().getMethod("getEntryFirstRep").invoke(bundle);
-					boolean hasRes = (boolean) firstRep.getClass().getMethod("hasResource").invoke(firstRep);
-					if (!hasRes) {
-						throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
+					LOG.debug("Creating PlanDefinitionProcessor...");
+					//Object fhirClient = initClient(fhirServerUrl, fhirServerAuth, patientHeaderData); 
+					Object fhirTerminologyClient = initClient(fhirTerminologyServerUrl, fhirTerminologyServerAuth, terminologyHeaderData);
+					if (planDefId != null) {
+						LOG.debug("Fetching PlanDefinition by ID: " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
+						key = planDefId;
+						planDefinition = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
+								invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition"), fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId);
+						if (planDefinition == null) {
+							throw new WorkItemHandlerException("PlanDefinition cannot be found by ID " + planDefId);
+						}
+						CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
+						String url = (String) planDefinition.getClass().getMethod("getUrl").invoke(planDefinition);
+						if (url != null) {
+							CACHED_PLANDEFS.put(url, new TimeObject<>(planDefinition));
+						}
+						LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition/" + planDefId + " successful");
+					} else {
+						LOG.debug("Fetching PlanDefinition by URL: " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
+						key = planDefUrl;
+						Object bundle = fhirTerminologyClient.getClass().getMethod("fetchResourceFromUrl", Class.class, String.class).
+								invoke(fhirTerminologyClient, cl.loadClass("org.hl7.fhir.r4.model.Bundle"), fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl);
+						Object firstRep = bundle.getClass().getMethod("getEntryFirstRep").invoke(bundle);
+						boolean hasRes = (boolean) firstRep.getClass().getMethod("hasResource").invoke(firstRep);
+						if (!hasRes) {
+							throw new WorkItemHandlerException("PlanDefinition cannot be found by Url " + planDefUrl);
+						}
+						planDefinition = firstRep.getClass().getMethod("getResource").invoke(firstRep);
+						CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
+						Object idObj = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
+						String id = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
+						if (id != null) {
+							CACHED_PLANDEFS.put(id, new TimeObject<>(planDefinition));
+						}
+						LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
 					}
-					planDefinition = firstRep.getClass().getMethod("getResource").invoke(firstRep);
-					CACHED_PLANDEFS.put(key, new TimeObject<>(planDefinition));
-					Object idObj = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
-					String id = (String) idObj.getClass().getMethod("getIdPart").invoke(idObj);
-					if (id != null) {
-						CACHED_PLANDEFS.put(id, new TimeObject<>(planDefinition));
-					}
-					LOG.debug("PlanDefinition fetch " + fhirTerminologyServerUrl + "/PlanDefinition?url=" + planDefUrl + " successful");
 				}
 				Object fdFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.dal.FhirRestFhirDalFactory").getConstructor(this.clientFactory.getClass()).newInstance(this.clientFactory);
 				List<String> headers = new ArrayList<>();
 				headers.add("Content-Type: application/json");
 				if (fhirTerminologyServerAuth != null) {
 					headers.add("Authorization:" + fhirTerminologyServerAuth);
+				}
+				if (terminologyHeaderData != null && !terminologyHeaderData.isEmpty()) {
+					for (String headerName : terminologyHeaderData.keySet()) {
+						headers.add(headerName + ": " + terminologyHeaderData.get(headerName));
+					}
 				}
 				Object fhirDal = fdFactory.getClass().getMethod("create", String.class, List.class).invoke(fdFactory, fhirTerminologyServerUrl, headers);
 				Class<?> ctxClass = cl.loadClass("ca.uhn.fhir.context.FhirContext");
@@ -279,11 +309,21 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			if (fhirTerminologyServerAuth != null) {
 				endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, "Authorization:" + fhirTerminologyServerAuth);
 			}
+			if (terminologyHeaderData != null && !terminologyHeaderData.isEmpty()) {
+				for (String headerName : terminologyHeaderData.keySet()) {
+					endpointClass.getMethod("addHeader", String.class).invoke(terminologyEndpoint, headerName + ": " + terminologyHeaderData.get(headerName));
+				}
+			}
 			Object dataEndpoint = endpointClass.getConstructor().newInstance();
 			endpointClass.getMethod("setAddress", String.class).invoke(dataEndpoint, fhirServerUrl);
 			endpointClass.getMethod("setConnectionType", codingClass).invoke(dataEndpoint, restCoding);
 			if (fhirServerAuth != null) {
 				endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, "Authorization:" + fhirServerAuth);
+			}
+			if (patientHeaderData != null && !patientHeaderData.isEmpty()) {
+				for (String headerName : patientHeaderData.keySet()) {
+					endpointClass.getMethod("addHeader", String.class).invoke(dataEndpoint, headerName + ": " + patientHeaderData.get(headerName));
+				}
 			}
 			planDefinition = CACHED_PLANDEFS.get(key).getValue();
 			Object planIdType = planDefinition.getClass().getMethod("getIdElement").invoke(planDefinition);
@@ -293,8 +333,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				practitionerId == null ? null : "Practitioner/" + practitionerId,
 				organizationId == null ? null : "Organization/" + organizationId, 
 				userType, userLanguage, userTaskContext, setting, settingContext, Boolean.TRUE, 
-				cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance(), 
-				Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, terminologyEndpoint, terminologyEndpoint);
+				asParameters(contextData), Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, 
+				terminologyEndpoint, terminologyEndpoint);
 			LOG.debug("PlanDefinitionProcessor apply call done");
 			List<Card> cards = convert(carePlan);
 			results.put("cards", cards);
@@ -312,7 +352,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		}
 	}
 
-	private Object initClient(String fhirServerUrl, String auth) throws ReflectiveOperationException {
+	private Object initClient(String fhirServerUrl, String auth, Map<String, String> headerData) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object fhirClient = ctx.getClass().getMethod("newRestfulGenericClient", String.class).invoke(ctx, fhirServerUrl);
 		fhirClient.getClass().getMethod("setDontValidateConformance", boolean.class).invoke(fhirClient, true);
@@ -323,6 +363,14 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			Object interceptor = cl.loadClass("ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor").
 					getConstructor(String.class, String.class).newInstance("Authorization", auth);
 			fhirClient.getClass().getMethod("registerInterceptor", Object.class).invoke(fhirClient, interceptor);
+		} 
+		if (headerData != null && !headerData.isEmpty()) {
+			for (String key : headerData.keySet()) {
+				String value = headerData.get(key);
+				Object interceptor = cl.loadClass("ca.uhn.fhir.rest.client.interceptor.SimpleRequestHeaderInterceptor").
+						getConstructor(String.class, String.class).newInstance(key, value);
+				fhirClient.getClass().getMethod("registerInterceptor", Object.class).invoke(fhirClient, interceptor);
+			}
 		}
 		return fhirClient;
 	}
@@ -354,17 +402,84 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 	private Object asParameters(Map<String, Object> prefetchData) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object retval = cl.loadClass("org.hl7.fhir.r4.model.Parameters").getConstructor().newInstance();
-		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 		if (prefetchData != null) {
 			for (Map.Entry<String, Object> entry : prefetchData.entrySet()) {
-				if (resClass.isInstance(entry.getValue())) {
-					Object param = retval.getClass().getMethod("addParameter").invoke(retval);
-					param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
-					param.getClass().getMethod("setResource", resClass).invoke(param, entry.getValue());
+				if (entry.getValue() instanceof Collection) {
+					//enter each element as a different ParameterComponent with same name
+					Collection<?> col = (Collection<?>) entry.getValue();
+					Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
+					Object extension = extClass.getConstructor().newInstance();
+					extClass.getMethod("setUrl", String.class).invoke(extension, "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-parameterDefinition");
+					Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
+					Class<?> paramDefClass = cl.loadClass("org.hl7.fhir.r4.model.ParameterDefinition");
+					Object paramDef = paramDefClass.getConstructor().newInstance();
+					paramDefClass.getMethod("setMin", int.class).invoke(paramDef, 0);
+					paramDefClass.getMethod("setMax", String.class).invoke(paramDef, String.valueOf(col.size() < 2 ? 2 : col.size()));
+					paramDefClass.getMethod("setType", String.class).invoke(paramDef, "item");
+					extClass.getMethod("setValue", typeClass).invoke(extension, paramDef);
+					for (Object item : col) {
+						Map<String, Object> hmap = new HashMap<>();
+						hmap.put(entry.getKey(), item);
+						Map.Entry<String, Object> mockEntry = hmap.entrySet().iterator().next();
+						addSingleParam(cl, retval, mockEntry, extension);
+					}
+				} else {
+					addSingleParam(cl, retval, entry, null);
 				}
 			}
 		}
 		return retval;
+	}
+
+	private void addSingleParam(ClassLoader cl, Object retval, Entry<String, Object> entry, Object extension) throws ReflectiveOperationException {
+		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
+		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
+		Object param = null;
+		if (resClass.isInstance(entry.getValue()) || entry.getValue() instanceof String || entry.getValue() instanceof Number || entry.getValue() instanceof Boolean || entry.getValue() instanceof Date) {
+			param = retval.getClass().getMethod("addParameter").invoke(retval);
+			param.getClass().getMethod("setName", String.class).invoke(param, entry.getKey());
+			if (extension != null) {
+				param.getClass().getMethod("addExtension", extension.getClass()).invoke(param, extension);
+			}
+		}
+		if (resClass.isInstance(entry.getValue())) {
+			param.getClass().getMethod("setResource", resClass).invoke(param, entry.getValue());
+		} else if (entry.getValue() instanceof String) {
+			Class<?> strTypeClass = cl.loadClass("org.hl7.fhir.r4.model.StringType");
+			Object value = strTypeClass.getConstructor(String.class).newInstance(String.valueOf(entry.getValue()));
+			param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+		} else if (entry.getValue() instanceof Number) {
+			Number n = (Number) entry.getValue();
+			if (n.toString().indexOf(".") == -1) {
+				//integer
+				Class<?> intTypeClass = cl.loadClass("org.hl7.fhir.r4.model.IntegerType");
+				Object value = intTypeClass.getConstructor(int.class).newInstance(n.intValue());
+				param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+			} else {
+				//decimal
+				Class<?> decTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DecimalType");
+				Object value = decTypeClass.getConstructor(double.class).newInstance(n.doubleValue());
+				param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+			}
+		} else if (entry.getValue() instanceof Boolean) {
+			//boolean
+			Class<?> boolTypeClass = cl.loadClass("org.hl7.fhir.r4.model.BooleanType");
+			Object value = boolTypeClass.getConstructor(Boolean.class).newInstance(entry.getValue());
+			param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+		} else if (entry.getValue() instanceof Date) {
+			//datetime
+			Class<?> dateTypeClass = cl.loadClass("org.hl7.fhir.r4.model.DateTimeType");
+			Object value = dateTypeClass.getConstructor(Date.class).newInstance(entry.getValue());
+			param.getClass().getMethod("setValue", typeClass).invoke(param, value);
+		} else {
+			//log parameter type not handled: type
+			if (entry.getValue() == null ) {
+				LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': null");
+			} else {
+				LOG.warn("Parameter type not supported for key '" + entry.getKey() + "': " + entry.getValue().getClass().getName());
+			}
+		}
+
 	}
 
 	@Override

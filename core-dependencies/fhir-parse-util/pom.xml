@@ -30,7 +30,7 @@
 
 
 	<properties>
-		<jdk.version>1.8</jdk.version>
+		<jdk.version>11</jdk.version>
 	</properties>
 
 	<dependencies>
@@ -45,18 +45,24 @@
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
-				    	<groupId>org.slf4j</groupId>
-    					<artifactId>slf4j-api</artifactId>	
-				</exclusion>
-				<exclusion>
 					<groupId>commons-codec</groupId>
 					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-text</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-text</artifactId>
+		    <version>${commons-text.version}</version>
+		    <scope>test</scope>
 		</dependency>	
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>

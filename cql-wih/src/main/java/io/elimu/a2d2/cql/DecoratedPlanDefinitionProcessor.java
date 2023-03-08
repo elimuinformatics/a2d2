@@ -487,8 +487,10 @@ public class DecoratedPlanDefinitionProcessor {
 				} else if (path != null && (path.startsWith("action") || path.startsWith("%action"))) {
 					try {
 						String propertyType = path.substring(path.indexOf(".")+1);
-						
-						if ("extension".equals(propertyType) && strTypeClass.isInstance(result)) {
+						if (propertyType.startsWith("extension") && propertyType.contains(".")) {
+							propertyType = propertyType.substring(0, propertyType.indexOf("."));
+						}
+						if ("extension".equals(propertyType) && typeClass.isInstance(result)) {
 							Object ext = extClass.getConstructor().newInstance();
 							extClass.getMethod("setValue", typeClass).invoke(ext, result);
 							extClass.getMethod("setUrl", String.class).invoke(ext, path);
@@ -528,8 +530,10 @@ public class DecoratedPlanDefinitionProcessor {
 			act.getClass().getMethod("setTiming", typeClass).invoke(act, timing);
 			boolean hasExtension = (boolean) action.getClass().getMethod("hasExtension").invoke(action);
 			if (hasExtension) {
-				Object ext = action.getClass().getMethod("getExtensionFirstRep").invoke(action);
-				act.getClass().getMethod("addExtension", extClass).invoke(act, ext);
+				List<?> exts = (List<?>) action.getClass().getMethod("getExtension").invoke(action);
+				for (Object ext : exts) {
+					act.getClass().getMethod("addExtension", extClass).invoke(act, ext);
+				}
 			}
 			boolean hasDocumentation = (boolean) action.getClass().getMethod("hasDocumentation").invoke(action);
 			if (hasDocumentation) {

@@ -2,12 +2,16 @@ package io.elimu.a2d2.cql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.elimu.a2d2.cdsresponse.entity.Card;
 import io.elimu.a2d2.cdsresponse.entity.LinkCard;
@@ -16,6 +20,8 @@ import io.elimu.a2d2.cdsresponse.entity.Suggestion;
 
 public class CardCreator {
 
+	private static final Logger LOG = LoggerFactory.getLogger(CardCreator.class);
+	
 	public static List<Card> convert(Object carePlan, ClassLoader cl) throws ParseException, ReflectiveOperationException {
         List<Card> cards = new ArrayList<>();
         List<?> activities = (List<?>) carePlan.getClass().getMethod("getActivity").invoke(carePlan);
@@ -30,7 +36,6 @@ public class CardCreator {
         return cards;
     }
 
-	@SuppressWarnings("unchecked")
     private static List<Card> _convert(Object requestGroup, ClassLoader cl) throws ParseException, ReflectiveOperationException {
     	List<Card> cards = new ArrayList<>();
     	List<Suggestion> suggestions = new ArrayList<>();
@@ -96,15 +101,45 @@ public class CardCreator {
                 boolean hasExtension2 = (boolean) r4actionClass.getMethod("hasExtension").invoke(action);
                 if (hasExtension2) {
                 	isValidCard = true;
-                	Object ext = r4actionClass.getMethod("getExtensionFirstRep").invoke(action);
-                	Object extValue = ext.getClass().getMethod("getValue").invoke(ext);
-                	card.setIndicator(String.valueOf(extValue));
+                	List<?> exts = (List<?>) r4actionClass.getMethod("getExtension").invoke(action);
+                	for (Object ext : exts) {
+	                	Object extUrl = ext.getClass().getMethod("getUrl").invoke(ext);
+	                	Object extValue = ext.getClass().getMethod("getValue").invoke(ext);
+	                	if (extUrl.toString().endsWith(".override")) {
+	                		Class<?> ccClass = cl.loadClass("org.hl7.fhir.r4.model.CodeableConcept");
+	                		Class<?> codingClass = cl.loadClass("org.hl7.fhir.r4.model.Coding");
+	                		if (extValue != null) {
+	                			List<JSONObject> overrideReasons = new ArrayList<>();
+	                			if (ccClass.isInstance(extValue)) {
+	                				List<?> codings = (List<?>) ccClass.getMethod("getCoding").invoke(extValue);
+	                				for (Object coding : codings) {
+	                					Map<String, Object> json = new HashMap<>();
+	                					json.put("code", codingClass.getMethod("getCode").invoke(coding));
+	                					json.put("system", codingClass.getMethod("getSystem").invoke(coding));
+	                					json.put("display", codingClass.getMethod("getDisplay").invoke(coding));
+	                					overrideReasons.add(new JSONObject(json));
+	                				}
+	                			} else if (codingClass.isInstance(extValue)) {
+	            					Map<String, Object> json = new HashMap<>();
+	                				json.put("code", codingClass.getMethod("getCode").invoke(extValue));
+	                				json.put("system", codingClass.getMethod("getSystem").invoke(extValue));
+	                				json.put("display", codingClass.getMethod("getDisplay").invoke(extValue));
+	            					overrideReasons.add(new JSONObject(json));
+	            				//TODO we need to add here something fro the case it comes as a String, or as a list of strings?
+	                			} else {
+	                				LOG.warn("Cannot parse extension of type " + extValue.getClass().getName() + " as overrideReasons element");
+	                			}
+	                			card.setOverrideReasons(overrideReasons);
+	                		}
+	                	} else {
+		                	card.setIndicator(String.valueOf(extValue));
+	                	}
+                	}
                 }
 
                 // source
                 boolean hasDoc = (boolean) r4actionClass.getMethod("hasDocumentation").invoke(action);
-                JSONObject source = new JSONObject();
-                card.setSource(source);
+                Map<String, Object> source = new HashMap<>();
                 if (hasDoc) {
                 	isValidCard = true;
                     // Assuming first related artifact has everything
@@ -129,6 +164,7 @@ public class CardCreator {
                     	}
                     }
                 }
+                card.setSource(new JSONObject(source));
 
                 boolean hasSelectionBehavior = (boolean) r4actionClass.getMethod("hasSelectionBehavior").invoke(action);
                 if (hasSelectionBehavior) {
@@ -141,7 +177,7 @@ public class CardCreator {
                 boolean hasPrefix = (boolean) r4actionClass.getMethod("hasPrefix").invoke(action);
                 if (hasPrefix) {
                 	Suggestion suggestion = new Suggestion();
-                	JSONObject actionsRet = new JSONObject();
+                	Map<String, Object> actionsRet = new HashMap<>();
                 	suggestion.setUuid(UUID.randomUUID().toString());
                 	Object prefix = r4actionClass.getMethod("getPrefix").invoke(action);
                 	suggestion.setLabel((String) prefix);
@@ -173,7 +209,7 @@ public class CardCreator {
 	                    	actionsRet.put("resource", obj);
                     	}
                     }
-                    suggestion.setActions(Arrays.asList(actionsRet));
+                    suggestion.setActions(Arrays.asList(new JSONObject(actionsRet)));
                     suggestions.add(suggestion);
                 }
                 card.setSuggestions(suggestions);
@@ -181,6 +217,7 @@ public class CardCreator {
                 	card.setLinks(links);
                 }
                 if (isValidCard) {
+                	card.setUuid(UUID.randomUUID().toString());
                 	cards.add(card);
                 	suggestions = new ArrayList<>();
                 }

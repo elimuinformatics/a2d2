@@ -2,6 +2,20 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
    <suppress>
       <notes><![CDATA[
+      file name: spring-web-5.3.23.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-web@.*$</packageUrl>
+      <cve>CVE-2016-1000027</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: spring-security-crypto-5.7.5.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
+      <vulnerabilityName>CVE-2020-5408</vulnerabilityName>
+   </suppress>   
+   <suppress>
+      <notes><![CDATA[
       file name: maven-core-3.3.9.jar
       False Positive: We use our own repository manager to govern the repositories used by our builds
       ]]></notes>
@@ -10,37 +24,177 @@
    </suppress>
    <suppress>
       <notes><![CDATA[
-      file name: snakeyaml-1.30.jar
+      file name: xstream-1.4.19.jar
       ]]></notes>
-      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-      <cve>CVE-2022-38749</cve>
+      <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+     <cve>CVE-2022-40151</cve>
    </suppress>
    <suppress>
       <notes><![CDATA[
-      file name: snakeyaml-1.30.jar
+      file name: xstream-1.4.19.jar
       ]]></notes>
-      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-      <cve>CVE-2022-38750</cve>
+      <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+      <cve>CVE-2022-40152</cve>
    </suppress>
    <suppress>
       <notes><![CDATA[
-      file name: snakeyaml-1.31.jar
+      file name: xstream-1.4.19.jar
       ]]></notes>
-      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-      <vulnerabilityName>CVE-2022-38751</vulnerabilityName>
+      <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-40153</vulnerabilityName>
    </suppress>
    <suppress>
       <notes><![CDATA[
-      file name: snakeyaml-1.31.jar
+      file name: xstream-1.4.19.jar
       ]]></notes>
-      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-      <cve>CVE-2022-38752</cve>
+      <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-40154</vulnerabilityName>
    </suppress>
    <suppress>
       <notes><![CDATA[
-      file name: snakeyaml-1.30.jar
+      file name: xstream-1.4.19.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-40155</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: xstream-1.4.19.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-40156</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: poi-4.1.2.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi@.*$</packageUrl>
+      <cve>CVE-2022-26336</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: poi-ooxml-4.1.2.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml@.*$</packageUrl>
+      <cve>CVE-2022-26336</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: poi-ooxml-schemas-4.1.2.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml\-schemas@.*$</packageUrl>
+      <cve>CVE-2022-26336</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: snakeyaml-1.33.jar
       ]]></notes>
       <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-      <cve>CVE-2022-25857</cve>
+      <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.13.3)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+      <cve>CVE-2022-42003</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.13.3)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+      <cve>CVE-2022-42004</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-audit-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-audit@.*$</packageUrl>
+      <cve>CVE-2015-5186</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: jbpm-bpmn2-7.73.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.jbpm/jbpm\-bpmn2@.*$</packageUrl>
+      <vulnerabilityName>CVE-2019-14839</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: org.apache.sshd:sshd-common:2.7.0)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.sshd/sshd\-common@.*$</packageUrl>
+      <cve>CVE-2022-45047</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-credential-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-credential@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-password-impl-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-password\-impl@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-realm-ldap-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-realm\-ldap@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-x500-2.0.0.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-x500@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: snakeyaml-1.33.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+      <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: snakeyaml-1.33.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+      <cve>CVE-2022-3064</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: snakeyaml-1.33.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+      <cve>CVE-2021-4235</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: resteasy-core-6.2.2.Final.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.jboss\.resteasy/resteasy\-core@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-0482</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: json-20220924.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
+      <cve>CVE-2022-45688</cve>
    </suppress>
 </suppressions>
