@@ -68,6 +68,14 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			Class<?> dataProviderFactoryClass = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.DataProviderFactory");
 			Class<?> terminologyProviderFactoryClass = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.TerminologyProviderFactory");
 			this.ctx = ctxClass.getMethod("forR4Cached").invoke(null);
+			
+			Object restClientFactory = ctxClass.getMethod("getRestfulClientFactory").invoke(this.ctx);
+			Class<?> rcfClass = cl.loadClass("ca.uhn.fhir.rest.client.api.IRestfulClientFactory");
+			rcfClass.getMethod("setHttpClient", Object.class).invoke(restClientFactory, new CachingHttpClient());
+			Class<?> svmeClass = cl.loadClass("ca.uhn.fhir.rest.client.api.ServerValidationModeEnum");
+			Object never = svmeClass.getField("NEVER").get(null);
+			rcfClass.getMethod("setServerValidationMode", svmeClass).invoke(restClientFactory, never);
+			
 			Object ctxVersion = ctxClass.getMethod("getVersion").invoke(ctx);
 			Object ctxVersionVersion = ctxVersion.getClass().getMethod("getVersion").invoke(ctxVersion);
 			this.clientFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.fhir.ClientFactory").getConstructor(ctxClass).newInstance(this.ctx);
