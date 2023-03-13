@@ -197,4 +197,11 @@
       <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
       <cve>CVE-2022-45688</cve>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: cxf-rt-bindings-soap-3.5.5.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.cxf/cxf\-rt\-bindings\-soap@.*$</packageUrl>
+      <cve>CVE-2022-40705</cve>
+   </suppress>
 </suppressions>
