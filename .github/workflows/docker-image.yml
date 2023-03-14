@@ -2,8 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    tags:
-      - '*'
+    branches: [ "Publish-docker-image-using-github-actions" ]
       
 jobs:        
   build-login-publish:
