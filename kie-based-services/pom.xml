@@ -319,6 +319,10 @@
 					<groupId>org.ow2.asm</groupId>
 					<artifactId>asm</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-bindings-soap</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -330,6 +334,12 @@
     		<groupId>org.apache.cxf</groupId>
     		<artifactId>cxf-rt-frontend-simple</artifactId>
     		<version>${cxf.version}</version>
+    		<exclusions>
+    			<exclusion>
+    				<groupId>org.apache.cxf</groupId>
+    				<artifactId>cxf-rt-bindings-soap</artifactId>
+    			</exclusion>
+    		</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jbpm</groupId>
