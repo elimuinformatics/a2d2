@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -32,7 +33,8 @@ public class ConfigAPIUtil {
 	
 	private final static Map<String, CachedResult> CACHE = new HashMap<>();
 	
-	public Map<String, Object> getConfig(ServiceRequest request, String environment, String client, String appName) {
+	public Map<String, Object> getConfig(ServiceRequest request, String environment, String client, String appName) throws TimeoutException {
+		try {
 		LOG.info("Started fetching configuration from Config-api ");
 		Map<String, Object> retval = new HashMap<>();
 		String configApiUrl = System.getProperty("configApiUrl");
@@ -84,16 +86,24 @@ public class ConfigAPIUtil {
 						} else {
 							LOG.warn("Invalid value type for JSON property: " + node.getNodeType().name());
 						}
+						}
 					}
+					else {
+						throw new TimeoutException("Timed out");
+					}
+					CACHE.put(url, new CachedResult(retval));
+				} catch (Exception e) {
+					LOG.warn("Error invoking config-api", e);
 				}
-				CACHE.put(url, new CachedResult(retval));
-			} catch (Exception e) {
-				LOG.warn("Error invoking config-api", e);
 			}
-		}
+		
 		LOG.info("ConfigAPIUtil fetched {} variable values", CACHE.get(url).getVariables().size());
 		return retval;
-	}
+		}catch (Exception e) {
+			throw new TimeoutException("Timed out");
+			}
+		}
+	
 
 	private String getOrGenerateToken(ServiceRequest request) {
 		if (request != null && request.getHeader(AUTH_HEADER) != null && request.getHeader(AUTH_HEADER).startsWith(BEARER_PREFIX)) {
