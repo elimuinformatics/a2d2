@@ -14,6 +14,8 @@
 
 package io.elimu.a2d2.core_wih;
 
+import java.util.Map;
+
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,7 +28,6 @@ import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.internal.utils.KieHelper;
 
 import io.elimu.a2d2.corewih.ServiceRestAPIDelegate;
-import io.elimu.a2d2.corewih.ServiceSoapAPIDelegate;
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 import io.elimu.a2d2.genericmodel.ClientRequest;
 import io.elimu.a2d2.genericmodel.ServiceResponse;
@@ -100,7 +101,7 @@ public class ServiceRestAPIDelegateTest {
 
 		wih = (WorkItemHandler) new ServiceRestAPIDelegate();
 		WorkItemImpl execution = new WorkItemImpl();
-		execution.setParameter("url", "https://api.ncbi.nlm.nih.gov/variation/v0/spdi/NC_000012.11:21382187:G:GAGTCCAC/all_equivalent_contextual");
+		execution.setParameter("url", "https://bing.com");
 		execution.setParameter("method", "GET");
 
 		wih.executeWorkItem(execution, workItemManager);

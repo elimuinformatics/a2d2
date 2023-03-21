@@ -75,10 +75,10 @@ public class QueryingServerHelperTest {
 		fhirResponse = new FhirResponse<>(iBaseList, 200, "responseInfo");
 	}
 
-	@Test
+	@Test 
 	public void testQSH() throws Exception {
-		String url = "https://api.logicahealth.org/cdssx/open";
-		String patientId = "SMART-1577780";
+		String url = "https://hapi.fhir.org/baseR4";
+		String patientId = "37";
 		/*GenericClient client = (GenericClient) FhirContext.forDstu2().newRestfulGenericClient(url);
 		client.setDontValidateConformance(true);
 		client.setEncoding(EncodingEnum.JSON);*/
