@@ -77,8 +77,8 @@ public class QueryingServerHelperTest {
 
 	@Test 
 	public void testQSH() throws Exception {
-		String url = "https://hapi.fhir.org/baseR4";
-		String patientId = "37";
+		String url = "https://hapi.fhir.org/baseDstu2";
+		String patientId = "131";
 		/*GenericClient client = (GenericClient) FhirContext.forDstu2().newRestfulGenericClient(url);
 		client.setDontValidateConformance(true);
 		client.setEncoding(EncodingEnum.JSON);*/
