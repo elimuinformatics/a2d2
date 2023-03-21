@@ -35,7 +35,7 @@ public class ConfigAPIWorkItemHandler implements WorkItemHandler {
 		try {
 			newValues = new ConfigAPIUtil().getConfig(request, env, client, appName);
 		} catch (Exception e) {
-			LOG.error("Timed out", e);
+			LOG.error("Timeout occurred when fetching configuration parameters", e);
 			
 		}
 		for (Map.Entry<String, Object> entry : newValues.entrySet()) {
