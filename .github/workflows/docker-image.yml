@@ -24,4 +24,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
+          tags: elimuinformatics/a2d2:${{ github.sha }}
