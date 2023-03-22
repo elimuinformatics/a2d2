@@ -1,4 +1,4 @@
-FROM maven:3.8.1-jdk-11-slim as maven
+FROM maven:3.8.1-amazoncorretto-11 as maven
 
 WORKDIR /usr/src
 
@@ -7,7 +7,7 @@ COPY . /usr/src
 RUN mvn clean install -DskipTests --settings=./a2d2-settings.xml
 RUN for file in /usr/src/services/*; do mvn clean install -f "$file" --settings=a2d2-settings.xml -Dmaven.repo.local=client_repo;   done 
 
-FROM adoptopenjdk/openjdk11:jre-11.0.10_9-alpine as final
+FROM amazoncorretto:11.0.11-alpine as final
 
 WORKDIR /app
 
