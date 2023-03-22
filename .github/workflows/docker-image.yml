@@ -20,10 +20,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: build image
-        run: docker build -t elimuinformatics/a2d2:latest .
+        run: docker build -t docker.io/elimuinformatics/a2d2:latest .
         
       - name: tag image with version id
-        run: docker image tag elimuinformatics/a2d2:latest elimuinformatics/a2d2:1.0.0
+        run: docker image tag docker.io/elimuinformatics/a2d2:latest docker.io/elimuinformatics/a2d2:1.0.0
       
       - name: push latest image
         run: docker push docker.io/elimuinformatics/a2d2:latest
