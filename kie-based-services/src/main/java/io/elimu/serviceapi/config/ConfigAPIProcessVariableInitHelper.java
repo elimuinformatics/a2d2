@@ -21,7 +21,7 @@ public class ConfigAPIProcessVariableInitHelper extends ProcessVariableInitHelpe
 		try {
 			serviceProperty.putAll(new ConfigAPIUtil().getConfig(request, env, client, appName));
 		} catch (TimeoutException e) {
-			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+			throw e;
 		}
 		serviceProperty.put("configApiAppName", appName);
 		serviceProperty.put("configApiClient", client);

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -147,12 +148,16 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			if (procId != null && !NOT_ALLOWED_METHOD_KEY.equals(procId)) {
 				LOG.info("Executing process " + procId + " for service " + getId());
 				Map<String, Object> params = new HashMap<>();
-				params.put("serviceRequest", request);
-				params.put("serviceResponse", defaultResponse());
-				params.put("defaultCustomer", getDefaultCustomer());
-                                String providedClient = getClient(request);
-                                params.put("configApiClient", providedClient);
-                                params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
+				try {
+					params.put("serviceRequest", request);
+					params.put("serviceResponse", defaultResponse());
+					params.put("defaultCustomer", getDefaultCustomer());
+	                                String providedClient = getClient(request);
+	                                params.put("configApiClient", providedClient);
+	                                params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
+				}catch(TimeoutException e) {
+					throw e;
+				}
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {

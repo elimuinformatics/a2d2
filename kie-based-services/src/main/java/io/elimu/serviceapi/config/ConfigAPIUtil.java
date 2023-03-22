@@ -89,7 +89,7 @@ public class ConfigAPIUtil {
 						}
 					}
 					else {
-						throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+						throw new TimeoutException();
 					}
 					CACHE.put(url, new CachedResult(retval));
 				} catch (Exception e) {
@@ -100,7 +100,7 @@ public class ConfigAPIUtil {
 		LOG.info("ConfigAPIUtil fetched {} variable values", CACHE.get(url).getVariables().size());
 		return retval;
 		}catch (Exception e) {
-			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+			throw e;
 			}
 		}
 	
