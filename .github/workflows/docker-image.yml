@@ -26,7 +26,4 @@ jobs:
         run: docker image tag elimuinformatics/a2d2:latest elimuinformatics/a2d2:1.0.0
       
       - name: push latest image
-        run: docker push elimuinformatics/a2d2:latest
-
-      - name: push image with Version id
-        run: docker push elimuinformatics/a2d2:1.0.0
+        uses: docker/build-push-action@v2
