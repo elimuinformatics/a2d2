@@ -183,9 +183,7 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			} else {
 				return new ServiceResponse(appendListenerOutput(request, listener, "Method " + request.getMethod() + " not allowed"), 405);
 			}
-		}
-		
-		} catch (TimeoutException e) {
+		}catch (TimeoutException e) {
 			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
 		}
 		catch (Exception e) {
