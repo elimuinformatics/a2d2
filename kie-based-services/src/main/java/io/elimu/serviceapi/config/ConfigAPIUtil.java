@@ -89,20 +89,26 @@ public class ConfigAPIUtil {
 						}
 					}
 					else {
-						throw new TimeoutException();
+						throw new TimeoutException("Timeout occurred when fetching configuration parameters");
 					}
 					CACHE.put(url, new CachedResult(retval));
-				} catch (Exception e) {
+				} catch (TimeoutException e) { 
+					throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+				}
+				catch (Exception e) {
 					LOG.warn("Error invoking config-api", e);
 				}
 			}
 		
 		LOG.info("ConfigAPIUtil fetched {} variable values", CACHE.get(url).getVariables().size());
 		return retval;
-		}catch (Exception e) {
+		}catch (TimeoutException e) { 
+			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+		}		
+		catch (Exception e) {
 			throw e;
-			}
 		}
+	}
 	
 
 	private String getOrGenerateToken(ServiceRequest request) {

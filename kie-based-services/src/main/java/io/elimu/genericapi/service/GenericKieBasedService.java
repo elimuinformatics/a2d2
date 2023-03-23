@@ -156,6 +156,8 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 	                                params.put("configApiClient", providedClient);
 	                                params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
 				}catch(TimeoutException e) {
+					throw TimeoutException("Timeout occurred when fetching configuration parameters");
+				} catch (Exception e) {
 					throw e;
 				}
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
@@ -181,7 +183,12 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			} else {
 				return new ServiceResponse(appendListenerOutput(request, listener, "Method " + request.getMethod() + " not allowed"), 405);
 			}
-		} catch (Exception e) {
+		}
+		
+		} catch (TimeoutException e) {
+			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+		}
+		catch (Exception e) {
 			LOG.error("Problem executing service", e);
 			throw new GenericServiceException(
 					"The execution of the service encountered an error of type " 
