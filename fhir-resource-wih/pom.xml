@@ -138,10 +138,10 @@
     			<artifactId>json-path</artifactId>
     			<version>2.6.0</version>
     			<exclusions>
-			<exclusion>
-				<groupId>net.minidev</groupId>
-				<artifactId>json-smart</artifactId>
-			</exclusion>
+    				<exclusion>
+    					<groupId>net.minidev</groupId>
+    					<artifactId>json-smart</artifactId>
+    				</exclusion>
     			</exclusions>
 		</dependency>
 		<dependency>
