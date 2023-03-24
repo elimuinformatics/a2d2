@@ -138,28 +138,23 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		}
 		RuntimeEngine runtime = null;
 		ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(getKieContainer().getClassLoader());
+		runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
+		KieSession ksession = runtime.getKieSession();
+		GenericDebugListener listener = enableDebugging(ksession, request);
 		try {
-			Thread.currentThread().setContextClassLoader(getKieContainer().getClassLoader());
-			runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
-			KieSession ksession = runtime.getKieSession();
-			GenericDebugListener listener = enableDebugging(ksession, request);
 			enableMixpanel(ksession);
 			String procId = getProcessId(request.getMethod());
 			if (procId != null && !NOT_ALLOWED_METHOD_KEY.equals(procId)) {
 				LOG.info("Executing process " + procId + " for service " + getId());
 				Map<String, Object> params = new HashMap<>();
-				try {
-					params.put("serviceRequest", request);
-					params.put("serviceResponse", defaultResponse());
-					params.put("defaultCustomer", getDefaultCustomer());
-	                                String providedClient = getClient(request);
-	                                params.put("configApiClient", providedClient);
-	                                params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
-				}catch(TimeoutException e) {
-					throw TimeoutException("Timeout occurred when fetching configuration parameters");
-				} catch (Exception e) {
-					throw e;
-				}
+				params.put("serviceRequest", request);
+				params.put("serviceResponse", defaultResponse());
+				params.put("defaultCustomer", getDefaultCustomer());
+                                String providedClient = getClient(request);
+                                params.put("configApiClient", providedClient);
+                                params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
+				
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {
@@ -184,7 +179,8 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 				return new ServiceResponse(appendListenerOutput(request, listener, "Method " + request.getMethod() + " not allowed"), 405);
 			}
 		}catch (TimeoutException e) {
-			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+			LOG.error("Timeout occurred when fetching configuration parameters");
+			return new ServiceResponse(appendListenerOutput(request, listener, "Timeout occurred when fetching configuration parameters"), 400);
 		}
 		catch (Exception e) {
 			LOG.error("Problem executing service", e);

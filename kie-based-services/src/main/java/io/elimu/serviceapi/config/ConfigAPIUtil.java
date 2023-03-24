@@ -86,14 +86,15 @@ public class ConfigAPIUtil {
 						} else {
 							LOG.warn("Invalid value type for JSON property: " + node.getNodeType().name());
 						}
-						}
+					}
 					}
 					else {
+						// to do: Check what kind exception might be happens,
 						throw new TimeoutException("Timeout occurred when fetching configuration parameters");
 					}
 					CACHE.put(url, new CachedResult(retval));
 				} catch (TimeoutException e) { 
-					throw new TimeoutException("Timeout occurred when fetching configuration parameters");
+					throw e;
 				}
 				catch (Exception e) {
 					LOG.warn("Error invoking config-api", e);

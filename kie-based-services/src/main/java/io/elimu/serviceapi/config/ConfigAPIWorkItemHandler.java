@@ -34,14 +34,16 @@ public class ConfigAPIWorkItemHandler implements WorkItemHandler {
 		Map<String, Object> newValues = new HashMap<>();
 		try {
 			newValues = new ConfigAPIUtil().getConfig(request, env, client, appName);
+			for (Map.Entry<String, Object> entry : newValues.entrySet()) {
+				pI.setVariable(entry.getKey(), entry.getValue());
+			}
+			
 		} catch (Exception e) {
 			LOG.error("Timeout occurred when fetching configuration parameters", e);
-			
-		}
-		for (Map.Entry<String, Object> entry : newValues.entrySet()) {
-			pI.setVariable(entry.getKey(), entry.getValue());
+			newValues.put("Error", "Timeout occurred when fetching configuration parameters: " +e.getMessage());
 		}
 		manager.completeWorkItem(workItem.getId(), newValues);
+		
 	}
 
 	@Override
