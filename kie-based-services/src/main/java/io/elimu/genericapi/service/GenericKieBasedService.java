@@ -154,7 +154,6 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
                                 String providedClient = getClient(request);
                                 params.put("configApiClient", providedClient);
                                 params.putAll(new ConfigAPIProcessVariableInitHelper().initVariables(request, providedClient, getDependency(), getConfig()));
-				
 				WorkflowProcessInstance instance = (WorkflowProcessInstance) ksession.startProcess(procId, params);
 				ServiceResponse response = (ServiceResponse) instance.getVariable("serviceResponse");
 				if (response == null) {

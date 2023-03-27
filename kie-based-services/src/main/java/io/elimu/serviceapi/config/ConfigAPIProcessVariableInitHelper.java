@@ -11,15 +11,15 @@ import io.elimu.serviceapi.service.ProcessVariableInitHelper;
 public class ConfigAPIProcessVariableInitHelper extends ProcessVariableInitHelper {
 
 	public Map<String, Object> initVariables(ServiceRequest request, String client, Dependency dep, Properties config) throws TimeoutException{
-			Map<String, Object> serviceProperty = super.initVariables(dep);
-			String env = System.getProperty("configApiEnv");
-			String appName = config.getProperty("kie.project.appname");
-			if (appName == null || "".equals(appName.trim())) {
-				appName = dep.getArtifactId();
-			}
-			serviceProperty.putAll(new ConfigAPIUtil().getConfig(request, env, client, appName));
-			serviceProperty.put("configApiAppName", appName);
-			serviceProperty.put("configApiClient", client);
-			return serviceProperty;
+		Map<String, Object> serviceProperty = super.initVariables(dep);
+		String env = System.getProperty("configApiEnv");
+		String appName = config.getProperty("kie.project.appname");
+		if (appName == null || "".equals(appName.trim())) {
+			appName = dep.getArtifactId();
+		}
+		serviceProperty.putAll(new ConfigAPIUtil().getConfig(request, env, client, appName));
+		serviceProperty.put("configApiAppName", appName);
+		serviceProperty.put("configApiClient", client);
+		return serviceProperty;
 	}
 }

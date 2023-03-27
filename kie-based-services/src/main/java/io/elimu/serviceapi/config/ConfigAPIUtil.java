@@ -87,23 +87,22 @@ public class ConfigAPIUtil {
 								LOG.warn("Invalid value type for JSON property: " + node.getNodeType().name());
 							}
 						}
+					} else {
+						// to do: Check what kind exception might be happens,
+						throw new TimeoutException("Timeout occurred when fetching configuration parameters");
 					}
-						else {
-							// to do: Check what kind exception might be happens,
-							throw new TimeoutException("Timeout occurred when fetching configuration parameters");
-						}
-						CACHE.put(url, new CachedResult(retval));
-					} catch (TimeoutException e) { 
-						throw e;
-					} catch (Exception e) {
-						LOG.warn("Error invoking config-api", e);
-					}
+					CACHE.put(url, new CachedResult(retval));
+				} catch (TimeoutException e) { 
+					throw e;
+				} catch (Exception e) {
+					LOG.warn("Error invoking config-api", e);
 				}
+			}
 			LOG.info("ConfigAPIUtil fetched {} variable values", CACHE.get(url).getVariables().size());
 			return retval;
 		} catch (TimeoutException e) {
 			throw new TimeoutException("Timeout occurred when fetching configuration parameters");
-		 }
+		}
 		catch (Exception e) {
 			throw e;
 		}

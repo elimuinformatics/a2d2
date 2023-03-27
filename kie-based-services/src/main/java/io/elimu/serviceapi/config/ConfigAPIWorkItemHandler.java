@@ -40,8 +40,8 @@ public class ConfigAPIWorkItemHandler implements WorkItemHandler {
 		} catch (Exception e) {
 			LOG.error("Timeout occurred when fetching configuration parameters", e);
 			newValues.put("Error", "Timeout occurred when fetching configuration parameters: " +e.getMessage());
-		 }
-		 manager.completeWorkItem(workItem.getId(), newValues);
+		}
+		manager.completeWorkItem(workItem.getId(), newValues);
 	}
 
 	@Override
