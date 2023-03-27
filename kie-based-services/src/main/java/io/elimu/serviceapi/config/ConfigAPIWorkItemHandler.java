@@ -37,13 +37,11 @@ public class ConfigAPIWorkItemHandler implements WorkItemHandler {
 			for (Map.Entry<String, Object> entry : newValues.entrySet()) {
 				pI.setVariable(entry.getKey(), entry.getValue());
 			}
-			
 		} catch (Exception e) {
 			LOG.error("Timeout occurred when fetching configuration parameters", e);
 			newValues.put("Error", "Timeout occurred when fetching configuration parameters: " +e.getMessage());
-		}
-		manager.completeWorkItem(workItem.getId(), newValues);
-		
+		 }
+		 manager.completeWorkItem(workItem.getId(), newValues);
 	}
 
 	@Override
