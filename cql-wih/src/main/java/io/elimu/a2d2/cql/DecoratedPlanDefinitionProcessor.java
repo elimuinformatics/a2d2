@@ -71,7 +71,7 @@ public class DecoratedPlanDefinitionProcessor {
 		// if no data anywhere blow up
 		evaluatedCqlResults.get().clear();
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Class<?> idTypeClass = cl.loadClass("org.hl7.fhir.instance.model.api.IIdType");
+		//Class<?> idTypeClass = cl.loadClass("org.hl7.fhir.instance.model.api.IIdType");
 		Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
 		Object basePlanDefinition = paramPlanDefinition;
 		requireNonNull(basePlanDefinition, "Couldn't find PlanDefinition " + theId);
@@ -327,6 +327,19 @@ public class DecoratedPlanDefinitionProcessor {
 						session.encounterId, session.practitionerId, session.organizationId, session.userType, session.userLanguage,
 						session.userTaskContext, session.setting, session.settingContext, session.parameters,
 						session.contentEndpoint, session.terminologyEndpoint, session.dataEndpoint);
+				if (hasMethod(activityDefinition, "getIntent") && hasMethod(result, "getIntent")) {
+					try {
+						Class<?> intentClass = result.getClass().getMethod("getIntent").getReturnType();
+						Object srcIntent = activityDefinition.getClass().getMethod("getIntent").invoke(activityDefinition);
+						String intentCode = (String) srcIntent.getClass().getMethod("toCode").invoke(srcIntent);
+						if (intentCode != null) {
+							Object tgtIntent = intentClass.getMethod("fromCode", String.class).invoke(null, intentCode);
+							result.getClass().getMethod("setIntent", intentClass).invoke(result, tgtIntent);
+						}
+					} catch (Exception e) {
+						logger.warn("Cannot override intent enum for result " + result + ": " + e.getMessage());
+					}
+				}
 			}
 			applyAction(session, result, action);
 			Object rgAction = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
@@ -346,6 +359,15 @@ public class DecoratedPlanDefinitionProcessor {
 		} catch (Exception e) {
 			logger.error("ERROR: ActivityDefinition {} could not be applied and threw exception {}", definition, e.toString(), e);
 		}
+	}
+
+	private boolean hasMethod(Object object, String methodName) {
+		for (Method m : object.getClass().getMethods()) {
+			if (m.getName().equals(methodName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void applyNestedPlanDefinition(Session session, Object definition, Object action) throws ReflectiveOperationException {
@@ -457,7 +479,7 @@ public class DecoratedPlanDefinitionProcessor {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
 		Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
-		Class<?> strTypeClass = cl.loadClass("org.hl7.fhir.r4.model.StringType");
+		//Class<?> strTypeClass = cl.loadClass("org.hl7.fhir.r4.model.StringType");
 		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
 		Class<?> baseClass = cl.loadClass("org.hl7.fhir.r4.model.Base");
 		boolean somethingFound = false;
@@ -708,6 +730,7 @@ public class DecoratedPlanDefinitionProcessor {
 		return null;
 	}
   
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected Object evaluateConditionOrDynamicValue(String expression, String language, String libraryToBeEvaluated, Session session, List<?> dataRequirements) throws ReflectiveOperationException { //List<DataRequirement> 
 		Object params = resolveInputParameters(dataRequirements);
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -800,6 +823,7 @@ public class DecoratedPlanDefinitionProcessor {
 				allresults.put(keyName, list);
 				allresults.put(keyName + "_multiple", true);
 			} else {
+				@SuppressWarnings("unchecked")
 				List<Object> list = (List<Object>) value;
 				list.add(result);
 			}
