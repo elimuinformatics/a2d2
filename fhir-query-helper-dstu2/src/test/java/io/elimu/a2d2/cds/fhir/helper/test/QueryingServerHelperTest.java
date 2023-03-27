@@ -28,6 +28,7 @@ import java.util.List;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -40,6 +41,7 @@ import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.QueryBuilder;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelper;
 
+@Ignore("No valid public FHIR servers available to test this")
 public class QueryingServerHelperTest {
 
 	private static QueryingServerHelper queryingServerHelper = spy(QueryingServerHelper.class);

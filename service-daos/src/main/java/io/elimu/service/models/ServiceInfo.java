@@ -23,6 +23,7 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -56,7 +57,7 @@ public class ServiceInfo {
     @Column(nullable = false)
     private String status;
 
-    @ElementCollection
+    @ElementCollection( fetch = FetchType.EAGER )
     @CollectionTable(name="othercustomers", joinColumns= {@JoinColumn(name="ServiceId"), @JoinColumn(name="ServiceVersion")})
     @Column(name="element")
     private Set<String> otherCustomers = new HashSet<String>();

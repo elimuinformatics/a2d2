@@ -46,6 +46,9 @@ public class JWTAuthUtil {
 	
 	public static boolean isValidJwt(String jwtToken, String serviceId) {
 		try {
+			if (jwtToken == null || "NO_CREDS".equalsIgnoreCase(jwtToken)) {
+				return false;
+			}
 			LOGGER.debug("Parsing token " + jwtToken);
 			DecodedJWT jwt = JWT.decode(jwtToken.replace("Bearer", "").trim());
 			GenericKieBasedService service = serviceId == null ? null : (GenericKieBasedService) RunningServices.getInstance().get(serviceId);
@@ -62,10 +65,6 @@ public class JWTAuthUtil {
 			if (aud == null || validAud.isEmpty() || !aud.stream().anyMatch(a -> validAud.contains(a))) {
 				return false;
 			}
-			//Ensure that the exp value is not before the current date/time.
-//			if (jwt.getExpiresAt().before(new Date())) {
-//				return false;
-//			}
 			//Ensure the jku value, if present, matches the request and validates the signature
 			String jku = jwt.getHeaderClaim("jku") == null ? null : jwt.getHeaderClaim("jku").asString();
 			List<String> validJku = getConfigPropertyAsString(serviceProperties, "jwtValidJku");
