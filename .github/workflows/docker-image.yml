@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "Use-login-action-v1" ]
+    branches: [ "main" ]
       
 jobs:        
   build-login-publish:
