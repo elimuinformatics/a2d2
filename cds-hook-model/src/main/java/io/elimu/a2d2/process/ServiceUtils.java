@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -263,21 +264,40 @@ public class ServiceUtils {
 
 	public static Properties getBaseConfigFromUrl(URL jarURL) throws IOException {
 		LOG.debug("Trying to read config from URL " + jarURL);
-		String auth = getMavenUser() + ":" + getMavenPassword();
-		HttpURLConnection conn = (HttpURLConnection) jarURL.openConnection();
-		String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
-		conn.setRequestProperty ("Authorization", basicAuth);
-		conn.connect();
-		try (InputStream input = conn.getInputStream()) {
-			byte[] data = input.readAllBytes();
-			Path file = Files.createTempFile("tempFile", ".jar");
-			Files.write(file, data, StandardOpenOption.WRITE);
-			try (JarFile jar = new JarFile(file.toFile())) {
-				JarEntry openEntry = jar.getJarEntry("service.dsl");
-				byte[] serviceDslData = jar.getInputStream(openEntry).readAllBytes();
-				Properties retval = new Properties();
-				retval.load(new ByteArrayInputStream(serviceDslData));
-				return retval;
+		if ("file".equals(jarURL.getProtocol())) {
+			try {
+				byte[] data = Files.readAllBytes(Paths.get(jarURL.toURI()));
+				Path file = Files.createTempFile("tempFile", ".jar");
+				Files.write(file, data, StandardOpenOption.WRITE);
+				try (JarFile jar = new JarFile(file.toFile())) {
+					JarEntry openEntry = jar.getJarEntry("service.dsl");
+					byte[] serviceDslData = jar.getInputStream(openEntry).readAllBytes();
+					Properties retval = new Properties();
+					retval.load(new ByteArrayInputStream(serviceDslData));
+					return retval;
+				}
+			} catch (URISyntaxException e) {
+				throw new IOException("Cannot read path " + jarURL, e);
+			}
+		} else {
+			HttpURLConnection conn = (HttpURLConnection) jarURL.openConnection();
+			if (getMavenUser() != null || getMavenPassword() != null) {
+				String auth = getMavenUser() + ":" + getMavenPassword();
+				String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+				conn.setRequestProperty ("Authorization", basicAuth);
+				conn.connect();
+			}
+			try (InputStream input = conn.getInputStream()) {
+				byte[] data = input.readAllBytes();
+				Path file = Files.createTempFile("tempFile", ".jar");
+				Files.write(file, data, StandardOpenOption.WRITE);
+				try (JarFile jar = new JarFile(file.toFile())) {
+					JarEntry openEntry = jar.getJarEntry("service.dsl");
+					byte[] serviceDslData = jar.getInputStream(openEntry).readAllBytes();
+					Properties retval = new Properties();
+					retval.load(new ByteArrayInputStream(serviceDslData));
+					return retval;
+				}
 			}
 		}
 	}
