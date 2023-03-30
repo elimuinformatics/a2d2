@@ -27,7 +27,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.7</version>
+		<version>2.7.10</version>
 		<relativePath />
 	</parent>
 
@@ -56,7 +56,7 @@
 		<spring-security.version>5.7.6</spring-security.version>
 		<postgresql.version>42.5.1</postgresql.version>
 		<cloudwatchlogbackappender.version>2.1</cloudwatchlogbackappender.version>
-		<mysql-connector-java.version>8.0.29</mysql-connector-java.version>	
+		<mysql-connector-java.version>8.0.31</mysql-connector-java.version>	
 		<snakeyaml.version>1.33</snakeyaml.version>
 		<xstream.version>1.4.20</xstream.version>
 		<plexus-utils.version>3.5.0</plexus-utils.version>		
