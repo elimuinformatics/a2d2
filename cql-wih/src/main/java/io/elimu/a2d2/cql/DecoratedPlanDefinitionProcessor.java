@@ -348,10 +348,12 @@ public class DecoratedPlanDefinitionProcessor {
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
 			Object prefix = activityDefinition.getClass().getMethod("getTitle").invoke(activityDefinition);
+			Object desc = activityDefinition.getClass().getMethod("getDescription").invoke(activityDefinition);
 			if (prefix == null) {
-				prefix = activityDefinition.getClass().getMethod("getDescription").invoke(activityDefinition);
+				prefix = desc;
 			}
 			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
+			rgAction.getClass().getMethod("setTextEquivalent", String.class).invoke(rgAction, desc);
 			Object type = rgAction.getClass().getMethod("getType").invoke(rgAction);
 			Object coding = type.getClass().getMethod("addCoding").invoke(type);
 			coding.getClass().getMethod("setCode", String.class).invoke(coding, "fire-event");
@@ -560,7 +562,10 @@ public class DecoratedPlanDefinitionProcessor {
 			Object timing = action.getClass().getMethod("getTiming").invoke(action);
 			act.getClass().getMethod("setTitle", String.class).invoke(act, title);
 			act.getClass().getMethod("setDescription", String.class).invoke(act, description);
-			act.getClass().getMethod("setTextEquivalent", String.class).invoke(act, textEquivalent);
+			boolean alreadyHasTextEq = (boolean) act.getClass().getMethod("hasTextEquivalent").invoke(act);
+			if (!alreadyHasTextEq) { // needed to preserve ActivityDefinition's description
+				act.getClass().getMethod("setTextEquivalent", String.class).invoke(act, textEquivalent);
+			}
 			act.getClass().getMethod("setCode", List.class).invoke(act, code);
 			act.getClass().getMethod("setTiming", typeClass).invoke(act, timing);
 			boolean hasExtension = (boolean) action.getClass().getMethod("hasExtension").invoke(action);
