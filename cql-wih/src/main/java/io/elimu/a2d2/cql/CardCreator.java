@@ -185,9 +185,9 @@ public class CardCreator {
                 	suggestion.setUuid(UUID.randomUUID().toString());
                 	Object prefix = r4actionClass.getMethod("getPrefix").invoke(action);
                 	suggestion.setLabel((String) prefix);
-                    boolean hasDescription2 = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
-                    if (hasDescription2) {
-                    	Object description = r4actionClass.getMethod("getDescription").invoke(action);
+                    boolean hasTextEquivalent = (boolean) r4actionClass.getMethod("hasTextEquivalent").invoke(action);
+                    if (hasTextEquivalent) {
+                    	Object description = r4actionClass.getMethod("getTextEquivalent").invoke(action);
                     	actionsRet.put("description", description);
                     }
                     boolean actionHasType = (boolean) r4actionClass.getMethod("hasType").invoke(action);
