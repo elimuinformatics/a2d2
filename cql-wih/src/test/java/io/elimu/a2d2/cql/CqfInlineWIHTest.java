@@ -1,21 +1,29 @@
 package io.elimu.a2d2.cql;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.drools.core.process.instance.impl.WorkItemImpl;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Identifier.IdentifierUse;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
+import org.hl7.fhir.r4.model.Period;
 import org.hl7.fhir.r4.model.PlanDefinition;
 import org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.RequestGroup;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Timing.UnitsOfTime;
@@ -25,6 +33,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import io.elimu.a2d2.cdsresponse.entity.Card;
+import io.elimu.a2d2.cdsresponse.entity.Suggestion;
 import io.elimu.a2d2.oauth.BodyBuilder;
 import io.elimu.a2d2.oauth.OAuthUtils;
 
@@ -238,6 +247,339 @@ public class CqfInlineWIHTest {
 	}
 	
 	@Test
+	public void testProvidedPlanDefJson() throws Exception {
+		if (System.getProperty("fhirServerToken") == null) {
+			return;
+		}
+		String token = System.getProperty("fhirServerToken");
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		
+		workItem.setParameter("fhirServerAuth", "Bearer " + token);
+		workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+		//workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+		//workItem.setParameter("fhirServer_header_Epic__Client__ID", "test-value-1");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+		//workItem.setParameter("fhirTerminologyServer_header_Epic__Client__ID", "test-value-2");
+		workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/SimpleGonorrheaCDS");
+		Bundle bundle = new Bundle();
+		bundle.setType(Bundle.BundleType.COLLECTION);
+		MedicationRequest mreq = new MedicationRequest();
+		mreq.setId("medrx0325");
+		mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
+		mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
+		mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
+		mreq.setMedication(new Reference().setReference("Medication/eWZNFft0XQRiRjSYPyNsf8w3").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+		mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
+		mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
+				setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
+		mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		Dosage dos1 = mreq.addDosageInstruction();
+		SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
+		dos1.getTiming().getCode().setText("Daily");
+		dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
+		dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
+		dos1.getRoute().setText("Intramuscular");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
+			getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		bundle.addEntry().setResource(mreq);
+		workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+		workItem.setParameter("context_draftOrders", bundle);
+		workItem.setParameter("context_hook", "order-select");
+		workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+		//workItem.setParameter("patientId", "smart-1288992");
+		//workItem.setParameter("context_patientId", "smart-1288992");
+		workItem.setParameter("context_encounterId", "89284");
+		workItem.setParameter("context_patientId", "SMART-436610");
+		workItem.setParameter("patientId", "SMART-436610");
+		workItem.setParameter("context_userId", "Practitioner/example");
+
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		for (String key : workItem.getResults().keySet()) {
+			System.out.println(" - " + key + ": " + workItem.getResult(key));
+		}
+		long time = System.currentTimeMillis() - start;
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNotNull(workItem.getResult("cards"));
+		List<?> cards = (List<?>) workItem.getResult("cards");
+		Assert.assertEquals(1, cards.size());
+		Card card = (Card) cards.get(0);
+		Assert.assertNotNull(card);
+		Assert.assertEquals("Attention: Antibiotic Stewardship", card.getSummary());
+		Assert.assertEquals("If the current ceftriaxone order is presumptive treatment for gonorrhea, please note that the CDC's "
+				+ "updated guidance is that for patients weighing <150 kg (presumably) and with no beta-lactam allergy, the "
+				+ "recommended dose is ceftriaxone 500 mg IM x1. Pt has a ceftriaxone order dose 250", card.getDetail());
+		Assert.assertEquals("warning", card.getIndicator());
+		Assert.assertEquals("any", card.getSelectionBehavior());
+		Assert.assertNotNull(card.getOverrideReasons());
+		Assert.assertEquals(2, card.getOverrideReasons().size());
+		for (JSONObject ovReason : card.getOverrideReasons()) {
+			Assert.assertNotNull(ovReason.get("display"));
+			Assert.assertTrue(Arrays.asList("Patient refused", "Incorrect diagnosis").contains(ovReason.get("display")));
+		}
+		Assert.assertNotNull(card.getSuggestions());
+		Assert.assertEquals(1, card.getSuggestions().size());
+		System.out.println("CARDS JSON");
+		System.out.println(workItem.getResult("cardsJson"));
+		System.out.println("CQL OUTPUTS:"); 
+		for (String key : workItem.getResults().keySet()) {
+			if (key.startsWith("cql_")) {
+				System.out.println(key + ": " + workItem.getResult(key));
+			}
+		}
+	}
+	
+	@Test
+	public void testRemoveAction() throws Exception {
+		if (System.getProperty("fhirServerToken") == null) {
+			return;
+		}
+		String token = System.getProperty("fhirServerToken");
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		
+		workItem.setParameter("fhirServerAuth", "Bearer " + token);
+		workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+		//workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+		workItem.setParameter("planDefinitionJson", "{\n"
+				+ "    \"resourceType\": \"PlanDefinition\",\n"
+				+ "    \"id\": \"SimpleGonorrheaCDS\",\n"
+				+ "    \"meta\": {\n"
+				+ "        \"versionId\": \"14\",\n"
+				+ "        \"lastUpdated\": \"2023-03-08T05:44:04.933+00:00\",\n"
+				+ "        \"source\": \"#FgIdWhecJuWEkPqD\"\n"
+				+ "    },\n"
+				+ "    \"url\": \"http://elimu.io/PlanDefinition/SimpleGonorrheaCDS\",\n"
+				+ "    \"name\": \"SimpleGonorrheaCDS\",\n"
+				+ "    \"title\": \"Simple Gonorrhea Management CDS for Hooks Testing\",\n"
+				+ "    \"type\": {\n"
+				+ "        \"coding\": [\n"
+				+ "            {\n"
+				+ "                \"system\": \"http://terminology.hl7.org/CodeSystem/plan-definition-type\",\n"
+				+ "                \"code\": \"eca-rule\",\n"
+				+ "                \"display\": \"ECA Rule\"\n"
+				+ "            }\n"
+				+ "        ]\n"
+				+ "    },\n"
+				+ "    \"status\": \"draft\",\n"
+				+ "    \"experimental\": true,\n"
+				+ "    \"date\": \"2022-10-03\",\n"
+				+ "    \"publisher\": \"PHII and Elimu Informatics\",\n"
+				+ "    \"description\": \"Propose gonorrhea management in conformance with latest guidelines\",\n"
+				+ "    \"useContext\": [\n"
+				+ "        {\n"
+				+ "            \"code\": {\n"
+				+ "                \"system\": \"http://terminology.hl7.org/CodeSystem/usage-context-type\",\n"
+				+ "                \"code\": \"focus\",\n"
+				+ "                \"display\": \"Clinical Focus\"\n"
+				+ "            },\n"
+				+ "            \"valueCodeableConcept\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://snomed.info/sct\",\n"
+				+ "                        \"code\": \"15628003\",\n"
+				+ "                        \"display\": \"Gonorrhea\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            }\n"
+				+ "        }\n"
+				+ "    ],\n"
+				+ "    \"library\": [\n"
+				+ "        \"http://elimu.io/Library/SimpleGonorrheaCDS2\"\n"
+				+ "    ],\n"
+				+ "    \"action\": [\n"
+				+ "        {\n"
+				+ "            \"documentation\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"documentation\",\n"
+				+ "                    \"display\": \"CDC's (STI) Treatment Guidelines, 2021\",\n"
+				+ "                    \"url\": \"https://www.cdc.gov/std/treatment-guidelines/default.htm\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"trigger\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"named-event\",\n"
+				+ "                    \"name\": \"order-sign\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"condition\": [\n"
+				+ "                {\n"
+				+ "                    \"kind\": \"applicability\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"description\": \"New diagnosis of urogenital/anorectal gonorrhea and meets criteria for 500 mg dose of ceftriaxone\",\n"
+				+ "                        \"language\": \"text/cql-identifier\",\n"
+				+ "                        \"expression\": \"HasIncorrectDoseCard\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"participant\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"practitioner\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"type\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                        \"code\": \"create\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            },\n"
+				+ "            \"groupingBehavior\": \"logical-group\",\n"
+				+ "            \"selectionBehavior\": \"any\",\n"
+				+ "            \"dynamicValue\": [\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.title\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql-identifier\",\n"
+				+ "                        \"expression\": \"CardTitle\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.description\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql-identifier\",\n"
+				+ "                        \"expression\": \"CardDetailTextGCOrderSign\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardIndicatorCategory\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension.override\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"overrideReasonsForCard1\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"action\": [\n"
+				+ "                {\n"
+				+ "                    \"description\": \"Remove Ceftriaxone draft order\",\n"
+				+ "                    \"type\": {\n"
+				+ "                        \"coding\": [\n"
+				+ "                            {\n"
+				+ "                                \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                                \"code\": \"remove\"\n"
+				+ "                            }\n"
+				+ "                        ]\n"
+				+ "                    },\n"
+				+ "                    \"dynamicValue\": [\n"
+				+ "                        {\n"
+				+ "                            \"path\": \"action.id\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"language\": \"text/cql.identifier\",\n"
+				+ "                                \"expression\": \"DraftCetriaxoneOrderId\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ]\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"description\": \"Ceftriaxone 500 mg order\",\n"
+				+ "                    \"precheckBehavior\": \"yes\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone500OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for Infectious Disease referral\",\n"
+				+ "                                \"language\": \"text/cql-identifier\",\n"
+				+ "                                \"expression\": \"IsFemaleAndPregnant\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/IDReferral\"\n"
+				+ "                }\n"
+				+ "            ]\n"
+				+ "        }\n"
+				+ "    ]\n"
+				+ "}\n");
+		Bundle bundle = new Bundle();
+		bundle.setType(Bundle.BundleType.COLLECTION);
+		MedicationRequest mreq = new MedicationRequest();
+		mreq.setId("medrx0325");
+		mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
+		mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
+		mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
+		mreq.setMedication(new Reference().setReference("Medication/eWZNFft0XQRiRjSYPyNsf8w3").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+		mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
+		mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
+				setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
+		mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		Dosage dos1 = mreq.addDosageInstruction();
+		SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
+		dos1.getTiming().getCode().setText("Daily");
+		dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
+		dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
+		dos1.getRoute().setText("Intramuscular");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
+			getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		bundle.addEntry().setResource(mreq);
+		workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+		workItem.setParameter("context_draftOrders", bundle);
+		workItem.setParameter("patientId", "SMART-436610");
+		workItem.setParameter("context_patientId", "SMART-436610");
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		long time = System.currentTimeMillis() - start;
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		Assert.assertNotNull(workItem.getResult("cards"));
+		List<?> cards = (List<?>) workItem.getResult("cards");
+		Assert.assertFalse(cards.isEmpty());
+		boolean found = false;
+		for (Object c : cards) {
+			Card card = (Card) c;
+			if ("Remove Ceftriaxone draft order".equals(card.getDetail())) {
+				found = true;
+				Assert.assertNotNull(card.getSuggestions());
+				Assert.assertEquals(1, card.getSuggestions().size());
+				Suggestion suggestion = card.getSuggestions().get(0);
+				Assert.assertNotNull(suggestion.getLabel());
+				Assert.assertEquals("Remove Ceftriaxone draft order", suggestion.getLabel());
+				Assert.assertNotNull(suggestion.getUuid());
+				Assert.assertNotNull(suggestion.getActions());
+				List<JSONObject> actions = suggestion.getActions();
+				Assert.assertFalse(actions.isEmpty());
+				Assert.assertEquals(1, actions.size());
+				JSONObject action = actions.get(0);
+				Assert.assertNotNull(action.get("type"));
+				Assert.assertEquals("delete", action.get("type").toString());
+			}
+		}
+		Assert.assertTrue(found);
+
+	}
+	
+	@Test
 	@Ignore //Ignoring because its failing the builds, someone is working on it. So, we are going to ignore it for now 
 	public void testInlineCall() throws Exception {
 		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
@@ -301,5 +643,5 @@ public class CqfInlineWIHTest {
 		handler.executeWorkItem(workItem, manager);
 		Assert.assertNotNull(workItem.getResults());
 		Assert.assertTrue(workItem.getResults().containsKey("error"));
-	}
+    }
 }

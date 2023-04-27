@@ -558,13 +558,23 @@ public class DecoratedPlanDefinitionProcessor {
 			Object title = action.getClass().getMethod("getTitle").invoke(action);
 			Object description = action.getClass().getMethod("getDescription").invoke(action);
 			Object textEquivalent = action.getClass().getMethod("getTextEquivalent").invoke(action);
+			Object prefix = action.getClass().getMethod("getPrefix").invoke(action);
 			Object code = action.getClass().getMethod("getCode").invoke(action);
 			Object timing = action.getClass().getMethod("getTiming").invoke(action);
 			act.getClass().getMethod("setTitle", String.class).invoke(act, title);
 			act.getClass().getMethod("setDescription", String.class).invoke(act, description);
+			if (prefix == null) {
+				act.getClass().getMethod("setPrefix", String.class).invoke(act, description);
+			} else {
+				act.getClass().getMethod("setPrefix", String.class).invoke(act, prefix);
+			}
 			boolean alreadyHasTextEq = (boolean) act.getClass().getMethod("hasTextEquivalent").invoke(act);
 			if (!alreadyHasTextEq) { // needed to preserve ActivityDefinition's description
 				act.getClass().getMethod("setTextEquivalent", String.class).invoke(act, textEquivalent);
+			}
+			Object cctype = action.getClass().getMethod("getType").invoke(action);
+			if (cctype != null) {
+				act.getClass().getMethod("setType", cl.loadClass("org.hl7.fhir.r4.model.CodeableConcept")).invoke(act, cctype);
 			}
 			act.getClass().getMethod("setCode", List.class).invoke(act, code);
 			act.getClass().getMethod("setTiming", typeClass).invoke(act, timing);
