@@ -198,8 +198,7 @@ public class CardCreator {
                     	if("fire-event".equals(code)) {
                     		actionsRet.put("type", "create");
                     	} else {
-                    		Object actionTypeCode = code.equals("remove") ? "delete" : code;
-                    		actionsRet.put("type", actionTypeCode);
+                    		actionsRet.put("type", "remove".equals(code) ? "delete" : code);
                     	}
                     }
                     boolean hasResource = (boolean) r4actionClass.getMethod("hasResource").invoke(action);
