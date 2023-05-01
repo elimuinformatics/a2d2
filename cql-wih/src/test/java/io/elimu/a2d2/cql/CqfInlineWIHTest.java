@@ -359,9 +359,9 @@ public class CqfInlineWIHTest {
 				+ "    \"resourceType\": \"PlanDefinition\",\n"
 				+ "    \"id\": \"SimpleGonorrheaCDS\",\n"
 				+ "    \"meta\": {\n"
-				+ "        \"versionId\": \"14\",\n"
-				+ "        \"lastUpdated\": \"2023-03-08T05:44:04.933+00:00\",\n"
-				+ "        \"source\": \"#FgIdWhecJuWEkPqD\"\n"
+				+ "        \"versionId\": \"24\",\n"
+				+ "        \"lastUpdated\": \"2023-04-28T15:37:06.725+00:00\",\n"
+				+ "        \"source\": \"#EoVfoqC0yWt6cO0w\"\n"
 				+ "    },\n"
 				+ "    \"url\": \"http://elimu.io/PlanDefinition/SimpleGonorrheaCDS\",\n"
 				+ "    \"name\": \"SimpleGonorrheaCDS\",\n"
@@ -514,7 +514,7 @@ public class CqfInlineWIHTest {
 				+ "            ]\n"
 				+ "        }\n"
 				+ "    ]\n"
-				+ "}\n");
+				+ "}");
 		Bundle bundle = new Bundle();
 		bundle.setType(Bundle.BundleType.COLLECTION);
 		MedicationRequest mreq = new MedicationRequest();
@@ -522,7 +522,7 @@ public class CqfInlineWIHTest {
 		mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
 		mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
 		mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
-		mreq.setMedication(new Reference().setReference("Medication/eWZNFft0XQRiRjSYPyNsf8w3").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+		mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
 		mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
 		mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
 				setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
@@ -535,10 +535,10 @@ public class CqfInlineWIHTest {
 		dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
 		dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
 		dos1.getRoute().setText("Intramuscular");
-		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
-			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
 		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
 			getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
+		getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
 		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
 			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
 		bundle.addEntry().setResource(mreq);
@@ -546,11 +546,15 @@ public class CqfInlineWIHTest {
 		workItem.setParameter("context_draftOrders", bundle);
 		workItem.setParameter("patientId", "SMART-436610");
 		workItem.setParameter("context_patientId", "SMART-436610");
+		workItem.setParameter("context_userId", "Practitioner/example");
+		workItem.setParameter("context_encounterId", "89284");
 		NoOpWorkItemManager manager = new NoOpWorkItemManager();
 		long start = System.currentTimeMillis();
+		System.out.println("About to start call...");
 		handler.executeWorkItem(workItem, manager);
 		long time = System.currentTimeMillis() - start;
 		System.out.println("Time to run 1st time (ms): " + time);
+		System.out.println(workItem.getResult("cardsJson"));
 		Assert.assertEquals(true, manager.isCompleted());
 		Assert.assertNotNull(workItem.getResult("cards"));
 		List<?> cards = (List<?>) workItem.getResult("cards");

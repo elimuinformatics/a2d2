@@ -561,10 +561,13 @@ public class DecoratedPlanDefinitionProcessor {
 			Object prefix = action.getClass().getMethod("getPrefix").invoke(action);
 			Object code = action.getClass().getMethod("getCode").invoke(action);
 			Object timing = action.getClass().getMethod("getTiming").invoke(action);
+			Object id = action.getClass().getMethod("getId").invoke(action);
 			act.getClass().getMethod("setTitle", String.class).invoke(act, title);
 			act.getClass().getMethod("setDescription", String.class).invoke(act, description);
 			if (prefix == null) {
-				act.getClass().getMethod("setPrefix", String.class).invoke(act, description);
+				if (act.getClass().getMethod("getPrefix").invoke(act) == null) {
+					act.getClass().getMethod("setPrefix", String.class).invoke(act, description);
+				}
 			} else {
 				act.getClass().getMethod("setPrefix", String.class).invoke(act, prefix);
 			}
@@ -576,6 +579,7 @@ public class DecoratedPlanDefinitionProcessor {
 			if (cctype != null) {
 				act.getClass().getMethod("setType", cl.loadClass("org.hl7.fhir.r4.model.CodeableConcept")).invoke(act, cctype);
 			}
+			act.getClass().getMethod("setId", String.class).invoke(act, id);
 			act.getClass().getMethod("setCode", List.class).invoke(act, code);
 			act.getClass().getMethod("setTiming", typeClass).invoke(act, timing);
 			boolean hasExtension = (boolean) action.getClass().getMethod("hasExtension").invoke(action);
