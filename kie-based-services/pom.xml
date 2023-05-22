@@ -12,7 +12,7 @@
 	<properties>
 		<cxf.version>3.5.5</cxf.version>
 		<mixpanel.version>1.4.4</mixpanel.version>
-		<org.json.version>20230227</org.json.version>
+		<org.json.version>20220924</org.json.version>
 		<ant.version>1.10.11</ant.version>
 		<jsoup.version>1.15.3</jsoup.version>
 		<plexus-utils.version>3.5.0</plexus-utils.version>
