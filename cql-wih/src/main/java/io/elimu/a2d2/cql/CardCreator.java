@@ -95,7 +95,7 @@ public class CardCreator {
                 }
                 boolean hasDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
                 if (hasDescription) {
-                	isValidCard = true;
+//                	isValidCard = true;
                 	card.setDetail((String) r4actionClass.getMethod("getDescription").invoke(action));
                 }
                 boolean hasExtension2 = (boolean) r4actionClass.getMethod("hasExtension").invoke(action);
@@ -141,7 +141,7 @@ public class CardCreator {
                 boolean hasDoc = (boolean) r4actionClass.getMethod("hasDocumentation").invoke(action);
                 Map<String, Object> source = new HashMap<>();
                 if (hasDoc) {
-                	isValidCard = true;
+                	//isValidCard = true;
                     // Assuming first related artifact has everything
                 	Object documentation = r4actionClass.getMethod("getDocumentationFirstRep").invoke(action);
                     boolean hasDisplay = (boolean) documentation.getClass().getMethod("hasDisplay").invoke(documentation);
@@ -189,6 +189,17 @@ public class CardCreator {
                     if (hasTextEquivalent) {
                     	Object description = r4actionClass.getMethod("getTextEquivalent").invoke(action);
                     	actionsRet.put("description", description);
+                    	if (card.getDetail() != null && description.equals(card.getDetail())) {
+                    		boolean hasActionDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
+                        	if (hasActionDescription) {
+                        		actionsRet.put("description", r4actionClass.getMethod("getDescription").invoke(action));
+                        	}
+                    	}
+                    } else {
+                    	boolean hasActionDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
+                    	if (hasActionDescription) {
+                    		actionsRet.put("description", r4actionClass.getMethod("getDescription").invoke(action));
+                    	}
                     }
                     boolean actionHasType = (boolean) r4actionClass.getMethod("hasType").invoke(action);
                     if (actionHasType) {
@@ -198,8 +209,7 @@ public class CardCreator {
                     	if("fire-event".equals(code)) {
                     		actionsRet.put("type", "create");
                     	} else {
-                    		Object actionTypeCode = code.equals("remove") ? "delete" : code;
-                    		actionsRet.put("type", actionTypeCode);
+                    		actionsRet.put("type", "remove".equals(code) ? "delete" : code);
                     	}
                     }
                     boolean hasResource = (boolean) r4actionClass.getMethod("hasResource").invoke(action);
@@ -212,6 +222,11 @@ public class CardCreator {
 	                    	JSONObject obj = (JSONObject) new JSONParser().parse(json);
 	                    	actionsRet.put("resource", obj);
                     	}
+                    }
+                    boolean hasId = (boolean) r4actionClass.getMethod("hasId").invoke(action);
+                    if (hasId) {
+                    	Object id = r4actionClass.getMethod("getId").invoke(action);
+                    	actionsRet.put("resourceId", id);
                     }
                     suggestion.setActions(Arrays.asList(new JSONObject(actionsRet)));
                     suggestions.add(suggestion);
