@@ -204,4 +204,11 @@
       <packageUrl regex="true">^pkg:maven/ca\.uhn\.hapi\.fhir/org\.hl7\.fhir\.utilities@.*$</packageUrl>
       <vulnerabilityName>CVE-2023-24057</vulnerabilityName>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: org.hl7.fhir.utilities-5.5.7.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/ca\.uhn\.hapi\.fhir/org\.hl7\.fhir\.utilities@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-28465</vulnerabilityName>
+   </suppress>
 </suppressions>
