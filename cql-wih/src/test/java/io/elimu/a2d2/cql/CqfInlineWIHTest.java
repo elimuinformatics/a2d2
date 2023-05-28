@@ -38,6 +38,84 @@ import io.elimu.a2d2.oauth.BodyBuilder;
 import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
+	
+	@Test
+	public void testCqlLibraryLoading() throws Exception {
+		if (System.getProperty("fhirServerToken") == null) {
+			return;
+		}
+		String token = System.getProperty("fhirServerToken");
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		workItem.setParameter("fhirServerAuth", "Bearer " + token);
+		workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+		workItem.setParameter("context_hook", "order-select");
+		workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+		workItem.setParameter("context_userId", "Practitioner/example");
+		workItem.setParameter("patientId", "SMART-436610");
+		workItem.setParameter("context_patientId", "SMART-436610");
+		workItem.setParameter("context_encounterId", "89284");
+		Bundle bundle = new Bundle();
+		bundle.setType(Bundle.BundleType.COLLECTION);
+		MedicationRequest mreq = new MedicationRequest();
+		mreq.setId("medrx0325");
+		mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
+		mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
+		mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
+		mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+		mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
+		mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
+				setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
+		mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		Dosage dos1 = mreq.addDosageInstruction();
+		SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
+		dos1.getTiming().getCode().setText("Daily");
+		dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
+		dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
+		dos1.getRoute().setText("Intramuscular");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
+			getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		bundle.addEntry().setResource(mreq);
+		workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+		workItem.setParameter("context_draftOrders", bundle);
+		workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		for (String key : workItem.getResults().keySet()) {
+			System.out.println(" - " + key + ": " + workItem.getResult(key));
+		}
+		long time = System.currentTimeMillis() - start;
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNotNull(workItem.getResult("cards"));
+		List<?> cards = (List<?>) workItem.getResult("cards");
+		Assert.assertEquals(1, cards.size());
+		Card card = (Card) cards.get(0);
+		Assert.assertNotNull(card);
+		Assert.assertEquals("Attention: Antibiotic Stewardship", card.getSummary());
+		Assert.assertEquals("If the current ceftriaxone order is presumptive treatment for gonorrhea, please note that the CDC\u0027s updated "
+				+ "guidance is that for patients (presumably) weighing \u003c150 kg and no beta-lactam allergy, the recommended dose is "
+				+ "ceftriaxone 500 mg IM x1.", card.getDetail());
+		Assert.assertEquals("warning", card.getIndicator());
+		Assert.assertEquals("any", card.getSelectionBehavior());
+		Assert.assertNotNull(card.getOverrideReasons());
+		Assert.assertEquals(3, card.getOverrideReasons().size());
+		Assert.assertNotNull(card.getSuggestions());
+		Assert.assertEquals(2, card.getSuggestions().size());
+	}
 
 	@Test
 	public void testSecondAzizPlanWithNoContextMeds() throws Exception {

@@ -72,6 +72,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			Object restClientFactory = ctxClass.getMethod("getRestfulClientFactory").invoke(this.ctx);
 			Class<?> rcfClass = cl.loadClass("ca.uhn.fhir.rest.client.api.IRestfulClientFactory");
 			rcfClass.getMethod("setHttpClient", Object.class).invoke(restClientFactory, new CachingHttpClient());
+			rcfClass.getMethod("setConnectTimeout", int.class).invoke(restClientFactory, 30000);
+			rcfClass.getMethod("setSocketTimeout", int.class).invoke(restClientFactory, 30000);
 			Class<?> svmeClass = cl.loadClass("ca.uhn.fhir.rest.client.api.ServerValidationModeEnum");
 			Object never = svmeClass.getField("NEVER").get(null);
 			rcfClass.getMethod("setServerValidationMode", svmeClass).invoke(restClientFactory, never);

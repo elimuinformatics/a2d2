@@ -795,8 +795,11 @@ public class DecoratedPlanDefinitionProcessor {
 			String key = generateExpressionKey(expression, params);
 			if (libraryResults.containsKey(key)) {
 				result = libraryResults.get(key);
+			} else if (libraryResults.containsKey(expression)) {
+				result = libraryResults.get(expression);
 			} else {	
 			    result = expressionEvaluator.getClass().getMethod("evaluate", String.class, iparamsClass).invoke(expressionEvaluator, expression, params);
+			    libraryResults.put(key, result);
 			}
 			break;
 		case "text/cql-identifier":
