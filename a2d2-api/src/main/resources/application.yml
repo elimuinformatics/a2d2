@@ -77,7 +77,7 @@ spring.jpa:
     hibernate.ddl-auto: update
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
     hibernate.naming.strategy: org.hibernate.cfg.ImprovedNamingStrategy
-    properties.hibernate.show_sql: false 
+    properties.hibernate.show_sql: ${show_sql:false}
     
 cds.service:
   name: 'cds profile:'
