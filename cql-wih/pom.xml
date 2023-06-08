@@ -274,6 +274,12 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
+		<dependency> <!-- THIS NEEDS TO BE A RUNTIME DEPENDENCY OF THE PROJECT -->
+			<groupId>io.elimu.a2d2</groupId>
+			<artifactId>cql-mods</artifactId>
+			<version>0.0.1</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cds-hook-model</artifactId>

@@ -123,7 +123,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				@Override
 				public Object get() {
 					try {
-						Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						//Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						Object builder = cl.loadClass("io.elimu.a2d2.cql.MyCqlEvaluatorBuilder").getConstructor().newInstance();
 						builder = builder.getClass().getMethod("withLibraryCache", HashMap.class).invoke(builder, LIBRARY_CACHE);
 						builder = builder.getClass().getMethod("withCqlOptions", cqlOptions.getClass()).invoke(builder, cqlOptions);
 						return builder;
@@ -136,7 +137,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				@Override
 				public Object get() {
 					try {
-						Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						//Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						Object builder = cl.loadClass("io.elimu.a2d2.cql.MyCqlEvaluatorBuilder").getConstructor().newInstance();
 						builder = builder.getClass().getDeclaredMethod("withLibraryCache", HashMap.class).invoke(builder, LIBRARY_CACHE);
 						builder = builder.getClass().getDeclaredMethod("withCqlOptions", cqlOptions.getClass()).invoke(builder, cqlOptions);
 						return builder;
