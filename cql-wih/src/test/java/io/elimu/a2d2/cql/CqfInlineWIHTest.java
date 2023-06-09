@@ -40,6 +40,674 @@ import io.elimu.a2d2.oauth.OAuthUtils;
 public class CqfInlineWIHTest {
 	
 	@Test
+	public void testCqlDoubleResult() throws Exception {
+		if (System.getProperty("fhirServerToken") == null) {
+			return;
+		}
+		String token = System.getProperty("fhirServerToken");
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		workItem.setParameter("fhirServerAuth", "Bearer " + token);
+		workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+		workItem.setParameter("context_hook", "order-select");
+		workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+		workItem.setParameter("context_userId", "Practitioner/example");
+		workItem.setParameter("patientId", "SMART-436610");
+		workItem.setParameter("context_patientId", "SMART-436610");
+		workItem.setParameter("context_encounterId", "89284");
+		Bundle bundle = new Bundle();
+		bundle.setType(Bundle.BundleType.COLLECTION);
+		MedicationRequest mreq = new MedicationRequest();
+		mreq.setId("medrx0325");
+		mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
+		mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
+		mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
+		mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+		mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
+		mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
+				setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
+		mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		Dosage dos1 = mreq.addDosageInstruction();
+		SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
+		dos1.getTiming().getCode().setText("Daily");
+		dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
+		dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
+		dos1.getRoute().setText("Intramuscular");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
+			getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		bundle.addEntry().setResource(mreq);
+		workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+		workItem.setParameter("context_draftOrders", bundle);
+		workItem.setParameter("planDefinitionJson", "{\n"
+				+ "    \"resourceType\": \"PlanDefinition\",\n"
+				+ "    \"id\": \"GonorrheaCDSPresumptiveTreatment\",\n"
+				+ "    \"meta\": {\n"
+				+ "        \"versionId\": \"20\",\n"
+				+ "        \"lastUpdated\": \"2023-06-07T06:14:11.101+00:00\",\n"
+				+ "        \"source\": \"#x13YpCZQTtyVQHnb\"\n"
+				+ "    },\n"
+				+ "    \"url\": \"http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment\",\n"
+				+ "    \"name\": \"GonorrheaCDSPresumptiveTreatment\",\n"
+				+ "    \"title\": \"Gonorrhea Management CDS: Presumptive Treatment Scenario\",\n"
+				+ "    \"type\": {\n"
+				+ "        \"coding\": [\n"
+				+ "            {\n"
+				+ "                \"system\": \"http://terminology.hl7.org/CodeSystem/plan-definition-type\",\n"
+				+ "                \"code\": \"eca-rule\",\n"
+				+ "                \"display\": \"ECA Rule\"\n"
+				+ "            }\n"
+				+ "        ]\n"
+				+ "    },\n"
+				+ "    \"status\": \"draft\",\n"
+				+ "    \"experimental\": true,\n"
+				+ "    \"date\": \"2023-05-10\",\n"
+				+ "    \"description\": \"Propose gonorrhea management in conformance with latest guidelines, in response to likely presumptive treatment as inferred by the ordering of intramuscular ceftriaxone\",\n"
+				+ "    \"useContext\": [\n"
+				+ "        {\n"
+				+ "            \"code\": {\n"
+				+ "                \"system\": \"http://terminology.hl7.org/CodeSystem/usage-context-type\",\n"
+				+ "                \"code\": \"focus\",\n"
+				+ "                \"display\": \"Clinical Focus\"\n"
+				+ "            },\n"
+				+ "            \"valueCodeableConcept\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://snomed.info/sct\",\n"
+				+ "                        \"code\": \"15628003\",\n"
+				+ "                        \"display\": \"Gonorrhea\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            }\n"
+				+ "        }\n"
+				+ "    ],\n"
+				+ "    \"library\": [\n"
+				+ "        \"http://elimu.io/Library/GonorrheaTxCDS\"\n"
+				+ "    ],\n"
+				+ "    \"action\": [\n"
+				+ "        {\n"
+				+ "            \"trigger\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"named-event\",\n"
+				+ "                    \"name\": \"order-sign\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"condition\": [\n"
+				+ "                {\n"
+				+ "                    \"kind\": \"applicability\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"description\": \"Is age 13 or higher, and has new order for intramuscular ceftriaxone of the wrong dose for weight\",\n"
+				+ "                        \"language\": \"text/cql\",\n"
+				+ "                        \"expression\": \"NeedsAnyGCTxRec\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"participant\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"practitioner\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"type\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                        \"code\": \"create\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            },\n"
+				+ "            \"groupingBehavior\": \"logical-group\",\n"
+				+ "            \"selectionBehavior\": \"any\",\n"
+				+ "            \"dynamicValue\": [\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.title\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardTitlePresumptiveGCTx\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.description\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardDetailTextGCTx\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardIndicatorCategory\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension.override\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"overrideReasonsForCeftriaxoneIMCard\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"action\": [\n"
+				+ "                {\n"
+				+ "                    \"description\": \"Remove Ceftriaxone draft order\",\n"
+				+ "                    \"type\": {\n"
+				+ "                        \"coding\": [\n"
+				+ "                            {\n"
+				+ "                                \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                                \"code\": \"remove\"\n"
+				+ "                            }\n"
+				+ "                        ]\n"
+				+ "                    },\n"
+				+ "                    \"dynamicValue\": [\n"
+				+ "                        {\n"
+				+ "                            \"path\": \"action.id\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"language\": \"text/cql.identifier\",\n"
+				+ "                                \"expression\": \"DraftCetriaxoneIMOrderId\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ]\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for prechecked ceftriaxone 500 mg IM x1\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsCeftriax500Prechecked\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"yes\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone500OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for prechecked ceftriaxone 1 gram IM x1\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsCeftriax1000Prechecked\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"yes\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone1000OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for a non-prechecked ceftriaxone 500 mg IM x1\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsCeftriax500Option\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone500OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Has beta lactam allergy, and needs option for gentamicin 240 mg\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsAllergyOptions\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Gentamicin240OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Has beta lactam allergy, and needs option for azithromycin 2 gram\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsAllergyOptions\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Azithromycin2GmOrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Has beta lactam allergy, and needs option for ID referral\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsAllergyOptions\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/IDReferral\"\n"
+				+ "                }\n"
+				+ "            ]\n"
+				+ "        }\n"
+				+ "    ]\n"
+				+ "}");
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		for (String key : workItem.getResults().keySet()) {
+			System.out.println(" - " + key + ": " + workItem.getResult(key));
+		}
+		long time = System.currentTimeMillis() - start;
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		
+		List<?> cards = (List<?>) workItem.getResult("cards");
+		Assert.assertEquals(2, cards.size());
+		Card card1 = ((Card) cards.get(0)).getSummary().equals("Attention: Antibiotic Stewardship") ? (Card) cards.get(0) : (Card) cards.get(1);
+		Card card2 = ((Card) cards.get(0)).getSummary().equals("Additional Gonorrhea Recommendations") ? (Card) cards.get(0) : (Card) cards.get(1);
+		Assert.assertEquals("warning", card1.getIndicator());
+		Assert.assertEquals("If the current ceftriaxone order is presumptive treatment for gonorrhea, please note that the CDC's updated guidance is that for patients (presumably) weighing <150 kg and no beta-lactam allergy, the recommended dose is ceftriaxone 500 mg IM x1.", card1.getDetail());
+		Assert.assertEquals(2, card1.getSuggestions().size());
+		Suggestion sug11 = card1.getSuggestions().get(0).getLabel().equals("Remove Ceftriaxone draft order") ? card1.getSuggestions().get(0) : card1.getSuggestions().get(1);
+		Suggestion sug12 = card1.getSuggestions().get(0).getLabel().equals("Intramuscular") ? card1.getSuggestions().get(0) : card1.getSuggestions().get(1);
+		Assert.assertEquals(1, sug11.getActions().size());
+		JSONObject sug11Action = sug11.getActions().get(0);
+		
+		Assert.assertEquals(1, sug12.getActions().size());
+		JSONObject sug12Action = sug12.getActions().get(0);
+		Assert.assertEquals("delete", sug11Action.get("type"));
+		Assert.assertEquals("Remove Ceftriaxone draft order", sug11Action.get("description"));
+		Assert.assertEquals("MedicationRequest/medrx0325", sug11Action.get("resourceId"));
+		Assert.assertEquals("create", sug12Action.get("type"));
+		Assert.assertNotNull(sug12Action.get("resource"));
+		Assert.assertEquals("Not duplicate cefTRIAXone (ROCEPHIN) injection 500 mg", sug12Action.get("description"));
+		Assert.assertEquals("any", card1.getSelectionBehavior());
+		Assert.assertEquals(3, card1.getOverrideReasons().size());
+
+		Assert.assertEquals("If presumptively treating for gonorrhea, current recommendations are to treat presumptively for concurrent Chlamydia infection when Chlamydia has not been excluded.   Available data indicate patient has no recent Chlamydia test,and has no beta-lactam allergy. Appropriate options are: if not pregnant, doxycycline 100 mg PO bid x7 days, azithromycin 1 g PO x1, or levofloxacin 500 mg PO daily x7 days; if pregnant, azithromycin 1 g PO x1 or amoxicillin 500 mg PO tid x7 days.\n Please consider the following additional recommendations: If pharyngeal gonorrhea, perform a test-of-cure 7-14 days after treatment Retest for gonorrhea 3 months after treatment Test for syphilis and HIV, if not yet done  \nPlease advise the patient of the following: Sexual partners within prior 60 days need evaluation and treatment Abstain from sexual activity for 7 days after treatment of yourself and partners", card2.getDetail());
+		Assert.assertTrue(card2.getSuggestions() == null || card2.getSuggestions().isEmpty());
+		Assert.assertEquals("warning", card2.getIndicator());
+		Assert.assertEquals("any", card2.getSelectionBehavior());
+	}
+	
+	@Test
+	public void testCqlDoubleCards() throws Exception {
+		//TODO NeedsAllergyOptions is true but CardTitlePresumptiveGCTx is returning the second case (so NeedsAllergyOptions is false??)
+		
+		if (System.getProperty("fhirServerToken") == null) {
+			return;
+		}
+		String token = System.getProperty("fhirServerToken");
+		PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+		WorkItemImpl workItem = new WorkItemImpl();
+		workItem.setParameter("fhirServerAuth", "Bearer " + token);
+		workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+		workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+		workItem.setParameter("context_hook", "order-select");
+		workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+		workItem.setParameter("context_userId", "Practitioner/example");
+		workItem.setParameter("patientId", "SMART-436610");
+		workItem.setParameter("context_patientId", "SMART-436610");
+		workItem.setParameter("context_encounterId", "89284");
+		Bundle bundle = new Bundle();
+		bundle.setType(Bundle.BundleType.COLLECTION);
+		MedicationRequest mreq = new MedicationRequest();
+		mreq.setId("medrx0325");
+		mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
+		mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
+		mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
+		mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+		mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
+		mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
+				setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
+		mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
+		Dosage dos1 = mreq.addDosageInstruction();
+		SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
+		dos1.getTiming().getCode().setText("Daily");
+		dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
+		dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
+		dos1.getRoute().setText("Intramuscular");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
+			getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
+			getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
+		bundle.addEntry().setResource(mreq);
+		workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+		workItem.setParameter("context_draftOrders", bundle);
+		workItem.setParameter("planDefinitionJson", "{\n"
+				+ "    \"resourceType\": \"PlanDefinition\",\n"
+				+ "    \"id\": \"GonorrheaCDSPresumptiveTreatment-UnitTest\",\n"
+				+ "    \"meta\": {\n"
+				+ "        \"versionId\": \"1\",\n"
+				+ "        \"lastUpdated\": \"2023-06-06T17:26:20.848+00:00\",\n"
+				+ "        \"source\": \"#15hOfB0ppyWnMbYz\"\n"
+				+ "    },\n"
+				+ "    \"url\": \"http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment\",\n"
+				+ "    \"name\": \"GonorrheaCDSPresumptiveTreatment\",\n"
+				+ "    \"title\": \"Gonorrhea Management CDS: Presumptive Treatment Scenario\",\n"
+				+ "    \"type\": {\n"
+				+ "        \"coding\": [\n"
+				+ "            {\n"
+				+ "                \"system\": \"http://terminology.hl7.org/CodeSystem/plan-definition-type\",\n"
+				+ "                \"code\": \"eca-rule\",\n"
+				+ "                \"display\": \"ECA Rule\"\n"
+				+ "            }\n"
+				+ "        ]\n"
+				+ "    },\n"
+				+ "    \"status\": \"draft\",\n"
+				+ "    \"experimental\": true,\n"
+				+ "    \"date\": \"2023-03-01\",\n"
+				+ "    \"description\": \"Propose gonorrhea management in conformance with latest guidelines, in response to likely presumptive treatment as inferred by the ordering of intramuscular ceftriaxone; concomitant recommendations for Chlamydia treatment are given, if needed\",\n"
+				+ "    \"useContext\": [\n"
+				+ "        {\n"
+				+ "            \"code\": {\n"
+				+ "                \"system\": \"http://terminology.hl7.org/CodeSystem/usage-context-type\",\n"
+				+ "                \"code\": \"focus\",\n"
+				+ "                \"display\": \"Clinical Focus\"\n"
+				+ "            },\n"
+				+ "            \"valueCodeableConcept\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://snomed.info/sct\",\n"
+				+ "                        \"code\": \"15628003\",\n"
+				+ "                        \"display\": \"Gonorrhea\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            }\n"
+				+ "        }\n"
+				+ "    ],\n"
+				+ "    \"library\": [\n"
+				+ "        \"http://elimu.io/Library/GonorrheaTxCDS-UnitTest\"\n"
+				+ "    ],\n"
+				+ "    \"action\": [\n"
+				+ "        {\n"
+				+ "            \"trigger\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"named-event\",\n"
+				+ "                    \"name\": \"order-sign\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"condition\": [\n"
+				+ "                {\n"
+				+ "                    \"kind\": \"applicability\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"description\": \"Meets basic inclusion criteria and trigger: age 13 or higher, and has new order for intramuscular ceftriaxone\",\n"
+				+ "                        \"language\": \"text/cql\",\n"
+				+ "                        \"expression\": \"IsAgeGT13WithNewIMCeftriaxOrder\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"participant\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"practitioner\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"type\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                        \"code\": \"create\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            },\n"
+				+ "            \"groupingBehavior\": \"logical-group\",\n"
+				+ "            \"selectionBehavior\": \"any\",\n"
+				+ "            \"dynamicValue\": [\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.title\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardTitlePresumptiveGCTx\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.description\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardDetailTextGCTx\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardIndicatorCategory\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension.override\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"overrideReasonsForCeftriaxoneIMCard\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"action\": [\n"
+				+ "                {\n"
+				+ "                    \"description\": \"Remove Ceftriaxone draft order\",\n"
+				+ "                    \"type\": {\n"
+				+ "                        \"coding\": [\n"
+				+ "                            {\n"
+				+ "                                \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                                \"code\": \"remove\"\n"
+				+ "                            }\n"
+				+ "                        ]\n"
+				+ "                    },\n"
+				+ "                    \"dynamicValue\": [\n"
+				+ "                        {\n"
+				+ "                            \"path\": \"action.id\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"language\": \"text/cql.identifier\",\n"
+				+ "                                \"expression\": \"DraftCetriaxoneIMOrderId\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ]\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for prechecked ceftriaxone 500 mg IM x1\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsCeftriax500Prechecked\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"yes\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone500OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for prechecked ceftriaxone 1 gram IM x1\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsCeftriax1000Prechecked\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"yes\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone1000OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Meets criteria for a non-prechecked ceftriaxone 500 mg IM x1\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsCeftriax500Option\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Ceftriaxone500OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Has beta lactam allergy, and needs option for gentamicin 240 mg\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsAllergyOptions\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Gentamicin240OrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Has beta lactam allergy, and needs option for azithromycin 2 gram\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsAllergyOptions\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/Azithromycin2GmOrderProposal\"\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"condition\": [\n"
+				+ "                        {\n"
+				+ "                            \"kind\": \"applicability\",\n"
+				+ "                            \"expression\": {\n"
+				+ "                                \"description\": \"Has beta lactam allergy, and needs option for ID referral\",\n"
+				+ "                                \"language\": \"text/cql\",\n"
+				+ "                                \"expression\": \"NeedsAllergyOptions\"\n"
+				+ "                            }\n"
+				+ "                        }\n"
+				+ "                    ],\n"
+				+ "                    \"precheckBehavior\": \"no\",\n"
+				+ "                    \"definitionCanonical\": \"http://elimu.io/ActivityDefinition/IDReferral\"\n"
+				+ "                }\n"
+				+ "            ]\n"
+				+ "        },\n"
+				+ "        {\n"
+				+ "            \"trigger\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"named-event\",\n"
+				+ "                    \"name\": \"order-sign\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"condition\": [\n"
+				+ "                {\n"
+				+ "                    \"kind\": \"applicability\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"description\": \"Meets trigger as above for presumptive gonorrhea treatment, and has positive or possible Chlamydia\",\n"
+				+ "                        \"language\": \"text/cql\",\n"
+				+ "                        \"expression\": \"NeedsChlamydiaTxRec\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"participant\": [\n"
+				+ "                {\n"
+				+ "                    \"type\": \"practitioner\"\n"
+				+ "                }\n"
+				+ "            ],\n"
+				+ "            \"type\": {\n"
+				+ "                \"coding\": [\n"
+				+ "                    {\n"
+				+ "                        \"system\": \"http://terminology.hl7.org/CodeSystem/action-type\",\n"
+				+ "                        \"code\": \"create\"\n"
+				+ "                    }\n"
+				+ "                ]\n"
+				+ "            },\n"
+				+ "            \"groupingBehavior\": \"logical-group\",\n"
+				+ "            \"selectionBehavior\": \"any\",\n"
+				+ "            \"dynamicValue\": [\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.title\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardTitleAdditionalGCRecs\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.description\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardDetailTextAdditionalGCRecs\"\n"
+				+ "                    }\n"
+				+ "                },\n"
+				+ "                {\n"
+				+ "                    \"path\": \"action.extension\",\n"
+				+ "                    \"expression\": {\n"
+				+ "                        \"language\": \"text/cql.identifier\",\n"
+				+ "                        \"expression\": \"CardIndicatorCategory\"\n"
+				+ "                    }\n"
+				+ "                }\n"
+				+ "            ]\n"
+				+ "        }\n"
+				+ "    ]\n"
+				+ "}");
+		NoOpWorkItemManager manager = new NoOpWorkItemManager();
+		long start = System.currentTimeMillis();
+		handler.executeWorkItem(workItem, manager);
+		for (String key : workItem.getResults().keySet()) {
+			System.out.println(" - " + key + ": " + workItem.getResult(key));
+		}
+		long time = System.currentTimeMillis() - start;
+		Assert.assertNotNull(workItem.getResults());
+		Assert.assertNull(workItem.getResult("error"));		
+		Assert.assertNotNull(workItem.getResult("cardsJson"));
+		System.out.println("Time to run 1st time (ms): " + time);
+		Assert.assertEquals(true, manager.isCompleted());
+		
+		List<?> cards = (List<?>) workItem.getResult("cards");
+		Assert.assertEquals(2, cards.size());
+		Card card1 = ((Card) cards.get(0)).getSummary().equals("Attention: Antibiotic Stewardship") ? (Card) cards.get(0) : (Card) cards.get(1);
+		Card card2 = ((Card) cards.get(0)).getSummary().equals("Additional Gonorrhea Recommendations") ? (Card) cards.get(0) : (Card) cards.get(1);
+		Assert.assertEquals("warning", card1.getIndicator());
+		Assert.assertEquals("If the current ceftriaxone order is presumptive treatment for gonorrhea, please note that the CDC's updated guidance is that for patients (presumably) weighing <150 kg and no beta-lactam allergy, the recommended dose is ceftriaxone 500 mg IM x1.", card1.getDetail());
+		Assert.assertEquals(2, card1.getSuggestions().size());
+		Suggestion sug11 = card1.getSuggestions().get(0).getLabel().equals("Remove Ceftriaxone draft order") ? card1.getSuggestions().get(0) : card1.getSuggestions().get(1);
+		Suggestion sug12 = card1.getSuggestions().get(0).getLabel().equals("Intramuscular") ? card1.getSuggestions().get(0) : card1.getSuggestions().get(1);
+		Assert.assertEquals(1, sug11.getActions().size());
+		JSONObject sug11Action = sug11.getActions().get(0);
+		
+		Assert.assertEquals(1, sug12.getActions().size());
+		JSONObject sug12Action = sug12.getActions().get(0);
+		Assert.assertEquals("delete", sug11Action.get("type"));
+		Assert.assertEquals("Remove Ceftriaxone draft order", sug11Action.get("description"));
+		Assert.assertEquals("MedicationRequest/medrx0325", sug11Action.get("resourceId"));
+		Assert.assertEquals("create", sug12Action.get("type"));
+		Assert.assertNotNull(sug12Action.get("resource"));
+		Assert.assertEquals("Not duplicate cefTRIAXone (ROCEPHIN) injection 500 mg", sug12Action.get("description"));
+		Assert.assertEquals("any", card1.getSelectionBehavior());
+		Assert.assertEquals(3, card1.getOverrideReasons().size());
+
+		Assert.assertEquals("If presumptively treating for gonorrhea, current recommendations are to treat presumptively for concurrent Chlamydia infection when Chlamydia has not been excluded.   Available data indicate patient has no recent Chlamydia test,and has no beta-lactam allergy. Appropriate options are: if not pregnant, doxycycline 100 mg PO bid x7 days, azithromycin 1 g PO x1, or levofloxacin 500 mg PO daily x7 days; if pregnant, azithromycin 1 g PO x1 or amoxicillin 500 mg PO tid x7 days.\n Please consider the following additional recommendations: If pharyngeal gonorrhea, perform a test-of-cure 7-14 days after treatment Retest for gonorrhea 3 months after treatment Test for syphilis and HIV, if not yet done  \nPlease advise the patient of the following: Sexual partners within prior 60 days need evaluation and treatment Abstain from sexual activity for 7 days after treatment of yourself and partners", card2.getDetail());
+		Assert.assertTrue(card2.getSuggestions() == null || card2.getSuggestions().isEmpty());
+		Assert.assertEquals("warning", card2.getIndicator());
+		Assert.assertEquals("any", card2.getSelectionBehavior());
+	}
+	
+	@Test
 	public void testCqlLibraryLoading() throws Exception {
 		if (System.getProperty("fhirServerToken") == null) {
 			return;

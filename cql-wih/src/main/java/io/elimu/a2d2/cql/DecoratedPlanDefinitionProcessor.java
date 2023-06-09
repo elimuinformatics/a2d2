@@ -767,7 +767,7 @@ public class DecoratedPlanDefinitionProcessor {
 		if (libraryResults.isEmpty()) {
 			Object libraryResult = libraryProcessor.getClass().getMethod("evaluate", libEvalParamTypes).
 					invoke(libraryProcessor, libraryToBeEvaluated, session.patientId,
-					session.parameters, session.contentEndpoint, session.terminologyEndpoint,
+					params, session.contentEndpoint, session.terminologyEndpoint,
 					session.dataEndpoint, session.bundle, null);
 			if (paramsClass.isInstance(libraryResult)) {
 				List<?> libParams = (List<?>) libraryResult.getClass().getMethod("getParameter").invoke(libraryResult);
@@ -775,15 +775,22 @@ public class DecoratedPlanDefinitionProcessor {
 					boolean hasName = (boolean) param.getClass().getMethod("hasName").invoke(param);
 					boolean hasValue = (boolean) param.getClass().getMethod("hasValue").invoke(param);
 					boolean hasResource = (boolean) param.getClass().getMethod("hasResource").invoke(param);
-					if (hasName && hasValue) {
+					if (hasName) {
 						String name = (String) param.getClass().getMethod("getName").invoke(param);
-						Object value = param.getClass().getMethod("getValue").invoke(param);
-						libraryResults.put(name, value);
-					} else if (hasName && hasResource) {
-						String name = (String) param.getClass().getMethod("getName").invoke(param);
-						Object resource = param.getClass().getMethod("getResource").invoke(param);
-						libraryResults.put(name, resource);
+						if (hasValue) {
+							Object value = param.getClass().getMethod("getValue").invoke(param);
+							System.out.println("- Evaluation " + name + ": " + value);
+							libraryResults.put(name, value);
+						} else if (hasResource) {
+							Object resource = param.getClass().getMethod("getResource").invoke(param);
+							libraryResults.put(name, resource);
+							System.out.println("- Evaluation " + name + ": " + resource);
+						} else {
+							logger.warn("Expression " + name + " has no value");
+						}
 					}
+						
+					
 				}
 			}
 		}
@@ -806,9 +813,17 @@ public class DecoratedPlanDefinitionProcessor {
 		case "text/cql.identifier":
 		case "text/cql.name":
 		case "text/cql-name":
-			result = libraryProcessor.getClass().getMethod("evaluate", libEvalParamTypes).invoke(libraryProcessor, 
-					libraryToBeEvaluated, session.patientId, session.parameters, session.contentEndpoint, 
+			String keyL = generateExpressionKey(expression, params);
+			if (libraryResults.containsKey(keyL)) {
+				result = libraryResults.get(keyL);
+			} else if (libraryResults.containsKey(expression)) {
+				result = libraryResults.get(expression);
+			} else {	
+				result = libraryProcessor.getClass().getMethod("evaluate", libEvalParamTypes).invoke(libraryProcessor, 
+					libraryToBeEvaluated, session.patientId, params, session.contentEndpoint, 
 					session.terminologyEndpoint, session.dataEndpoint, session.bundle, Collections.singleton(expression));
+				libraryResults.put(keyL, result);
+			}
 			break;
 		case "text/fhirpath":
 			List<?> outputs;
