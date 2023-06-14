@@ -170,8 +170,10 @@ public class DecoratedPlanDefinitionProcessor {
 	private Object resolveActions(Session session) throws ReflectiveOperationException {
 		Map<String, Object> metConditions = new HashMap<String, Object>();//PlanDefinition.PlanDefinitionActionComponent
 		List<?> actions = (List<?>) session.planDefinition.getClass().getMethod("getAction").invoke(session.planDefinition);
+		int index = 0;
 		for (Object action : actions) {
-			resolveAction(session, metConditions, action);
+			resolveAction(session, metConditions, action, index, false);
+			index++;
 		}	
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
@@ -185,8 +187,8 @@ public class DecoratedPlanDefinitionProcessor {
 		return session.carePlan;
 	}
 
-	private void resolveAction(Session session, Map<String, Object> metConditions, Object action) throws ReflectiveOperationException {
-		if (meetsConditions(session, action)) {
+	private void resolveAction(Session session, Map<String, Object> metConditions, Object action, int index, boolean isSubItem) throws ReflectiveOperationException {
+		if (meetsConditions(session, action, index)) {
 			boolean hasRelatedAction = (boolean) action.getClass().getMethod("hasRelatedAction").invoke(action);
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			Class<?> artClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition$ActionRelationshipType");
@@ -200,19 +202,19 @@ public class DecoratedPlanDefinitionProcessor {
 						String actionId = (String) relatedActionComponent.getClass().getMethod("getActionId").invoke(relatedActionComponent);
 						if (metConditions.containsKey(actionId)) {
 							metConditions.put(id, action);
-							resolveDynamicActions(session, action);
-							resolveDefinition(session, action);
+							resolveDynamicActions(session, action, index, isSubItem);
+							resolveDefinition(session, action, index);
 						}
 					}
 				}
 			}
 			metConditions.put(id, action);
-			resolveDefinition(session, action);
-			resolveDynamicActions(session, action);
+			resolveDefinition(session, action, index);
+			resolveDynamicActions(session, action, index, isSubItem);
 		}
 	}
 
-	private void resolveDefinition(Session session, Object action) throws ReflectiveOperationException {
+	private void resolveDefinition(Session session, Object action, int index) throws ReflectiveOperationException {
 		boolean hasDefCanType = (boolean) action.getClass().getMethod("hasDefinitionCanonicalType").invoke(action);
 		if (hasDefCanType) {
 			Object defCanType = action.getClass().getMethod("getDefinitionCanonicalType").invoke(action);
@@ -220,13 +222,13 @@ public class DecoratedPlanDefinitionProcessor {
 			logger.debug("Resolving definition " + defCanTypeValue);
 			switch (getResourceName(defCanType)) {
 			case "PlanDefinition":
-				applyNestedPlanDefinition(session, defCanType, action);
+				applyNestedPlanDefinition(session, defCanType, action, index);
 				break;
 			case "ActivityDefinition":
-				applyActivityDefinition(session, defCanType, action);
+				applyActivityDefinition(session, defCanType, action, index);
 				break;
 			case "Questionnaire":
-				applyQuestionnaireDefinition(session, defCanType, action);
+				applyQuestionnaireDefinition(session, defCanType, action, index);
 				break;
 			default:
 				throw new RuntimeException(String.format("Unknown action definition: ", defCanType));
@@ -235,16 +237,22 @@ public class DecoratedPlanDefinitionProcessor {
 			boolean hasDefUriType = (boolean) action.getClass().getMethod("hasDefinitionUriType").invoke(action);
 			if (hasDefUriType) {
 				Object definition = action.getClass().getMethod("getDefinitionUriType").invoke(action);
-				applyUriDefinition(session, definition, action);
+				applyUriDefinition(session, definition, action, index);
 			}
 		}
 	}
 
-	private void applyUriDefinition(Session session, Object definition, Object action) throws ReflectiveOperationException {
+	private void applyUriDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
-		Object rgAction = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+		List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+		while (index >= acts.size()) {
+			session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+			acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+		}
+		Object act = acts.get(index);
+		Object rgAction = act.getClass().getMethod("addAction").invoke(act);
 		Object reference = refClass.getConstructor(String.class).newInstance(definition.getClass().getMethod("asStringValue").invoke(definition));
 		rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, reference);
 		rgAction.getClass().getMethod("setTitle", String.class).invoke(rgAction, action.getClass().getMethod("getTitle").invoke(action));
@@ -254,7 +262,7 @@ public class DecoratedPlanDefinitionProcessor {
 		rgAction.getClass().getMethod("setTiming", typeClass).invoke(rgAction, action.getClass().getMethod("getTiming").invoke(action));
 	}
 
-	private void applyQuestionnaireDefinition(Session session, Object definition, Object action) throws ReflectiveOperationException {
+	private void applyQuestionnaireDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object result; //IBaseResource
 		try {
@@ -272,7 +280,13 @@ public class DecoratedPlanDefinitionProcessor {
 				result = iterator.next();
 			}
 			applyAction(session, result, action);
-			Object rgAction = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+			List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			while (index >= acts.size()) {
+				session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+				acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			}
+			Object act = acts.get(index);
+			Object rgAction = act.getClass().getMethod("addAction").invoke(act);
 			Class<?> anyResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IAnyResource");
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
@@ -291,7 +305,7 @@ public class DecoratedPlanDefinitionProcessor {
 		}
 	}
 
-	private void applyActivityDefinition(Session session, Object definition, Object action) throws ReflectiveOperationException {
+	private void applyActivityDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> iparamsClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseParameters");
 		Class<?> iresClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource");
@@ -342,7 +356,13 @@ public class DecoratedPlanDefinitionProcessor {
 				}
 			}
 			applyAction(session, result, action);
-			Object rgAction = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+			List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			while (index >= acts.size()) {
+				session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+				acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			}
+			Object act = acts.get(index);
+			Object rgAction = act.getClass().getMethod("addAction").invoke(act);
 			Class<?> anyResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IAnyResource");
 			Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 			Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
@@ -372,7 +392,7 @@ public class DecoratedPlanDefinitionProcessor {
 		return false;
 	}
 
-	private void applyNestedPlanDefinition(Session session, Object definition, Object action) throws ReflectiveOperationException {
+	private void applyNestedPlanDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object carePlan; //CarePlan
 		Object defStringValue = definition.getClass().getMethod("asStringValue").invoke(definition);
@@ -390,7 +410,13 @@ public class DecoratedPlanDefinitionProcessor {
 				session.terminologyEndpoint);
 		applyAction(session, carePlan, action);
 		// Add an action to the request group which points to this CarePlan
-		Object rgAction = session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+		List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+		while (index >= acts.size()) {
+			session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+			acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+		}
+		Object act = acts.get(index);
+		Object rgAction = act.getClass().getMethod("addAction").invoke(act);
 		Class<?> anyResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IAnyResource");
 		Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 		Class<?> resClass = cl.loadClass("org.hl7.fhir.r4.model.Resource");
@@ -477,7 +503,7 @@ public class DecoratedPlanDefinitionProcessor {
 	    return task;
 	}
 
-	private boolean resolveDynamicActions(Session session, Object action) throws ReflectiveOperationException {
+	private boolean resolveDynamicActions(Session session, Object action, int index, boolean isSubItem) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
 		Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
@@ -549,11 +575,13 @@ public class DecoratedPlanDefinitionProcessor {
 		}
 		if (somethingFound == true) {
 			List<?> acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
-			Object act = null;
-			if (acts != null && !acts.isEmpty()) {
-				act = acts.get(acts.size() - 1);
-			} else {
-				act = session.requestGroup.getClass().getMethod("getActionFirstRep").invoke(session.requestGroup);
+			while (acts.size() <= index) {
+				session.requestGroup.getClass().getMethod("addAction").invoke(session.requestGroup);
+				acts = (List<?>) session.requestGroup.getClass().getMethod("getAction").invoke(session.requestGroup);
+			}
+			Object act = acts.get(index);
+			if (isSubItem) {
+				act = act.getClass().getMethod("addAction").invoke(act);
 			}
 			Object title = action.getClass().getMethod("getTitle").invoke(action);
 			Object description = action.getClass().getMethod("getDescription").invoke(action);
@@ -618,7 +646,7 @@ public class DecoratedPlanDefinitionProcessor {
 		return somethingFound;
 	}
 	
-	private Boolean meetsConditions(Session session, Object action) throws ReflectiveOperationException {
+	private Boolean meetsConditions(Session session, Object action, int index) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
 		Class<?> boolClass = cl.loadClass("org.hl7.fhir.r4.model.BooleanType");
@@ -627,7 +655,7 @@ public class DecoratedPlanDefinitionProcessor {
 			List<?> actions = (List<?>) action.getClass().getMethod("getAction").invoke(action);
 			for (Object containedAction : actions) {
 				Map<String, Object> metConditions = new HashMap<String, Object>();
-				resolveAction(session, metConditions, containedAction);
+				resolveAction(session, metConditions, containedAction, index, true);
 			}
 		}
 		Object type = session.planDefinition.getClass().getMethod("getType").invoke(session.planDefinition);
@@ -779,12 +807,10 @@ public class DecoratedPlanDefinitionProcessor {
 						String name = (String) param.getClass().getMethod("getName").invoke(param);
 						if (hasValue) {
 							Object value = param.getClass().getMethod("getValue").invoke(param);
-							System.out.println("- Evaluation " + name + ": " + value);
 							libraryResults.put(name, value);
 						} else if (hasResource) {
 							Object resource = param.getClass().getMethod("getResource").invoke(param);
 							libraryResults.put(name, resource);
-							System.out.println("- Evaluation " + name + ": " + resource);
 						} else {
 							logger.warn("Expression " + name + " has no value");
 						}

@@ -36,9 +36,8 @@ public class CardCreator {
         return cards;
     }
 
-    private static List<Card> _convert(Object requestGroup, ClassLoader cl) throws ParseException, ReflectiveOperationException {
+    public static List<Card> _convert(Object requestGroup, ClassLoader cl) throws ParseException, ReflectiveOperationException {
     	List<Card> cards = new ArrayList<>();
-    	List<Suggestion> suggestions = new ArrayList<>();
     	// links
     	List<LinkCard> links = new ArrayList<>();
     	boolean hasExtension = (boolean) requestGroup.getClass().getMethod("hasExtension").invoke(requestGroup);
@@ -82,6 +81,7 @@ public class CardCreator {
         	Object r4En = enumClass.getField("R4").get(null);
         	Object ctx = ctxClass.getMethod("forCached", enumClass).invoke(null, r4En);
             for (Object action : actionsList) {
+            	List<Suggestion> suggestions = new ArrayList<>();
             	boolean isValidCard = false;
             	Class<?> r4actionClass = action.getClass();
             	Object parser = ctx.getClass().getMethod("newJsonParser").invoke(ctx);
@@ -95,7 +95,7 @@ public class CardCreator {
                 }
                 boolean hasDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
                 if (hasDescription) {
-//                	isValidCard = true;
+                	isValidCard = true;
                 	card.setDetail((String) r4actionClass.getMethod("getDescription").invoke(action));
                 }
                 boolean hasExtension2 = (boolean) r4actionClass.getMethod("hasExtension").invoke(action);
@@ -136,7 +136,6 @@ public class CardCreator {
 	                	}
                 	}
                 }
-
                 // source
                 boolean hasDoc = (boolean) r4actionClass.getMethod("hasDocumentation").invoke(action);
                 Map<String, Object> source = new HashMap<>();
@@ -176,60 +175,52 @@ public class CardCreator {
                 	Object code = selBehavior.getClass().getMethod("toCode").invoke(selBehavior);
                 	card.setSelectionBehavior((String) code);
                 }
-
-                // suggestions
-                boolean hasPrefix = (boolean) r4actionClass.getMethod("hasPrefix").invoke(action);
-                if (hasPrefix) {
-                	Suggestion suggestion = new Suggestion();
-                	Map<String, Object> actionsRet = new HashMap<>();
-                	suggestion.setUuid(UUID.randomUUID().toString());
-                	Object prefix = r4actionClass.getMethod("getPrefix").invoke(action);
-                	suggestion.setLabel((String) prefix);
-                    boolean hasTextEquivalent = (boolean) r4actionClass.getMethod("hasTextEquivalent").invoke(action);
-                    if (hasTextEquivalent) {
-                    	Object description = r4actionClass.getMethod("getTextEquivalent").invoke(action);
-                    	actionsRet.put("description", description);
-                    	if (card.getDetail() != null && description.equals(card.getDetail())) {
-                    		boolean hasActionDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
-                        	if (hasActionDescription) {
-                        		actionsRet.put("description", r4actionClass.getMethod("getDescription").invoke(action));
+                boolean hasAction2 = (boolean) r4actionClass.getMethod("hasAction").invoke(action);
+                if (hasAction2) {
+                	List<?> action2List = (List<?>) r4actionClass.getMethod("getAction").invoke(action);
+                	for (Object act2 : action2List) {
+                		Suggestion sug = new Suggestion();
+                		sug.setLabel((String) r4actionClass.getMethod("getPrefix").invoke(act2));
+                		Map<String, Object> actionsRet = new HashMap<>();
+                		sug.setUuid(UUID.randomUUID().toString());
+                		boolean hasId = (boolean) r4actionClass.getMethod("hasId").invoke(act2);
+                        if (hasId) {
+                        	Object id = r4actionClass.getMethod("getId").invoke(act2);
+                        	actionsRet.put("resourceId", id);
+                        }
+                        boolean hasTextEquivalent = (boolean) r4actionClass.getMethod("hasTextEquivalent").invoke(act2);
+                        if (hasTextEquivalent) {
+                        	Object description = r4actionClass.getMethod("getTextEquivalent").invoke(act2);
+                        	actionsRet.put("description", description);
+                        } else {
+                        	Object description = r4actionClass.getMethod("getDescription").invoke(act2);
+                        	actionsRet.put("description", description);
+                        }
+                        boolean actionHasType = (boolean) r4actionClass.getMethod("hasType").invoke(act2);
+                        if (actionHasType) {
+                        	Object type = r4actionClass.getMethod("getType").invoke(act2);
+                        	Object codingFirstRep = type.getClass().getMethod("getCodingFirstRep").invoke(type);
+                        	Object code = codingFirstRep.getClass().getMethod("getCode").invoke(codingFirstRep);
+                        	if("fire-event".equals(code)) {
+                        		actionsRet.put("type", "create");
+                        	} else {
+                        		actionsRet.put("type", "remove".equals(code) ? "delete" : code);
                         	}
-                    	}
-                    } else {
-                    	boolean hasActionDescription = (boolean) r4actionClass.getMethod("hasDescription").invoke(action);
-                    	if (hasActionDescription) {
-                    		actionsRet.put("description", r4actionClass.getMethod("getDescription").invoke(action));
-                    	}
-                    }
-                    boolean actionHasType = (boolean) r4actionClass.getMethod("hasType").invoke(action);
-                    if (actionHasType) {
-                    	Object type = r4actionClass.getMethod("getType").invoke(action);
-                    	Object codingFirstRep = type.getClass().getMethod("getCodingFirstRep").invoke(type);
-                    	Object code = codingFirstRep.getClass().getMethod("getCode").invoke(codingFirstRep);
-                    	if("fire-event".equals(code)) {
-                    		actionsRet.put("type", "create");
-                    	} else {
-                    		actionsRet.put("type", "remove".equals(code) ? "delete" : code);
-                    	}
-                    }
-                    boolean hasResource = (boolean) r4actionClass.getMethod("hasResource").invoke(action);
-                    if (hasResource) {
-                    	Class<?> ibaseResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource");
-                    	Object resource = r4actionClass.getMethod("getResource").invoke(action);
-                    	Object resourceTarget = resource.getClass().getMethod("getResource").invoke(resource);
-                    	if (resourceTarget != null) {
-	                    	String json = (String) parser.getClass().getMethod("encodeResourceToString", ibaseResClass).invoke(parser, resourceTarget);
-	                    	JSONObject obj = (JSONObject) new JSONParser().parse(json);
-	                    	actionsRet.put("resource", obj);
-                    	}
-                    }
-                    boolean hasId = (boolean) r4actionClass.getMethod("hasId").invoke(action);
-                    if (hasId) {
-                    	Object id = r4actionClass.getMethod("getId").invoke(action);
-                    	actionsRet.put("resourceId", id);
-                    }
-                    suggestion.setActions(Arrays.asList(new JSONObject(actionsRet)));
-                    suggestions.add(suggestion);
+                        }
+                        boolean hasResource = (boolean) r4actionClass.getMethod("hasResource").invoke(act2);
+                        if (hasResource) {
+                        	Class<?> ibaseResClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource");
+                        	Object resource = r4actionClass.getMethod("getResource").invoke(act2);
+                        	Object resourceTarget = resource.getClass().getMethod("getResource").invoke(resource);
+                        	if (resourceTarget != null) {
+    	                    	String json = (String) parser.getClass().getMethod("encodeResourceToString", ibaseResClass).invoke(parser, resourceTarget);
+    	                    	JSONObject obj = (JSONObject) new JSONParser().parse(json);
+    	                    	actionsRet.put("resource", obj);
+                        	}
+                        }
+                        sug.setActions(Arrays.asList(new JSONObject(actionsRet)));
+                        suggestions.add(sug);
+                	}
                 }
                 card.setSuggestions(suggestions);
                 if (!links.isEmpty()) {
@@ -238,12 +229,8 @@ public class CardCreator {
                 if (isValidCard) {
                 	card.setUuid(UUID.randomUUID().toString());
                 	cards.add(card);
-                	suggestions = new ArrayList<>();
                 }
             }
-        }
-        if (suggestions.size() > 0 && !cards.isEmpty()) {
-        	cards.get(cards.size() - 1).getSuggestions().addAll(suggestions);
         }
         return cards;
     }
