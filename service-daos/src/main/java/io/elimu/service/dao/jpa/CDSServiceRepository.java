@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import io.elimu.service.models.ServiceInfo;
 import io.elimu.service.models.ServiceInfoKey;
 
+@Transactional
 public interface CDSServiceRepository extends CrudRepository<ServiceInfo, ServiceInfoKey> {
 
 	@Query("from ServiceInfo c where c.id.id = ?1 and c.id.version in "

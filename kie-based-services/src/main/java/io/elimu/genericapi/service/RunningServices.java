@@ -69,10 +69,14 @@ public class RunningServices {
 	
 	public void register(GenericService service, boolean store) {
 		if (store && service instanceof GenericKieBasedService) {
+			LOG.info("Service " + service.getDependency().getExternalForm() + " found for register and initiated for update in DB");
 			ServiceStore.get().markUpdate((GenericKieBasedService) service);
+		}else {
+			LOG.info("Service " + service.getDependency().getExternalForm() + " found for register and not initiated for update in DB");
 		}
 		registry.put(service.getId(), service);
 		if (store && service instanceof GenericKieBasedService) {
+			LOG.info("Checking status of service " + service.getDependency().getExternalForm());
 			ServiceStore.get().updateDone((GenericKieBasedService) service);
 		}
 	}
