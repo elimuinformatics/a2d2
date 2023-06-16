@@ -1,5 +1,6 @@
 package io.elimu.a2d2.cql;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,181 @@ import io.elimu.a2d2.oauth.BodyBuilder;
 import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
-    
+
+	//smart-7777705 patient under 13 yrs should get no cards
+	@Test
+	public void testNoCards() throws Exception {
+        if (System.getProperty("fhirServerToken") == null) {
+            return;
+        }
+        String token = System.getProperty("fhirServerToken");
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+        workItem.setParameter("context_hook", "order-sign");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "smart-7777705");
+        workItem.setParameter("context_patientId", "smart-7777705");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("smart-7777705");
+        workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem.setParameter("context_draftOrders", bundle);
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));        
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertEquals(0, cards.size());
+        Assert.assertNotNull(workItem.getResult("cql_IsAdolescentOrAdult"));
+        Assert.assertTrue(workItem.getResult("cql_IsAdolescentOrAdult").toString().toLowerCase().contains("false"));
+	}
+
+	//SMART-436610 - "Ducks", expect "allergy & antibiotic stewardship" and also text about pregnant/not pregnant
+	@Test
+	public void testAllergyAndAntibiotic() throws Exception {
+        if (System.getProperty("fhirServerToken") == null) {
+            return;
+        }
+        String token = System.getProperty("fhirServerToken");
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+        workItem.setParameter("context_hook", "order-sign");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "SMART-436610");
+        workItem.setParameter("context_patientId", "SMART-436610");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("SMART-436610");
+        workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem.setParameter("context_draftOrders", bundle);
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));        
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertEquals(1, cards.size());
+        Card card = (Card) cards.get(0);
+        Assert.assertNotNull(card);
+        Assert.assertEquals("Attention: allergy and antibiotic stewardship", card.getSummary());
+        Assert.assertTrue(card.getDetail().contains("pregnant"));
+	}
+	
+	//smart-1951076 I added weight 152 kg receives response as no weight on record (if no weight, "presumably weight <150kg")
+	@Test
+	public void testWeightOnRecord() throws Exception {
+        if (System.getProperty("fhirServerToken") == null) {
+            return;
+        }
+        String token = System.getProperty("fhirServerToken");
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+        workItem.setParameter("context_hook", "order-sign");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "smart-1951076");
+        workItem.setParameter("context_patientId", "smart-1951076");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("smart-1951076");
+        workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem.setParameter("context_draftOrders", bundle);
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));        
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertEquals(1, cards.size());
+        Card card = (Card) cards.get(0);
+        Assert.assertNotNull(card);
+        
+        Assert.assertNotNull(workItem.getResult("cql_HasNoWeightOnRecord"));
+        Assert.assertTrue(workItem.getResult("cql_HasNoWeightOnRecord").toString().toLowerCase().contains("false"));	
+	}
+
+	
+	//smart-724111 has an AllergyIntolerance that was just "no known allergies" - but still getting allergy response. Should get response for no allergy
+	@Test
+	public void testAllergyRead() throws Exception {
+        if (System.getProperty("fhirServerToken") == null) {
+            return;
+        }
+        String token = System.getProperty("fhirServerToken");
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+        workItem.setParameter("context_hook", "order-sign");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "smart-724111");
+        workItem.setParameter("context_patientId", "smart-724111");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("smart-724111");
+        workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem.setParameter("context_draftOrders", bundle);
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));        
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertEquals(1, cards.size());
+        Card card = (Card) cards.get(0);
+        Assert.assertNotNull(card);
+        
+        Assert.assertNotNull(workItem.getResult("cql_NeedsAllergyOptions"));
+        Assert.assertTrue(workItem.getResult("cql_NeedsAllergyOptions").toString().toLowerCase().contains("false"));
+        Assert.assertEquals("Attention: Antibiotic Stewardship", card.getSummary());
+	}
+	
     @Test
     public void testCardTransform() throws Exception {
         String cpJson = "{"
@@ -174,33 +349,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "SMART-436610");
         workItem.setParameter("context_patientId", "SMART-436610");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = new Bundle();
-        bundle.setType(Bundle.BundleType.COLLECTION);
-        MedicationRequest mreq = new MedicationRequest();
-        mreq.setId("medrx0325");
-        mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
-        mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
-        mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
-        mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
-        mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
-        mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
-                setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
-        mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
-        mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
-        Dosage dos1 = mreq.addDosageInstruction();
-        SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
-        dos1.getTiming().getCode().setText("Daily");
-        dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
-        dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
-        dos1.getRoute().setText("Intramuscular");
-        dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
-            getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
-        dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
-            getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
-        dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
-            getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
-        bundle.addEntry().setResource(mreq);
+        Bundle bundle = createMedOrders("SMART-436610");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
@@ -281,25 +430,9 @@ public class CqfInlineWIHTest {
         Assert.assertEquals("any", card.getSelectionBehavior());
         Assert.assertEquals(3, card.getOverrideReasons().size());
     }
-    
-    @Test
-    public void testCqlDoubleCards() throws Exception {
-        if (System.getProperty("fhirServerToken") == null) {
-            return;
-        }
-        String token = System.getProperty("fhirServerToken");
-        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
-        WorkItemImpl workItem = new WorkItemImpl();
-        workItem.setParameter("fhirServerAuth", "Bearer " + token);
-        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
-        workItem.setParameter("context_hook", "order-select");
-        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
-        workItem.setParameter("context_userId", "Practitioner/example");
-        workItem.setParameter("patientId", "SMART-436610");
-        workItem.setParameter("context_patientId", "SMART-436610");
-        workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = new Bundle();
+
+	private Bundle createMedOrders(String patientRef) throws ParseException {
+		Bundle bundle = new Bundle();
         bundle.setType(Bundle.BundleType.COLLECTION);
         MedicationRequest mreq = new MedicationRequest();
         mreq.setId("medrx0325");
@@ -307,7 +440,7 @@ public class CqfInlineWIHTest {
         mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
         mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
         mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
-        mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
+        mreq.setSubject(new Reference().setReference(patientRef).setDisplay("Zzzrsh, Gonotwentyfour"));
         mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
                 setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
         mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
@@ -326,6 +459,27 @@ public class CqfInlineWIHTest {
         dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
             getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
         bundle.addEntry().setResource(mreq);
+        return bundle;
+	}
+    
+    @Test
+    public void testCqlDoubleCards() throws Exception {
+        if (System.getProperty("fhirServerToken") == null) {
+            return;
+        }
+        String token = System.getProperty("fhirServerToken");
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+        workItem.setParameter("context_hook", "order-select");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "SMART-436610");
+        workItem.setParameter("context_patientId", "SMART-436610");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("SMART-436610");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionJson", "{\n"
@@ -660,33 +814,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "SMART-436610");
         workItem.setParameter("context_patientId", "SMART-436610");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = new Bundle();
-        bundle.setType(Bundle.BundleType.COLLECTION);
-        MedicationRequest mreq = new MedicationRequest();
-        mreq.setId("medrx0325");
-        mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
-        mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
-        mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
-        mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
-        mreq.setSubject(new Reference().setReference("Patient/eCWvPpzzlvY3RVsspc7TKiw3").setDisplay("Zzzrsh, Gonotwentyfour"));
-        mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
-                setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
-        mreq.setRequester(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
-        mreq.setRecorder(new Reference().setType("Practitioner").setDisplay("Physician Family Medicine, MD"));
-        Dosage dos1 = mreq.addDosageInstruction();
-        SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        dos1.getTiming().getRepeat().setBounds(new Period().setStart(FORMAT.parse("2023-03-03T14:00:00Z"))).setFrequency(1).setPeriod(1).setPeriodUnit(UnitsOfTime.D);
-        dos1.getTiming().getCode().setText("Daily");
-        dos1.getRoute().addCoding().setCode("78421000").setSystem("http://snomed.info/sct").setDisplay("Intramuscular route (qualifier value)");
-        dos1.getRoute().addCoding().setCode("6").setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.4.798268.7025").setDisplay("Intramuscular");
-        dos1.getRoute().setText("Intramuscular");
-        dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "admin-amount", "admin-amount")).setText("admin-amount")).
-            getDoseQuantity().setValue(1).setUnit("mL").setCode("mL").setSystem("http://unitsofmeasure.org");
-        dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "calculated", "calculated")).setText("calculated")).
-            getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
-        dos1.addDoseAndRate().setType(new CodeableConcept(new Coding("http://epic.com/CodeSystem/dose-rate-type", "ordered", "ordered")).setText("ordered")).
-            getDoseQuantity().setValue(250).setUnit("mg").setCode("mg").setSystem("http://unitsofmeasure.org");
-        bundle.addEntry().setResource(mreq);
+        Bundle bundle = createMedOrders("SMART-436610");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
