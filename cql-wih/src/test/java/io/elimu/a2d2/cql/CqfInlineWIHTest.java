@@ -830,7 +830,6 @@ public class CqfInlineWIHTest {
         Assert.assertNotNull(workItem.getResult("cardsJson"));
         System.out.println("Time to run 1st time (ms): " + time);
         Assert.assertEquals(true, manager.isCompleted());
-
         Assert.assertNotNull(workItem.getResults());
         Assert.assertNotNull(workItem.getResult("cards"));
         List<?> cards = (List<?>) workItem.getResult("cards");
@@ -1064,7 +1063,6 @@ public class CqfInlineWIHTest {
         String token = System.getProperty("fhirServerToken");
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
-        
         workItem.setParameter("fhirServerAuth", "Bearer " + token);
         workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
         //workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
