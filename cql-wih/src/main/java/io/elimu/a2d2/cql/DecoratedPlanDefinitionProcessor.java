@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -792,7 +793,7 @@ public class DecoratedPlanDefinitionProcessor {
 			List<?> sessionParams = (List<?>) session.parameters.getClass().getMethod("getParameter").invoke(session.parameters);
 			paramsParams.addAll(sessionParams);
 		}
-		if (libraryResults.isEmpty()) {
+		if (libraryResults.keySet().stream().noneMatch(k -> k.startsWith(session.patientId + "_"))) {
 			Object libraryResult = libraryProcessor.getClass().getMethod("evaluate", libEvalParamTypes).
 					invoke(libraryProcessor, libraryToBeEvaluated, session.patientId,
 					params, session.contentEndpoint, session.terminologyEndpoint,
@@ -807,10 +808,12 @@ public class DecoratedPlanDefinitionProcessor {
 						String name = (String) param.getClass().getMethod("getName").invoke(param);
 						if (hasValue) {
 							Object value = param.getClass().getMethod("getValue").invoke(param);
-							libraryResults.put(name, value);
+							libraryResults.put(session.patientId + "_" + name, value);
+							logger.debug(" - " + name + ": " + value);
 						} else if (hasResource) {
 							Object resource = param.getClass().getMethod("getResource").invoke(param);
-							libraryResults.put(name, resource);
+							libraryResults.put(session.patientId + "_" + name, resource);
+							logger.debug(" - " + name + ": " + resource);
 						} else {
 							logger.warn("Expression " + name + " has no value");
 						}
@@ -828,8 +831,8 @@ public class DecoratedPlanDefinitionProcessor {
 			String key = generateExpressionKey(expression, params);
 			if (libraryResults.containsKey(key)) {
 				result = libraryResults.get(key);
-			} else if (libraryResults.containsKey(expression)) {
-				result = libraryResults.get(expression);
+			} else if (libraryResults.containsKey(session.patientId + "_" + expression)) {
+				result = libraryResults.get(session.patientId + "_" + expression);
 			} else {	
 			    result = expressionEvaluator.getClass().getMethod("evaluate", String.class, iparamsClass).invoke(expressionEvaluator, expression, params);
 			    libraryResults.put(key, result);
@@ -878,6 +881,13 @@ public class DecoratedPlanDefinitionProcessor {
 		Map<String, Object> allresults = evaluatedCqlResults.get();
 		Object idTypeObj = cl.loadClass("org.hl7.fhir.r4.model.IdType").getConstructor(String.class).newInstance(libraryToBeEvaluated);
 		String keyName = (String) idTypeObj.getClass().getMethod("getIdPart").invoke(idTypeObj) + "_" + expression;
+		//add keys to result
+		for (String key : libraryResults.keySet().stream().filter(k -> k.startsWith(session.patientId + "_")).collect(Collectors.toList())) {
+			if (!allresults.containsKey(key.replace(session.patientId + "_", ""))) {
+				allresults.put(key.replace(session.patientId + "_", ""), libraryResults.get(key));
+			}
+		}
+
 		if (allresults.containsKey(keyName)) {
 			Object value = allresults.get(keyName);
 			if (!allresults.containsKey(keyName + "_multiple")) {
@@ -886,7 +896,6 @@ public class DecoratedPlanDefinitionProcessor {
 				allresults.put(keyName, list);
 				allresults.put(keyName + "_multiple", true);
 			} else {
-				@SuppressWarnings("unchecked")
 				List<Object> list = (List<Object>) value;
 				list.add(result);
 			}
