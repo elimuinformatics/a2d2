@@ -42,9 +42,6 @@ public class CDSHookConfig {
     @Value("${spring.datasource.password}")
     private String dataSourcePassword;
     
-    @Value(value = "${show_sql}")
-    private boolean showSql;
-    
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -75,7 +72,7 @@ public class CDSHookConfig {
         Properties properties = new Properties();
 	properties.put("hibernate.dialect", env.getRequiredProperty("spring.jpa.properties.hibernate.dialect"));
         properties.put("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.show_sql", showSql);
+        properties.put("hibernate.show_sql", false);
 //        properties.put("hibernate.hbm2ddl.auto", env.getRequiredProperty("spring.jpa.hibernate.ddl-auto"));
 //        properties.put("hibernate.show_sql", env.getRequiredProperty("spring.jpa.hibernate.show_sql"));
       
