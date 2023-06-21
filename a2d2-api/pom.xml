@@ -46,7 +46,7 @@
 		<log4j.version>2.17.2</log4j.version>
 		<logback-classic.version>1.2.10</logback-classic.version>
 		<logback-core.version>1.2.9</logback-core.version>
-		<checker-qual.version>3.8.0</checker-qual.version>
+		<checker-qual.version>3.33.0</checker-qual.version>
 		<kotlin-stdlib.version>1.6.21</kotlin-stdlib.version>
 		<okio.version>3.1.0</okio.version>
 		<okhttp.version>4.9.3</okhttp.version>
@@ -59,7 +59,8 @@
 		<mysql-connector-java.version>8.0.31</mysql-connector-java.version>	
 		<snakeyaml.version>1.33</snakeyaml.version>
 		<xstream.version>1.4.20</xstream.version>
-		<plexus-utils.version>3.5.0</plexus-utils.version>		
+		<plexus-utils.version>3.5.0</plexus-utils.version>
+		<guava.version>32.0.0-android</guava.version>		
 	</properties>
 
 	<dependencyManagement>
@@ -87,7 +88,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>29.0-android</version>
+				<version>${guava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.plexus</groupId>
