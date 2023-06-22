@@ -15,13 +15,10 @@ public class JedisHelperTest {
 	
 	@BeforeClass
 	public static void startup() throws IOException {
-		String host = System.getProperty("cache.jedis.host", "localhost");
-		if ("localhost".equals(host)) {
-			int port = Integer.valueOf(System.getProperty("cache.jedis.port", "6379"));
-			redis = RedisServer.newRedisServer(port);
-			redis.start();
-			System.setProperty("cache.jedis.port", String.valueOf(redis.getBindPort()));//port might differ from initial configuration
-		}
+		int port = Integer.valueOf(System.getProperty("cache.jedis.port", "6379"));
+		redis = RedisServer.newRedisServer(port);
+		redis.start();
+		System.setProperty("cache.jedis.port", String.valueOf(redis.getBindPort()));//port might differ from initial configuration
 	}
 	
 	@AfterClass
