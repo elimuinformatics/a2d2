@@ -100,7 +100,7 @@ You will need to install the following:
 
 ### Optional configurations
 
-1. Redis Cache: components lie the `fhir-query-helper-r4` or `generic-helpers` use cache implementations that are configurable via JVM properties. If you want to use JedisHelper, or jedis implementation of caching of values, you need to add these JVM properties:
+1. Redis Cache: components like the `fhir-query-helper-r4` or `generic-helpers` use cache implementations that are configurable via JVM properties. If you want to use JedisHelper, or jedis implementation of caching of values, you need to add these JVM properties:
 
 	-Dcache.type.impl=REDIS -Dcache.jedis.host=<your-redis-host> -Dcache.jedis.port=<your-redis-port>
 
