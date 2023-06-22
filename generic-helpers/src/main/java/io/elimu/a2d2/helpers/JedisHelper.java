@@ -9,18 +9,25 @@ import redis.clients.jedis.Protocol;
 
 public class JedisHelper {
 
-	static final int JEDIS_PORT = Integer.parseInt(System.getProperty("cache.jedis.port", "6379"));
-	static final String JEDIS_PWD = System.getProperty("cache.jedis.password");
-	static final String JEDIS_HOST = System.getProperty("cache.jedis.host", "localhost");
-	static final Boolean JEDIS_SSL = Boolean.valueOf(System.getProperty("cache.jedis.use_ssl", "false"));
-	static final int JEDIS_TIMEOUT_CONNECTION = Integer.parseInt(System.getProperty("cache.jedis.connection.timeout", "10000")); //milliseconds
+	private static final int JEDIS_PORT = Integer.parseInt(System.getProperty("cache.jedis.port", "6379"));
+	private static final String JEDIS_PWD = System.getProperty("cache.jedis.password");
+	private static String JEDIS_HOST;
+	private static final Boolean JEDIS_SSL = Boolean.valueOf(System.getProperty("cache.jedis.use_ssl", "false"));
+	private static final int JEDIS_TIMEOUT_CONNECTION = Integer.parseInt(System.getProperty("cache.jedis.connection.timeout", "10000")); //milliseconds
 
-	private static JedisHelper INSTANCE;
+	static JedisHelper INSTANCE;
+	
 	private static final Object _sync = new Object();
+
+	
 	
 	public static JedisHelper getInstance() {
 		synchronized(_sync) {
 			if (INSTANCE == null) {
+				JEDIS_HOST = System.getProperty("cache.jedis.host");
+				if (JEDIS_HOST == null) {
+					throw new RuntimeException("Required config variable not found: cache.jedis.host");
+				}
 				INSTANCE = new JedisHelper();
 			}
 		}

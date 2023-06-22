@@ -28,13 +28,25 @@ public class JedisHelperTest {
 		}
 	}
 	
+	@Test(expected = RuntimeException.class)
+	public void testNoConfig() {
+		System.clearProperty("cache.jedis.host");
+		JedisHelper.INSTANCE = null;
+		JedisHelper.getInstance();
+	}
+	
 	@Test
 	public void testJedisKeys() throws Exception {
-		String key = "htn-engage-program_18582221234";
-		Assert.assertFalse(JedisHelper.getInstance().containsKey(key));
-		JedisHelper.getInstance().register(key, 2);
-		Assert.assertTrue(JedisHelper.getInstance().containsKey(key));
-		Thread.sleep(5000);
-		Assert.assertFalse(JedisHelper.getInstance().containsKey(key));
+		try {
+			System.setProperty("cache.jedis.host", "localhost");
+			String key = "htn-engage-program_18582221234";
+			Assert.assertFalse(JedisHelper.getInstance().containsKey(key));
+			JedisHelper.getInstance().register(key, 2);
+			Assert.assertTrue(JedisHelper.getInstance().containsKey(key));
+			Thread.sleep(5000);
+			Assert.assertFalse(JedisHelper.getInstance().containsKey(key));
+		} finally {
+			System.clearProperty("cache.jedis.host");
+		}
 	}
 }
