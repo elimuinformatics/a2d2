@@ -97,4 +97,14 @@ You will need to install the following:
 2. Run docker a2d2 with local database
 
         docker run -e "JAVA_OPTS=-Dmaven.repo.location=<your-maven-repo-location> -Dmaven.repo.pwd=<your-maven-repo-pwd> -Dmaven.repo.user=<your-maven-repo-user> -Dkie.wb.user=<your-kie-wb-user> -Dkie.wb.location=<your-kie-wb-location> -Dkie.wb.pwd=<your-kie-wb-pwd> -Dspring.profiles.active=local,test,default" --network="host" -d --name a2d2 a2d2
- 
+
+### Optional configurations
+
+1. Redis Cache: components lie the `fhir-query-helper-r4` or `generic-helpers` use cache implementations that are configurable via JVM properties. If you want to use JedisHelper, or jedis implementation of caching of values, you need to add these JVM properties:
+
+	-Dcache.type.impl=REDIS -Dcache.jedis.host=<your-redis-host> -Dcache.jedis.port=<your-redis-port>
+
+   Also, if you want to also configure secure access to it, you will need the following JVM properties as well:
+
+	-Dcache.jedis.use_ssl=true -Dcache.jedis.password=<your-optional-redis-password> -Dcache.jedis.connection.timeout=<your-optional-conn-timeout-in-millis-defaults-to-10-seconds>
+

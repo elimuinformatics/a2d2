@@ -86,9 +86,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>it.ozimov</groupId>
-			<artifactId>embedded-redis</artifactId>
-			<version>0.7.2</version>
+			<groupId>ai.grakn</groupId>
+			<artifactId>redis-mock</artifactId>
+			<version>0.1.6</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
