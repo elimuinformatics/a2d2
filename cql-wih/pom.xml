@@ -32,7 +32,7 @@
 
 	<properties>
 		<mixpanel.version>1.4.4</mixpanel.version>
-		<org.json.version>20220924</org.json.version>
+		<org.json.version>20230227</org.json.version>
 		<jackson-databind.version>2.13.5</jackson-databind.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -273,6 +273,12 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency> <!-- THIS NEEDS TO BE A RUNTIME DEPENDENCY OF THE PROJECT -->
+			<groupId>io.elimu.a2d2</groupId>
+			<artifactId>cql-mods</artifactId>
+			<version>0.0.1</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>

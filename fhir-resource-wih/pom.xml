@@ -138,7 +138,11 @@
     			<artifactId>json-path</artifactId>
     			<version>2.6.0</version>
     			<exclusions>
-			</exclusions>
+    				<exclusion>
+    					<groupId>net.minidev</groupId>
+    					<artifactId>json-smart</artifactId>
+    				</exclusion>
+    			</exclusions>
 		</dependency>
 		<dependency>
 			  <groupId>com.google.code.gson</groupId>

@@ -96,6 +96,7 @@ public class FhirParseUtil {
 	public synchronized String encodeJsonResource(FormatType type, Object hapiresource) {
 		try {
 			Object parser = type.getCtx().getClass().getMethod("newJsonParser").invoke(type.getCtx());
+			parser.getClass().getMethod("setPrettyPrint", boolean.class).invoke(parser, false);
 			ClassLoader cl = parser.getClass().getClassLoader();
 			Method encodeMethod = cl.loadClass("ca.uhn.fhir.parser.IParser").getMethod("encodeResourceToString", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource"));
 			return (String) encodeMethod.invoke(parser, hapiresource);
@@ -107,6 +108,7 @@ public class FhirParseUtil {
 	public synchronized String encodeXmlResource(FormatType type, Object hapiresource) {
 		try {
 			Object parser = type.getCtx().getClass().getMethod("newXmlParser").invoke(type.getCtx());
+			parser.getClass().getMethod("setPrettyPrint", boolean.class).invoke(parser, false);
 			ClassLoader cl = parser.getClass().getClassLoader();
 			Method encodeMethod = cl.loadClass("ca.uhn.fhir.parser.IParser").getMethod("encodeResourceToString", cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource"));
 			return (String) encodeMethod.invoke(parser, hapiresource);

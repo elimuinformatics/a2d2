@@ -8,3 +8,4 @@ target/
 .recommenders
 .idea/
 .factorypath
+**/META-INF/MANIFEST.MF

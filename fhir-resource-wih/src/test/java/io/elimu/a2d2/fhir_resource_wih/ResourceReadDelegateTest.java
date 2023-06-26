@@ -30,7 +30,7 @@ import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import io.elimu.a2d2.exception.FhirServerException;
 import io.elimu.a2d2.fhirresourcewih.ResourceReadDelegate;
 
-//@Ignore ("disable for now as the test is based on public testing server")
+@Ignore ("disable for now as the test is based on public testing server")
 public class ResourceReadDelegateTest {
 
 	private static final String fhirUrl = "http://hapi.fhir.org/baseDstu2";
