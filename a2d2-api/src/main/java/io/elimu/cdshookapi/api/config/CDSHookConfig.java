@@ -72,7 +72,7 @@ public class CDSHookConfig {
         Properties properties = new Properties();
 	properties.put("hibernate.dialect", env.getRequiredProperty("spring.jpa.properties.hibernate.dialect"));
         properties.put("hibernate.hbm2ddl.auto", "update");
-        properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.show_sql", false);
 //        properties.put("hibernate.hbm2ddl.auto", env.getRequiredProperty("spring.jpa.hibernate.ddl-auto"));
 //        properties.put("hibernate.show_sql", env.getRequiredProperty("spring.jpa.hibernate.show_sql"));
       

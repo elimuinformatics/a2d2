@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -137,11 +138,11 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 		}
 		RuntimeEngine runtime = null;
 		ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(getKieContainer().getClassLoader());
+		runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
+		KieSession ksession = runtime.getKieSession();
+		GenericDebugListener listener = enableDebugging(ksession, request);
 		try {
-			Thread.currentThread().setContextClassLoader(getKieContainer().getClassLoader());
-			runtime = getManager().getRuntimeEngine(ProcessInstanceIdContext.get());
-			KieSession ksession = runtime.getKieSession();
-			GenericDebugListener listener = enableDebugging(ksession, request);
 			enableMixpanel(ksession);
 			String procId = getProcessId(request.getMethod());
 			if (procId != null && !NOT_ALLOWED_METHOD_KEY.equals(procId)) {
@@ -176,6 +177,9 @@ public class GenericKieBasedService extends AbstractKieService implements Generi
 			} else {
 				return new ServiceResponse(appendListenerOutput(request, listener, "Method " + request.getMethod() + " not allowed"), 405);
 			}
+		} catch (TimeoutException e) {
+			LOG.error("Timeout occurred when fetching configuration parameters");
+			return new ServiceResponse(appendListenerOutput(request, listener, "Timeout occurred when fetching configuration parameters"), 400);
 		} catch (Exception e) {
 			LOG.error("Problem executing service", e);
 			throw new GenericServiceException(

@@ -197,4 +197,32 @@
       <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
       <cve>CVE-2022-45688</cve>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: org.hl7.fhir.utilities-5.5.7.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/ca\.uhn\.hapi\.fhir/org\.hl7\.fhir\.utilities@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-24057</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: org.hl7.fhir.utilities-5.5.7.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/ca\.uhn\.hapi\.fhir/org\.hl7\.fhir\.utilities@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-28465</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: org.hl7.fhir.r5-5.5.7.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/ca\.uhn\.hapi\.fhir/org\.hl7\.fhir\.r5@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-24057</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: org.hl7.fhir.convertors-5.5.7.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/ca\.uhn\.hapi\.fhir/org\.hl7\.fhir\.convertors@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-24057</vulnerabilityName>
+   </suppress>
 </suppressions>

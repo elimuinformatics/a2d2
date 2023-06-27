@@ -68,6 +68,16 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 			Class<?> dataProviderFactoryClass = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.DataProviderFactory");
 			Class<?> terminologyProviderFactoryClass = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.TerminologyProviderFactory");
 			this.ctx = ctxClass.getMethod("forR4Cached").invoke(null);
+			
+			Object restClientFactory = ctxClass.getMethod("getRestfulClientFactory").invoke(this.ctx);
+			Class<?> rcfClass = cl.loadClass("ca.uhn.fhir.rest.client.api.IRestfulClientFactory");
+			rcfClass.getMethod("setHttpClient", Object.class).invoke(restClientFactory, new CachingHttpClient());
+			rcfClass.getMethod("setConnectTimeout", int.class).invoke(restClientFactory, 30000);
+			rcfClass.getMethod("setSocketTimeout", int.class).invoke(restClientFactory, 30000);
+			Class<?> svmeClass = cl.loadClass("ca.uhn.fhir.rest.client.api.ServerValidationModeEnum");
+			Object never = svmeClass.getField("NEVER").get(null);
+			rcfClass.getMethod("setServerValidationMode", svmeClass).invoke(restClientFactory, never);
+			
 			Object ctxVersion = ctxClass.getMethod("getVersion").invoke(ctx);
 			Object ctxVersionVersion = ctxVersion.getClass().getMethod("getVersion").invoke(ctxVersion);
 			this.clientFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.fhir.ClientFactory").getConstructor(ctxClass).newInstance(this.ctx);
@@ -113,7 +123,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				@Override
 				public Object get() {
 					try {
-						Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						//Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						Object builder = cl.loadClass("io.elimu.a2d2.cql.MyCqlEvaluatorBuilder").getConstructor().newInstance();
 						builder = builder.getClass().getMethod("withLibraryCache", HashMap.class).invoke(builder, LIBRARY_CACHE);
 						builder = builder.getClass().getMethod("withCqlOptions", cqlOptions.getClass()).invoke(builder, cqlOptions);
 						return builder;
@@ -126,7 +137,8 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				@Override
 				public Object get() {
 					try {
-						Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						//Object builder = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder").getConstructor().newInstance();
+						Object builder = cl.loadClass("io.elimu.a2d2.cql.MyCqlEvaluatorBuilder").getConstructor().newInstance();
 						builder = builder.getClass().getDeclaredMethod("withLibraryCache", HashMap.class).invoke(builder, LIBRARY_CACHE);
 						builder = builder.getClass().getDeclaredMethod("withCqlOptions", cqlOptions.getClass()).invoke(builder, cqlOptions);
 						return builder;
@@ -335,6 +347,13 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 				userType, userLanguage, userTaskContext, setting, settingContext, Boolean.TRUE, 
 				asParameters(contextData), Boolean.TRUE, null, asParameters(prefetchData), dataEndpoint, 
 				terminologyEndpoint, terminologyEndpoint);
+			Map<String, Object> cqlResults = pdProcessor.getEvaluatedCqlResults();
+			//populate CQL results
+			if (cqlResults != null) {
+				for (String cqlResultKey : cqlResults.keySet()) {
+					results.put("cql_" + cqlResultKey, cqlResults.get(cqlResultKey));
+				}
+			}
 			LOG.debug("PlanDefinitionProcessor apply call done");
 			List<Card> cards = convert(carePlan);
 			results.put("cards", cards);
