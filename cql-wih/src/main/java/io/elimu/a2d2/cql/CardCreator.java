@@ -219,6 +219,13 @@ public class CardCreator {
                         	}
                         }
                         sug.setActions(Arrays.asList(new JSONObject(actionsRet)));
+                        Object precheck = act2.getClass().getMethod("getPrecheckBehavior").invoke(act2);
+                        if (precheck != null) {
+                        	String precheckCode = (String) precheck.getClass().getMethod("toCode").invoke(precheck);
+                        	sug.setIsRecommended("yes".equalsIgnoreCase(precheckCode));
+                        } else {
+                        	sug.setIsRecommended(false);
+                        }
                         suggestions.add(sug);
                 	}
                 }
