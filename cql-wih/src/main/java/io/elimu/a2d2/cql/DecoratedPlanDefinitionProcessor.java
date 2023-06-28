@@ -173,7 +173,7 @@ public class DecoratedPlanDefinitionProcessor {
 		List<?> actions = (List<?>) session.planDefinition.getClass().getMethod("getAction").invoke(session.planDefinition);
 		int index = 0;
 		for (Object action : actions) {
-			resolveAction(session, metConditions, action, index, false);
+			resolveAction(session, metConditions, action, index, false, -1);
 			index++;
 		}	
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -188,7 +188,7 @@ public class DecoratedPlanDefinitionProcessor {
 		return session.carePlan;
 	}
 
-	private void resolveAction(Session session, Map<String, Object> metConditions, Object action, int index, boolean isSubItem) throws ReflectiveOperationException {
+	private void resolveAction(Session session, Map<String, Object> metConditions, Object action, int index, boolean isSubItem, int subIndex) throws ReflectiveOperationException {
 		if (meetsConditions(session, action, index)) {
 			boolean hasRelatedAction = (boolean) action.getClass().getMethod("hasRelatedAction").invoke(action);
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -203,19 +203,19 @@ public class DecoratedPlanDefinitionProcessor {
 						String actionId = (String) relatedActionComponent.getClass().getMethod("getActionId").invoke(relatedActionComponent);
 						if (metConditions.containsKey(actionId)) {
 							metConditions.put(id, action);
-							resolveDynamicActions(session, action, index, isSubItem);
-							resolveDefinition(session, action, index);
+							resolveDynamicActions(session, action, index, isSubItem, subIndex);
+							resolveDefinition(session, action, index, subIndex);
 						}
 					}
 				}
 			}
 			metConditions.put(id, action);
-			resolveDefinition(session, action, index);
-			resolveDynamicActions(session, action, index, isSubItem);
+			resolveDefinition(session, action, index, subIndex);
+			resolveDynamicActions(session, action, index, isSubItem, subIndex);
 		}
 	}
 
-	private void resolveDefinition(Session session, Object action, int index) throws ReflectiveOperationException {
+	private void resolveDefinition(Session session, Object action, int index, int subIndex) throws ReflectiveOperationException {
 		boolean hasDefCanType = (boolean) action.getClass().getMethod("hasDefinitionCanonicalType").invoke(action);
 		if (hasDefCanType) {
 			Object defCanType = action.getClass().getMethod("getDefinitionCanonicalType").invoke(action);
@@ -223,13 +223,13 @@ public class DecoratedPlanDefinitionProcessor {
 			logger.debug("Resolving definition " + defCanTypeValue);
 			switch (getResourceName(defCanType)) {
 			case "PlanDefinition":
-				applyNestedPlanDefinition(session, defCanType, action, index);
+				applyNestedPlanDefinition(session, defCanType, action, index, subIndex);
 				break;
 			case "ActivityDefinition":
-				applyActivityDefinition(session, defCanType, action, index);
+				applyActivityDefinition(session, defCanType, action, index, subIndex);
 				break;
 			case "Questionnaire":
-				applyQuestionnaireDefinition(session, defCanType, action, index);
+				applyQuestionnaireDefinition(session, defCanType, action, index, subIndex);
 				break;
 			default:
 				throw new RuntimeException(String.format("Unknown action definition: ", defCanType));
@@ -238,12 +238,12 @@ public class DecoratedPlanDefinitionProcessor {
 			boolean hasDefUriType = (boolean) action.getClass().getMethod("hasDefinitionUriType").invoke(action);
 			if (hasDefUriType) {
 				Object definition = action.getClass().getMethod("getDefinitionUriType").invoke(action);
-				applyUriDefinition(session, definition, action, index);
+				applyUriDefinition(session, definition, action, index, subIndex);
 			}
 		}
 	}
 
-	private void applyUriDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
+	private void applyUriDefinition(Session session, Object definition, Object action, int index, int subIndex) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> refClass = cl.loadClass("org.hl7.fhir.r4.model.Reference");
 		Class<?> typeClass = cl.loadClass("org.hl7.fhir.r4.model.Type");
@@ -261,9 +261,26 @@ public class DecoratedPlanDefinitionProcessor {
 		rgAction.getClass().getMethod("setTextEquivalent", String.class).invoke(rgAction, action.getClass().getMethod("getTextEquivalent").invoke(action));
 		rgAction.getClass().getMethod("setCode", List.class).invoke(rgAction, action.getClass().getMethod("getCode").invoke(action));
 		rgAction.getClass().getMethod("setTiming", typeClass).invoke(rgAction, action.getClass().getMethod("getTiming").invoke(action));
+		setPrecheckBehavior(cl, rgAction, action, subIndex);
+	}
+	
+	private void setPrecheckBehavior(ClassLoader cl, Object rgTarget, Object pdefSource, int subIndex) throws ReflectiveOperationException {
+		Class<?> rgPrecheckClass = cl.loadClass("org.hl7.fhir.r4.model.RequestGroup$ActionPrecheckBehavior");
+		if (subIndex >= 0) {
+			List<?> subActionList = (List<?>) pdefSource.getClass().getMethod("getAction").invoke(pdefSource);
+			if (subActionList != null && subActionList.size() > subIndex) {
+				pdefSource = subActionList.get(subIndex);
+			}
+		}
+		Object pdefPrecheck = pdefSource.getClass().getMethod("getPrecheckBehavior").invoke(pdefSource);
+		if (pdefPrecheck != null) {
+			String precheck = (String) pdefPrecheck.getClass().getMethod("toCode").invoke(pdefPrecheck);
+			Object rgPrecheck = rgPrecheckClass.getMethod("fromCode", String.class).invoke(null, precheck);
+			rgTarget.getClass().getMethod("setPrecheckBehavior", rgPrecheckClass).invoke(rgTarget, rgPrecheck);
+		}
 	}
 
-	private void applyQuestionnaireDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
+	private void applyQuestionnaireDefinition(Session session, Object definition, Object action, int index, int subIndex) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object result; //IBaseResource
 		try {
@@ -300,13 +317,14 @@ public class DecoratedPlanDefinitionProcessor {
 			rgAction.getClass().getMethod("setDescription", String.class).invoke(rgAction, desc);
 			rgAction.getClass().getMethod("setResource", refClass).invoke(rgAction, refClass.getConstructor(anyResClass).newInstance(result));
 			session.requestGroup.getClass().getMethod("addContained", resClass).invoke(session.requestGroup, result);
+			setPrecheckBehavior(cl, rgAction, action, subIndex);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("ERROR: Questionnaire {} could not be applied and threw exception {}", definition, e.toString());
 		}
 	}
 
-	private void applyActivityDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
+	private void applyActivityDefinition(Session session, Object definition, Object action, int index, int subIndex) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> iparamsClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseParameters");
 		Class<?> iresClass = cl.loadClass("org.hl7.fhir.instance.model.api.IBaseResource");
@@ -375,6 +393,7 @@ public class DecoratedPlanDefinitionProcessor {
 			}
 			rgAction.getClass().getMethod("setPrefix", String.class).invoke(rgAction, prefix);
 			rgAction.getClass().getMethod("setTextEquivalent", String.class).invoke(rgAction, desc);
+			setPrecheckBehavior(cl, rgAction, action, subIndex);
 			Object type = rgAction.getClass().getMethod("getType").invoke(rgAction);
 			Object coding = type.getClass().getMethod("addCoding").invoke(type);
 			coding.getClass().getMethod("setCode", String.class).invoke(coding, "fire-event");
@@ -393,7 +412,7 @@ public class DecoratedPlanDefinitionProcessor {
 		return false;
 	}
 
-	private void applyNestedPlanDefinition(Session session, Object definition, Object action, int index) throws ReflectiveOperationException {
+	private void applyNestedPlanDefinition(Session session, Object definition, Object action, int index, int subIndex) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Object carePlan; //CarePlan
 		Object defStringValue = definition.getClass().getMethod("asStringValue").invoke(definition);
@@ -428,6 +447,7 @@ public class DecoratedPlanDefinitionProcessor {
 			Object valueString = c.getClass().getMethod("getValueAsString").invoke(c);
 			session.carePlan.getClass().getMethod("addInstantiatesCanonical", String.class).invoke(session.carePlan, valueString);
 		}
+		setPrecheckBehavior(cl, act, action, subIndex);
 	}
 
 	private void applyAction(Session session, Object result, Object action) throws ReflectiveOperationException {
@@ -504,7 +524,7 @@ public class DecoratedPlanDefinitionProcessor {
 	    return task;
 	}
 
-	private boolean resolveDynamicActions(Session session, Object action, int index, boolean isSubItem) throws ReflectiveOperationException {
+	private boolean resolveDynamicActions(Session session, Object action, int index, boolean isSubItem, int subIndex) throws ReflectiveOperationException {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Class<?> expClass = cl.loadClass("org.hl7.fhir.r4.model.Expression");
 		Class<?> extClass = cl.loadClass("org.hl7.fhir.r4.model.Extension");
@@ -583,6 +603,7 @@ public class DecoratedPlanDefinitionProcessor {
 			Object act = acts.get(index);
 			if (isSubItem) {
 				act = act.getClass().getMethod("addAction").invoke(act);
+				
 			}
 			Object title = action.getClass().getMethod("getTitle").invoke(action);
 			Object description = action.getClass().getMethod("getDescription").invoke(action);
@@ -643,6 +664,7 @@ public class DecoratedPlanDefinitionProcessor {
 				Object selBehavior = rgasbClass.getMethod("valueOf", String.class).invoke(null, actSelBehaviorName);
 				act.getClass().getMethod("setSelectionBehavior", rgasbClass).invoke(act, selBehavior);
 			}
+			setPrecheckBehavior(cl, act, action, subIndex);
 		}
 		return somethingFound;
 	}
@@ -654,9 +676,11 @@ public class DecoratedPlanDefinitionProcessor {
 		boolean hasAction = (boolean) action.getClass().getMethod("hasAction").invoke(action);
 		if (hasAction) {
 			List<?> actions = (List<?>) action.getClass().getMethod("getAction").invoke(action);
+			int subIndex = 0;
 			for (Object containedAction : actions) {
 				Map<String, Object> metConditions = new HashMap<String, Object>();
-				resolveAction(session, metConditions, containedAction, index, true);
+				resolveAction(session, metConditions, containedAction, index, true, subIndex);
+				subIndex++;
 			}
 		}
 		Object type = session.planDefinition.getClass().getMethod("getType").invoke(session.planDefinition);

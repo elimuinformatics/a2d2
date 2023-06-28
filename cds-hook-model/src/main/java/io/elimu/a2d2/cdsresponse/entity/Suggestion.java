@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.json.simple.JSONObject;
 
@@ -28,6 +29,7 @@ public class Suggestion  implements Serializable {
 	private String label;
 	private String uuid;
 	private List<JSONObject> actions;
+	private boolean isRecommended;
 
 	public String getLabel() {
 		return label;
@@ -43,12 +45,7 @@ public class Suggestion  implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((actions == null) ? 0 : actions.hashCode());
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-		return result;
+		return Objects.hash(actions, label, uuid, isRecommended);
 	}
 
 	@Override
@@ -60,25 +57,8 @@ public class Suggestion  implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Suggestion other = (Suggestion) obj;
-		if (actions == null) {
-			if (other.actions != null)
-				return false;
-		} else if (!actions.equals(other.actions)) {
-			return false;
-		}
-		if (label == null) {
-			if (other.label != null)
-				return false;
-		} else if (!label.equals(other.label)) {
-			return false;
-		}
-		if (uuid == null) {
-			if (other.uuid != null)
-				return false;
-		} else if (!uuid.equals(other.uuid)) {
-			return false;
-		}
-		return true;
+		return Objects.equals(actions, other.actions) && Objects.equals(label, other.label)
+				&& Objects.equals(uuid, other.uuid) && Objects.equals(isRecommended, other.isRecommended);
 	}
 
 	public void setUuid(String uuid) {
@@ -98,5 +78,13 @@ public class Suggestion  implements Serializable {
 			this.actions = new ArrayList<>();
 		}
 		this.actions.add(new JSONObject(map));
+	}
+	
+	public boolean getIsRecommended() {
+		return isRecommended;
+	}
+	
+	public void setIsRecommended(boolean isRecommended) {
+		this.isRecommended = isRecommended;
 	}
 }
