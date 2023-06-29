@@ -232,7 +232,8 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-helpers</artifactId>
-				<version>${cds.helper.version}</version>
+				<!--version>${cds.helper.version}</version-->
+				<version>0.0.15</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
