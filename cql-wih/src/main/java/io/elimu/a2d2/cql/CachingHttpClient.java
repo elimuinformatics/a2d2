@@ -32,9 +32,9 @@ public class CachingHttpClient implements HttpClient {
 		connectionManager.setValidateAfterInactivity(300000);
 		RequestConfig defaultRequestConfig =
 			RequestConfig.custom()
-				.setSocketTimeout(10000)
-				.setConnectTimeout(10000)
-				.setConnectionRequestTimeout(10000)
+				.setSocketTimeout(30000)
+				.setConnectTimeout(30000)
+				.setConnectionRequestTimeout(30000)
 				.build();
 		HttpClientBuilder builder = HttpClients.custom()
 				.useSystemProperties()
