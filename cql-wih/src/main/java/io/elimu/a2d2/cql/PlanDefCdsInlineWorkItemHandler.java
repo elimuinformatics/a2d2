@@ -361,11 +361,11 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			LOG.warn("PlanDefinitionProcessor execution threw a RuntimeException. Returning error output", e);
-			results.put("error", e.getMessage());
+			results.put("error", e.getMessage() == null ? "null message" : e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.warn("PlanDefinitionProcessor execution threw an Exception. Returning error output", e);
-			results.put("error", e.getMessage());
+			results.put("error", e.getMessage() == null ? "null message" : e.getMessage());
 		} finally {
 			manager.completeWorkItem(workItem.getId(), results);
 		}

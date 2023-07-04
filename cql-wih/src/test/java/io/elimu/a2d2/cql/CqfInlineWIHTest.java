@@ -42,10 +42,120 @@ import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
 
+	
+	@Test
+	public void testCachingIssues() throws Exception {
+		if (System.getProperty("fhirServerToken") == null) {
+            return;
+        }
+        String token = System.getProperty("fhirServerToken");
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+
+        workItem.setParameter("context_hook", "order-sign");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "smart-724111");
+        workItem.setParameter("context_patientId", "smart-724111");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("smart-724111", "14652");
+        workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem.setParameter("context_draftOrders", bundle);
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));        
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertEquals(1, cards.size());
+        
+        WorkItemImpl workItem2 = new WorkItemImpl();
+        workItem2.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem2.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
+        workItem2.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+
+        workItem2.setParameter("context_hook", "order-sign");
+        workItem2.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem2.setParameter("context_userId", "Practitioner/example");
+        workItem2.setParameter("patientId", "smart-724111");
+        workItem2.setParameter("context_patientId", "smart-724111");
+        workItem2.setParameter("context_encounterId", "89284");
+        Bundle bundle2 = createMedOrders("smart-724111", "XXXX");
+        workItem2.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem2.setParameter("context_draftOrders", bundle2);
+        workItem2.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+
+        start = System.currentTimeMillis();
+        manager = new NoOpWorkItemManager();
+        handler.executeWorkItem(workItem2, manager);
+        for (String key : workItem2.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem2.getResults());
+        Assert.assertNotNull(workItem2.getResult("error"));        
+        System.out.println("Time to run 2nd time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        List<?> cards2 = (List<?>) workItem2.getResult("cards");
+        Assert.assertNull(cards2);
+	}
+	
+	@Test
+	public void testCacheHttpClient() throws Exception {
+		if (System.getProperty("fhirServerTokenInternal") == null) {
+			return;
+		}
+        String token = System.getProperty("fhirServerTokenInternal");
+        Assert.assertNotNull(token);
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
+        workItem.setParameter("context_hook", "order-sign");
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "540010");
+        workItem.setParameter("context_patientId", "540010");
+        workItem.setParameter("context_encounterId", "89284");
+        Bundle bundle = createMedOrders("540010", "624649");
+        workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
+        workItem.setParameter("context_draftOrders", bundle);
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));        
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertNotNull(cards);
+	}
+	
+	
 	//smart-7777705 patient under 13 yrs should get no cards
 	@Test
 	public void testNoCards() throws Exception {
-        if (System.getProperty("fhirServerToken") == null) {
+		if (System.getProperty("fhirServerToken") == null) {
             return;
         }
         String token = System.getProperty("fhirServerToken");
@@ -60,7 +170,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "smart-7777705");
         workItem.setParameter("context_patientId", "smart-7777705");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("smart-7777705");
+        Bundle bundle = createMedOrders("smart-7777705", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
@@ -101,7 +211,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "SMART-436610");
         workItem.setParameter("context_patientId", "SMART-436610");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("SMART-436610");
+        Bundle bundle = createMedOrders("SMART-436610", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
@@ -144,7 +254,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "smart-1951076");
         workItem.setParameter("context_patientId", "smart-1951076");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("smart-1951076");
+        Bundle bundle = createMedOrders("smart-1951076", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
@@ -189,7 +299,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "smart-724111");
         workItem.setParameter("context_patientId", "smart-724111");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("smart-724111");
+        Bundle bundle = createMedOrders("smart-724111", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
@@ -349,7 +459,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "SMART-436610");
         workItem.setParameter("context_patientId", "SMART-436610");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("SMART-436610");
+        Bundle bundle = createMedOrders("SMART-436610", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");
@@ -431,7 +541,7 @@ public class CqfInlineWIHTest {
         Assert.assertEquals(3, card.getOverrideReasons().size());
     }
 
-	private Bundle createMedOrders(String patientRef) throws ParseException {
+	private Bundle createMedOrders(String patientRef, String medId) throws ParseException {
 		Bundle bundle = new Bundle();
         bundle.setType(Bundle.BundleType.COLLECTION);
         MedicationRequest mreq = new MedicationRequest();
@@ -439,7 +549,7 @@ public class CqfInlineWIHTest {
         mreq.setStatus(MedicationRequest.MedicationRequestStatus.DRAFT);
         mreq.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
         mreq.addCategory().setText("Inpatient").addCoding().setCode("inpatient").setSystem("http://terminology.hl7.org/CodeSystem/medicationrequest-category").setDisplay("Inpatient");
-        mreq.setMedication(new Reference().setReference("Medication/14652").setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
+        mreq.setMedication(new Reference().setReference("Medication/" + medId).setDisplay("CEFTRIAXONE 250 MG SOLUTION FOR INJECTION"));
         mreq.setSubject(new Reference().setReference(patientRef).setDisplay("Zzzrsh, Gonotwentyfour"));
         mreq.setEncounter(new Reference().setDisplay("Office Visit").setReference("Encounter/eKhmYI-wOnGOK1xPgpVID7Q3").
                 setIdentifier(new Identifier().setUse(Identifier.IdentifierUse.USUAL).setSystem("urn:oid:1.2.840.114350.1.13.301.3.7.3.698084.8").setValue("80399662")));
@@ -479,7 +589,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "SMART-436610");
         workItem.setParameter("context_patientId", "SMART-436610");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("SMART-436610");
+        Bundle bundle = createMedOrders("SMART-436610", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionJson", "{\n"
@@ -814,7 +924,7 @@ public class CqfInlineWIHTest {
         workItem.setParameter("patientId", "SMART-436610");
         workItem.setParameter("context_patientId", "SMART-436610");
         workItem.setParameter("context_encounterId", "89284");
-        Bundle bundle = createMedOrders("SMART-436610");
+        Bundle bundle = createMedOrders("SMART-436610", "14652");
         workItem.setParameter("context_selections", Arrays.asList("MedicationRequest/medrx0325"));
         workItem.setParameter("context_draftOrders", bundle);
         workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSPresumptiveTreatment");

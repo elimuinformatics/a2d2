@@ -19,6 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DecoratedPlanDefinitionProcessor {
+
+	private static final Logger logger = LoggerFactory.getLogger(DecoratedPlanDefinitionProcessor.class);
+	private static final String alternateExpressionExtension = "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression";
+
 	protected Object activityDefinitionProcessor;
 	protected Object libraryProcessor;
 	protected Object expressionEvaluator;
@@ -27,11 +31,12 @@ public class DecoratedPlanDefinitionProcessor {
 	protected Object fhirDal;
 	protected Object fhirPath;
 
-	private Map<String, Object> libraryResults = new HashMap<>();
+	private ThreadLocal<Map<String, Object>> libraryResults = new ThreadLocal<>() {
+		protected Map<String,Object> initialValue() {
+			return new HashMap<>();
+		}
+	};
   
-	private static final Logger logger = LoggerFactory.getLogger(DecoratedPlanDefinitionProcessor.class);
-	private static final String alternateExpressionExtension = "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression";
-
 	private ThreadLocal<Map<String, Object>> evaluatedCqlResults = new ThreadLocal<>() {
 		protected Map<String, Object> initialValue() {
 			return new HashMap<>();
@@ -71,6 +76,7 @@ public class DecoratedPlanDefinitionProcessor {
 		// warn if prefetchData exists
 		// if no data anywhere blow up
 		evaluatedCqlResults.get().clear();
+		libraryResults.get().clear();
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		//Class<?> idTypeClass = cl.loadClass("org.hl7.fhir.instance.model.api.IIdType");
 		Class<?> planDefClass = cl.loadClass("org.hl7.fhir.r4.model.PlanDefinition");
@@ -817,7 +823,7 @@ public class DecoratedPlanDefinitionProcessor {
 			List<?> sessionParams = (List<?>) session.parameters.getClass().getMethod("getParameter").invoke(session.parameters);
 			paramsParams.addAll(sessionParams);
 		}
-		if (libraryResults.keySet().stream().noneMatch(k -> k.startsWith(session.patientId + "_"))) {
+		if (libraryResults.get().keySet().stream().noneMatch(k -> k.startsWith(session.patientId + "_"))) {
 			Object libraryResult = libraryProcessor.getClass().getMethod("evaluate", libEvalParamTypes).
 					invoke(libraryProcessor, libraryToBeEvaluated, session.patientId,
 					params, session.contentEndpoint, session.terminologyEndpoint,
@@ -832,11 +838,11 @@ public class DecoratedPlanDefinitionProcessor {
 						String name = (String) param.getClass().getMethod("getName").invoke(param);
 						if (hasValue) {
 							Object value = param.getClass().getMethod("getValue").invoke(param);
-							libraryResults.put(session.patientId + "_" + name, value);
+							libraryResults.get().put(session.patientId + "_" + name, value);
 							logger.debug(" - " + name + ": " + value);
 						} else if (hasResource) {
 							Object resource = param.getClass().getMethod("getResource").invoke(param);
-							libraryResults.put(session.patientId + "_" + name, resource);
+							libraryResults.get().put(session.patientId + "_" + name, resource);
 							logger.debug(" - " + name + ": " + resource);
 						} else {
 							logger.warn("Expression " + name + " has no value");
@@ -853,13 +859,13 @@ public class DecoratedPlanDefinitionProcessor {
 		case "text/cql.expression":
 		case "text/cql-expression": 
 			String key = generateExpressionKey(expression, params);
-			if (libraryResults.containsKey(key)) {
-				result = libraryResults.get(key);
-			} else if (libraryResults.containsKey(session.patientId + "_" + expression)) {
-				result = libraryResults.get(session.patientId + "_" + expression);
+			if (libraryResults.get().containsKey(key)) {
+				result = libraryResults.get().get(key);
+			} else if (libraryResults.get().containsKey(session.patientId + "_" + expression)) {
+				result = libraryResults.get().get(session.patientId + "_" + expression);
 			} else {	
 			    result = expressionEvaluator.getClass().getMethod("evaluate", String.class, iparamsClass).invoke(expressionEvaluator, expression, params);
-			    libraryResults.put(key, result);
+			    libraryResults.get().put(key, result);
 			}
 			break;
 		case "text/cql-identifier":
@@ -867,15 +873,15 @@ public class DecoratedPlanDefinitionProcessor {
 		case "text/cql.name":
 		case "text/cql-name":
 			String keyL = generateExpressionKey(expression, params);
-			if (libraryResults.containsKey(keyL)) {
-				result = libraryResults.get(keyL);
-			} else if (libraryResults.containsKey(expression)) {
-				result = libraryResults.get(expression);
+			if (libraryResults.get().containsKey(keyL)) {
+				result = libraryResults.get().get(keyL);
+			} else if (libraryResults.get().containsKey(expression)) {
+				result = libraryResults.get().get(expression);
 			} else {	
 				result = libraryProcessor.getClass().getMethod("evaluate", libEvalParamTypes).invoke(libraryProcessor, 
 					libraryToBeEvaluated, session.patientId, params, session.contentEndpoint, 
 					session.terminologyEndpoint, session.dataEndpoint, session.bundle, Collections.singleton(expression));
-				libraryResults.put(keyL, result);
+				libraryResults.get().put(keyL, result);
 			}
 			break;
 		case "text/fhirpath":
@@ -906,9 +912,9 @@ public class DecoratedPlanDefinitionProcessor {
 		Object idTypeObj = cl.loadClass("org.hl7.fhir.r4.model.IdType").getConstructor(String.class).newInstance(libraryToBeEvaluated);
 		String keyName = (String) idTypeObj.getClass().getMethod("getIdPart").invoke(idTypeObj) + "_" + expression;
 		//add keys to result
-		for (String key : libraryResults.keySet().stream().filter(k -> k.startsWith(session.patientId + "_")).collect(Collectors.toList())) {
+		for (String key : libraryResults.get().keySet().stream().filter(k -> k.startsWith(session.patientId + "_")).collect(Collectors.toList())) {
 			if (!allresults.containsKey(key.replace(session.patientId + "_", ""))) {
-				allresults.put(key.replace(session.patientId + "_", ""), libraryResults.get(key));
+				allresults.put(key.replace(session.patientId + "_", ""), libraryResults.get().get(key));
 			}
 		}
 
