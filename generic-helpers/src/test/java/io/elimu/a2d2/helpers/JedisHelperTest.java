@@ -1,6 +1,7 @@
 package io.elimu.a2d2.helpers;
 
 import java.io.IOException;
+import java.util.Random;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -15,9 +16,20 @@ public class JedisHelperTest {
 	
 	@BeforeClass
 	public static void startup() throws IOException {
-		int port = Integer.valueOf(System.getProperty("cache.jedis.port", "6379"));
-		redis = RedisServer.newRedisServer(port);
-		redis.start();
+		int port = new Random().nextInt(5000) + 3000;
+		boolean loaded = false;
+		int attempts = 0;
+		while (!loaded && attempts < 10) {
+			try {
+				System.err.println("Attempting redis server mock at port " + port + "...");
+				redis = RedisServer.newRedisServer(port);
+				redis.start();
+				loaded = true;
+			} catch (Exception e) {
+				port = new Random().nextInt(5000) + 3000;
+				attempts++;
+			}
+		}
 		System.setProperty("cache.jedis.port", String.valueOf(redis.getBindPort()));//port might differ from initial configuration
 	}
 	

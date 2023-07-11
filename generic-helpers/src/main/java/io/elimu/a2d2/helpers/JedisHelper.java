@@ -60,11 +60,12 @@ public class JedisHelper {
 	}
 
 	public boolean containsKey(String key) {
-		return jedis.exists(key.getBytes());
+		return jedis.exists(key);
 	}
 
 	public void register(String key, int timeoutInSeconds) {
-		jedis.setex(key.getBytes(), timeoutInSeconds, new byte[] {1,2,3});
+		jedis.set(key, "x");
+		jedis.expire(key, timeoutInSeconds);
 	}
 
 }
