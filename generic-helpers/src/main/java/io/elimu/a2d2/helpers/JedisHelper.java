@@ -64,7 +64,8 @@ public class JedisHelper {
 	}
 
 	public void register(String key, int timeoutInSeconds) {
-		jedis.setex(key, timeoutInSeconds, "x");
+		jedis.set(key, "x");
+		jedis.expire(key, timeoutInSeconds);
 	}
 
 }
