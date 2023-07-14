@@ -239,4 +239,11 @@
       <packageUrl regex="true">^pkg:maven/commons\-beanutils/commons\-beanutils@.*$</packageUrl>
       <cve>CVE-2019-10086</cve>
    </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: com.fasterxml.jackson.core:jackson-databind:2.13.3)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+      <cve>CVE-2023-35116</cve>
+   </suppress>
 </suppressions>
