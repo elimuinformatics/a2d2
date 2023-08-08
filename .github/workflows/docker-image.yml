@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "update-docker-image" ]
+    branches: [ "update-docker-image-1" ]
       
 jobs:        
   build-login-publish:
