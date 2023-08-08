@@ -31,9 +31,10 @@ jobs:
       - name: push image with Version id
         run: docker push elimuinformatics/a2d2:1.0.2
       
-      - name: Add Docker Hub description
-        run: |
-          docker run --rm -e DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME -e DOCKERHUB_TOKEN=$DOCKERHUB_TOKEN elimuinformatics/a2d2:1.0.2 push-description
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Update Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: mnv/abcd
+          readme-filepath: ./README.md
