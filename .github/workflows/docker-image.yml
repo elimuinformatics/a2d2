@@ -36,5 +36,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: mnv/abcd
+          repository: elimuinformatics/a2d2
           readme-filepath: ./README.md
