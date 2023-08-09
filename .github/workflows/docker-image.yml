@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "update-docker-image-1" ]
+    branches: [ "main" ]
       
 jobs:        
   build-login-publish:
@@ -30,11 +30,3 @@ jobs:
 
       - name: push image with Version id
         run: docker push elimuinformatics/a2d2:1.0.2
-      
-      - name: Update Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: elimuinformatics/a2d2
-          readme-filepath: ./README.md
