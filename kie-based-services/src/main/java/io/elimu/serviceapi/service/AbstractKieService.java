@@ -180,7 +180,7 @@ public abstract class AbstractKieService {
 				addEnvironmentEntry(EnvironmentName.TRANSACTION, tm).
 				addEnvironmentEntry(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, tsr).
 				addEnvironmentEntry("ExecutorService", new InMemoryExecutorService(dep.getArtifactId())).
-				schedulerService(new QuartzSchedulerService()).
+				schedulerService(persistent ? new QuartzSchedulerService() : null).
 				registerableItemsFactory(new ConfigRegisterableItemsFactory(kContainer, dep.getArtifactId(), deployDescriptor, shouldLogExecution(), getConfig())).
 				knowledgeBase(this.kbase).
 				userGroupCallback(new FreeUserGroupCallback()).
