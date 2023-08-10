@@ -27,8 +27,8 @@ public class CachingHttpClient implements HttpClient {
 	public CachingHttpClient() {
 		PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(5000,
 				TimeUnit.MILLISECONDS);
-		connectionManager.setMaxTotal(20);
-		connectionManager.setDefaultMaxPerRoute(20);
+		connectionManager.setMaxTotal(200);
+		connectionManager.setDefaultMaxPerRoute(200);
 		connectionManager.setValidateAfterInactivity(300000);
 		RequestConfig defaultRequestConfig =
 			RequestConfig.custom()
