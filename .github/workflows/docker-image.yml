@@ -30,3 +30,11 @@ jobs:
 
       - name: push image with Version id
         run: docker push elimuinformatics/a2d2:1.0.2
+
+      - name: push README to Dockerhub
+        uses: a2d2/update-container-description-action@v1
+        with:
+          destination_container_repo: elimuinformatics/a2d2
+          provider: dockerhub
+          short_description: 'Updated README file'
+          readme_file: 'Dockerhub-README.md'
