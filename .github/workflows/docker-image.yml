@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "update-workflow-file" ]
+    branches: [ "main" ]
       
 jobs:        
   build-login-publish:
