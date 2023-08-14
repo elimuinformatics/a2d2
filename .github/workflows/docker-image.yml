@@ -37,4 +37,4 @@ jobs:
           destination_container_repo: elimuinformatics/a2d2
           provider: dockerhub
           short_description: 'Updated README file'
-          readme_file: 'README.md'
+          readme_file: 'Dockerhub-README.md'
