@@ -586,7 +586,11 @@ public class DecoratedPlanDefinitionProcessor {
 							extClass.getMethod("setUrl", String.class).invoke(ext, path);
 							result = ext;
 						}
-						action.getClass().getMethod("setProperty", String.class, baseClass).invoke(action, propertyType, result);
+						if (result != null) { 
+							action.getClass().getMethod("setProperty", String.class, baseClass).invoke(action, propertyType, result);
+						} else {
+							logger.warn(String.format("Path %s attempted null value", path));
+						}
 						somethingFound = true;
 					} catch (Exception e) {
 						throw new RuntimeException(String.format("Could not set path %s to value: %s", path, result));
