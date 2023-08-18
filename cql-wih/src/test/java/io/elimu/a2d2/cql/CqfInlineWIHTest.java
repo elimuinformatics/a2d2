@@ -42,6 +42,50 @@ import io.elimu.a2d2.oauth.OAuthUtils;
 
 public class CqfInlineWIHTest {
 
+	@Test
+	public void testSpecimenCalls() throws Exception {
+        PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
+        NoOpWorkItemManager manager = new NoOpWorkItemManager();
+        if (System.getProperty("fhirUsername") == null || System.getProperty("fhirPassword") == null) {
+		return;
+        }
+        String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
+        String body = new BodyBuilder().addToBody("client_id", "omnibus-api").addToBody("client_secret", "").
+                addToBody("token_url", tokenUrl).addToBody("grant_type", "password").addToBody("username", System.getProperty("fhirUsername")).
+                addToBody("password", System.getProperty("fhirPassword")).addToBody("scope", "openid").build();
+        Map<String, Object> results = OAuthUtils.authenticate(body, tokenUrl, "omnibus-api", "");
+        String token = (String) results.get("access_token");
+
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setParameter("fhirServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirTerminologyServerAuth", "Bearer " + token);
+        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir-terminology-sandbox-internal.elimuinformatics.com/baseR4");
+
+        workItem.setParameter("context_hook", "patient-view");
+        workItem.setParameter("context_userId", "Practitioner/example");
+        workItem.setParameter("patientId", "627513");
+        workItem.setParameter("context_patientId", "627513");
+        workItem.setParameter("context_encounterId", "89284");
+        workItem.setParameter("context_selections", null);
+        workItem.setParameter("context_draftOrders", null);
+        workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
+        workItem.setParameter("planDefinitionUrl", "http://elimu.io/PlanDefinition/GonorrheaCDSLaboratoryConfirmed");
+
+        long start = System.currentTimeMillis();
+        handler.executeWorkItem(workItem, manager);
+        for (String key : workItem.getResults().keySet()) {
+            System.out.println(" - " + key + ": " + workItem.getResult(key));
+        }
+        long time = System.currentTimeMillis() - start;
+        Assert.assertNotNull(workItem.getResults());
+        Assert.assertNull(workItem.getResult("error"));
+        Assert.assertNotNull(workItem.getResult("cardsJson"));
+        System.out.println("Time to run 1st time (ms): " + time);
+        Assert.assertEquals(true, manager.isCompleted());
+        List<?> cards = (List<?>) workItem.getResult("cards");
+        Assert.assertEquals(1, cards.size());
+	}
 	
 	@Test
 	public void testCachingIssues() throws Exception {
