@@ -30,13 +30,3 @@ jobs:
 
       - name: push image with Version id
         run: docker push elimuinformatics/a2d2:1.0.2
-
-      - name: push README to Dockerhub
-        uses: peter-evans/dockerhub-description@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: elimuinformatics/a2d2
-          readme-filepath: Dockerhub-README.md
-
-
