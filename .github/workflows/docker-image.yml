@@ -37,4 +37,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           repository: elimuinformatics/a2d2
-          readme-filepath: Dockerhub-README.md
+          readme-filepath: ./Dockerhub-README.md
