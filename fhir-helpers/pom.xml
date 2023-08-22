@@ -20,7 +20,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.elimu.a2d2</groupId>
 	<artifactId>fhir-helpers</artifactId>
-	<version>0.0.14</version>
+	<version>0.0.15</version>
 	<packaging>jar</packaging>
 	<name>fhir-helpers</name>
 	<url>http://maven.apache.org</url>
