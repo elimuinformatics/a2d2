@@ -29,6 +29,7 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -131,7 +132,9 @@ public class ServiceRestAPIDelegate implements WorkItemHandler {
 			else {
 				logger.warn("No authentication for the rest api request " + url);
 			}
-
+			if (!headers.containsKey("X-Correlation-ID")) {
+				headers.add("X-Correlation-ID", MDC.get("correlationId"));
+			}
 
 			HttpEntity<?> entity = new HttpEntity<>(body, headers);
 			logger.debug("Prepared http entity");

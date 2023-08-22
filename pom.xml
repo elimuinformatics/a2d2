@@ -23,7 +23,7 @@
 		<protobuf-java.version>3.21.8</protobuf-java.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
-		<cds.helper.version>0.0.14</cds.helper.version>
+		<cds.helper.version>0.0.15</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
 		<jacoco.version>0.8.7</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
