@@ -277,7 +277,7 @@
 		<dependency> <!-- THIS NEEDS TO BE A RUNTIME DEPENDENCY OF THE PROJECT -->
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>cql-mods</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

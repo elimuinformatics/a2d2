@@ -99,7 +99,7 @@ public class PlanDefCdsInlineWorkItemHandler implements WorkItemHandler {
 					newInstance(this.ctx, this.adapterFactory, this.libraryContentProviderFactories, this.libraryVersionSelector);
 			this.mrFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.data.FhirModelResolverFactory").getConstructor().newInstance();
 			this.modelResolverFactories = Collections.singleton(this.mrFactory);
-			this.trpFactory = cl.loadClass("org.opencds.cqf.cql.evaluator.builder.data.FhirRestRetrieveProviderFactory").
+			this.trpFactory = cl.loadClass("io.elimu.a2d2.cql.CustomFhirRestRetrieveProviderFactory").
 				getConstructor(ctxClass, clientFactory.getClass()).
 				newInstance(this.ctx, this.clientFactory);
 			this.retrieveProviderFactories = new HashSet<>();

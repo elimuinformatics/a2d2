@@ -32,9 +32,9 @@ jobs:
         run: docker push elimuinformatics/a2d2:1.0.2
 
       - name: push README to Dockerhub
-        uses: a2d2/update-container-description-action@v1
+        uses: peter-evans/dockerhub-description@v2
         with:
-          destination_container_repo: elimuinformatics/a2d2
-          provider: dockerhub
-          short_description: 'Updated README file'
-          readme_file: 'README.md'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: elimuinformatics/a2d2
+          readme-filepath: Dockerhub-README.md
