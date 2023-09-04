@@ -310,8 +310,8 @@ public class RunningServices {
 			JsonNode projects = space.get("projects");
 			for (int projIndex = 0; projIndex < projects.size(); projIndex++) {
 				JsonNode project = projects.get(projIndex);
-				if (project.get("groupId").asText().equals(dep.getGroupId()) &&
-					project.get("name").asText().equals(dep.getArtifactId())) {
+				if (project.get("groupId").asText().equalsIgnoreCase(dep.getGroupId()) &&
+					project.get("name").asText().equalsIgnoreCase(dep.getArtifactId())) {
 					return spaceName;
 				}
 			}
