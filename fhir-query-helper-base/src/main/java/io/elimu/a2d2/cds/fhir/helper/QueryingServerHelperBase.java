@@ -301,8 +301,10 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 					client.registerInterceptor(i);
 				}
 				SingleAuthInterceptor singleAuth = new SingleAuthInterceptor();
+				CorrelationIdInterceptor correlationId = new CorrelationIdInterceptor();
 				client.registerInterceptor(singleAuth);
 				client.registerInterceptor(tracker);
+				client.registerInterceptor(correlationId);
 				try {
 					result = callback.execute(client);
 				} catch (RuntimeException t) {
@@ -312,8 +314,8 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 					log.debug("Unregistering interceptor " + i);
 					client.unregisterInterceptor(i);
 				}
+				client.unregisterInterceptor(correlationId);
 				client.unregisterInterceptor(singleAuth);
-				
 				client.unregisterInterceptor(tracker);
 			};
 		} finally {

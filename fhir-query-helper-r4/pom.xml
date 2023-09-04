@@ -26,7 +26,7 @@
 	</parent>
 
 	<artifactId>fhir-query-helper-r4</artifactId>
-	<version>0.0.14</version>
+	<version>0.0.15</version>
 	<packaging>jar</packaging>
 	<description>CDS Helper R4</description>
 
