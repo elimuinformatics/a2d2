@@ -34,6 +34,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.ECDSAKeyProvider;
+import com.auth0.jwt.interfaces.RSAKeyProvider;
 
 import io.elimu.genericapi.service.GenericKieBasedService;
 import io.elimu.genericapi.service.RunningServices;
@@ -98,12 +100,7 @@ public class JWTAuthUtil {
 		} else {
 			key = buildKey(presetKey);
 		}
-		JWTVerifier verifier = null;
-		if (jwt.getAlgorithm().startsWith("RS")) {
-			verifier = JWT.require(Algorithm.RSA256(new SimpleRSAKeyProvider((RSAPublicKey) key))).build();
-		} else if (jwt.getAlgorithm().startsWith("ES")) {
-			verifier = JWT.require(Algorithm.ECDSA384(new SimpleECDSAKeyProvider((ECPublicKey) key))).build();
-		}
+		JWTVerifier verifier = buildVerifier(jwt.getAlgorithm(), key);
 		if (verifier == null) {
 			LOGGER.warn("Cannot validate algorithm of type " + jwt.getAlgorithm());
 			return false;
@@ -116,6 +113,21 @@ public class JWTAuthUtil {
 		}
 	}
 	
+	private static JWTVerifier buildVerifier(String algorithm, PublicKey key) {
+		try {
+			if (algorithm.startsWith("RS")) {
+				algorithm = algorithm.replace("RS", "RSA");
+				return JWT.require((Algorithm) Algorithm.class.getMethod(algorithm, RSAKeyProvider.class).invoke(null, new SimpleRSAKeyProvider((RSAPublicKey) key))).build();
+			} else if (algorithm.startsWith("ES")) {
+				algorithm = algorithm.replace("ES", "ECDSA");
+				return JWT.require((Algorithm) Algorithm.class.getMethod(algorithm, ECDSAKeyProvider.class).invoke(null, new SimpleECDSAKeyProvider((ECPublicKey) key))).build();
+			}
+		} catch (Exception e) {
+			LOGGER.warn("Cannot instantiate JWTVerifier from algorithm " + algorithm, e);
+		}
+		return null;
+	}
+
 	private static PublicKey buildKey(String presetKey) {
 		try {
 			byte[] key = org.apache.commons.codec.binary.Base64.decodeBase64(presetKey);
