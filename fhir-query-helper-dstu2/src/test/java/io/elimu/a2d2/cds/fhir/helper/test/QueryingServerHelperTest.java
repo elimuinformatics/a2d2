@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -33,6 +34,7 @@ import org.junit.Test;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
@@ -41,7 +43,7 @@ import io.elimu.a2d2.cds.fhir.helper.FhirResponse;
 import io.elimu.a2d2.cds.fhir.helper.QueryBuilder;
 import io.elimu.a2d2.cds.fhir.helper.QueryingServerHelper;
 
-@Ignore("No valid public FHIR servers available to test this")
+//@Ignore("No valid public FHIR servers available to test this")
 public class QueryingServerHelperTest {
 
 	private static QueryingServerHelper queryingServerHelper = spy(QueryingServerHelper.class);
@@ -59,6 +61,10 @@ public class QueryingServerHelperTest {
 	private static List<IBaseResource> iBaseList = new ArrayList<IBaseResource>();
 
 	private static FhirResponse<List<IBaseResource>> fhirResponse = null;
+	
+	private static FhirResponse<IBaseBundle> fhirResponse2 = null;
+	
+	private static FhirResponse<IBaseBundle> fhirResponse3 = null;
 
 	private static FhirResponse<IBaseResource> fhirResponseObservation = null;
 
@@ -75,6 +81,10 @@ public class QueryingServerHelperTest {
 		iBaseList.add(patient);
 		iBaseList.add(observation);
 		fhirResponse = new FhirResponse<>(iBaseList, 200, "responseInfo");
+		Bundle bundle = new Bundle();
+		bundle.addLink().setRelation("next").setUrl("http://fhir2/someOtherUrl");
+		fhirResponse2 = new FhirResponse<>(bundle, 200, "responseInfo");
+		fhirResponse3 = new FhirResponse<>(new Bundle(), 200, "responseInfo2");
 	}
 
 	@Test 
@@ -121,6 +131,24 @@ public class QueryingServerHelperTest {
 		Assert.assertNotNull(retval);
 		Assert.assertEquals(200, retval.getResponseStatusCode());
 		Assert.assertNotNull(retval.getResult());
+	}
+	
+	@Test
+	public void testQueryPage() {
+		doReturn(fhirResponse2).when(queryingServerHelper).fetchServer(eq("Bundle"), eq(FHIR2_URL + "/Patient?_count=50"));
+		doReturn(fhirResponse3).when(queryingServerHelper).fetchServer(eq("Bundle"), eq("http://fhir2/someOtherUrl"));
+		FhirResponse<IBaseBundle> retval = queryingServerHelper.queryPageByLink(new QueryBuilder().resourceType("Patient"));
+		Assert.assertNotNull(retval);
+		Assert.assertEquals(200, retval.getResponseStatusCode());
+		Bundle b = (Bundle) retval.getResult();
+		Assert.assertNotNull(b);
+		Assert.assertNotNull(b.getLink("next"));
+		FhirResponse<IBaseBundle> retval2 = queryingServerHelper.queryPageByLink(b.getLink("next").getUrl());
+		Assert.assertEquals(200, retval2.getResponseStatusCode());
+		Assert.assertEquals("responseInfo2", retval2.getResponseStatusInfo());
+		Bundle b2 = (Bundle) retval2.getResult();
+		Assert.assertNotNull(b2);
+		Assert.assertNull(b2.getLink("next"));
 	}
 	
 	@Test
