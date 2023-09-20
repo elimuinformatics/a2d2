@@ -35,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpStatus;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -556,6 +557,61 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			}
 		}
 		return new FhirResponse<>(new ArrayList<>(), -1, "not invoked due to internal error");
+	}
+	
+	/**
+	 * 
+	 * @param qb
+	 * @return
+	 */
+	public FhirResponse<IBaseBundle> queryPageByLink(QueryBuilder qb) {
+		return queryPageByLink(qb.buildQuery(fhirUrl), qb.useCache());
+	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public FhirResponse<IBaseBundle> queryPageByLink(String url) {
+		return queryPageByLink(url, true);
+	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public FhirResponse<IBaseBundle> queryPageByLinkNoCache(String url) {
+		return queryPageByLink(url, false);
+	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @param useCache
+	 * @return
+	 */
+	protected FhirResponse<IBaseBundle> queryPageByLink(String url, boolean useCache) {
+		try {
+			if(!useCache) {
+				avoidCache.set(Boolean.TRUE);
+			}
+			PerformanceHelper.getInstance().beginClock(QUERYINGSERVERHELPER, "queryPageByLink");
+			if (url == null) {
+				return null;
+			}
+			FhirResponse<IBaseResource> res = fetchServer("Bundle", url);
+			return new FhirResponse<>((IBaseBundle) res.getResult(), res.getResponseStatusCode(), res.getResponseStatusInfo());
+		} catch (Exception e) {
+			log.error( ERROR_MSG + e.getMessage() + ". [" + e.getClass().getName() + "]");
+		} finally {
+			PerformanceHelper.getInstance().endClock(QUERYINGSERVERHELPER, "queryPageByLink");
+			if (!useCache) {
+				avoidCache.set(Boolean.FALSE);
+			}
+		}
+		return new FhirResponse<>(null, -1, "not invoked due to internal error");
 	}
 
 	/**
