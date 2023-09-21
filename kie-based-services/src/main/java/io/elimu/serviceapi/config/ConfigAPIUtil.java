@@ -50,6 +50,7 @@ public class ConfigAPIUtil {
 			try {
 				uri = new URI(builder.toUriString());
 				LOG.info("Config-api URL builded successfully");
+				LOG.info("Config-api URL is ->" + uri);
 			} catch (URISyntaxException e1) {
 			LOG.error ("Error while fetching configuration from Config-api ", e1);
 			}

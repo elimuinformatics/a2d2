@@ -38,6 +38,7 @@ public class ConfigAPIWorkItemHandler implements WorkItemHandler {
 				pI.setVariable(entry.getKey(), entry.getValue());
 			}
 		} catch (Exception e) {
+			LOG.error("Error while setting appName,client");
 			LOG.error("Timeout occurred when fetching configuration parameters", e);
 			newValues.put("Error", "Timeout occurred when fetching configuration parameters: " +e.getMessage());
 		}
