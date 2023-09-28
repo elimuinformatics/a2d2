@@ -125,7 +125,11 @@ public class RuleInvokeDelegate implements WorkItemHandler {
 			LOG.debug("After rule firing, inferences has " + inferences.size() + " elements");
 			Map<String, Object> results = workItem.getResults();
 			for (Map.Entry<String, Object> entry : inferences.entrySet()) {
-				LOG.debug("Adding to the results [inference_" + entry.getKey() + " with object of type " + entry.getValue().getClass().getName() +"]");
+				if (entry.getValue() != null) {
+					LOG.debug("Adding to the results [inference_" + entry.getKey() + " with object of type " + entry.getValue().getClass().getName() +"]");
+				} else {
+					LOG.debug("Adding to the results [inference_" + entry.getKey() + " with NULL]");
+				}
 				results.put("inference_" + entry.getKey(), entry.getValue());
 			}
 			inferences.forEach((key, value) -> results.put("inference_" + key, value));

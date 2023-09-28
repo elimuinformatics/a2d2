@@ -167,6 +167,9 @@ public class ServiceUtils {
 	}
 
 	public static InputStream readEntry(URL jarPath, String entry) {
+		if (jarPath == null) {
+			return null;
+		}
 		try (JarFile jar = new JarFile(jarPath.getFile())) {
 			JarEntry openEntry = jar.getJarEntry(entry);
 			DataInputStream input = new DataInputStream(jar.getInputStream(openEntry));
