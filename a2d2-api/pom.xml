@@ -151,14 +151,19 @@
 				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
+			   	<groupId>org.apache.sshd</groupId>
+			    <artifactId>sshd-core</artifactId>
+			    <version>2.10.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-compat</artifactId>
 				<version>${maven.version}</version>
 			</dependency>
                 	<dependency>
-                	        <groupId>ca.uhn.hapi.fhir</groupId>
-                	        <artifactId>hapi-fhir-base</artifactId>
-                	        <version>${hapi.fhir.version}</version>
+                	    <groupId>ca.uhn.hapi.fhir</groupId>
+                	    <artifactId>hapi-fhir-base</artifactId>
+                	    <version>${hapi.fhir.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -231,6 +236,10 @@
 				<exclusion>
 					<groupId>com.squareup.okhttp3</groupId>
 					<artifactId>okhttp</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.sshd</groupId>
+					<artifactId>sshd-common</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
