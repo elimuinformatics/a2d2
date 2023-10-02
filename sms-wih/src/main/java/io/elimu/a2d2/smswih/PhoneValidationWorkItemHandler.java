@@ -87,6 +87,11 @@ public class PhoneValidationWorkItemHandler implements WorkItemHandler {
 				.setType(Arrays.asList("carrier", "type")).fetch();
 			//here, the phone number is valid
 			//based on country code we can determine nationality
+			if (phoneNumber == null || phoneNumber.getCarrier() == null) {
+				workItemResult.put("isValid", false);
+				workItemResult.put("errorCode", "-1");
+				workItemResult.put("errorMessage", "Phone could not be processed by SMS provider");
+			}
 			workItemResult.put("isValid", phoneNumber.getCarrier().get("error_code") == null && !"landline".equalsIgnoreCase(String.valueOf(phoneNumber.getCarrier().get("type"))));
 			if (phoneNumber.getCarrier().get("error_code") == null && !"landline".equalsIgnoreCase(String.valueOf(phoneNumber.getCarrier().get("type")))) {
 				workItemResult.put("isUSANumber", "US".equalsIgnoreCase(phoneNumber.getCountryCode()));
