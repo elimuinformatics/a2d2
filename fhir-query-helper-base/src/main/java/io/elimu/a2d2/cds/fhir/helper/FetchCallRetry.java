@@ -35,11 +35,14 @@ public class FetchCallRetry<T> {
 				log.info("FHIR REST call failed attempt number " + count + " with status " + client.getTracker().getResponseStatusCode() + ". Retrying after waiting " + (delay * count) + "ms");
 				count++;
 			} catch (Throwable t) {
+				if (client.getTracker().getResponseStatusCode() >= 0 && client.getTracker().getResponseStatusCode() < 500) {
+					throw new RuntimeException("Invocation of call failed with status code " + client.getTracker().getResponseStatusCode() + ". No further retries will be performed");
+				}
 				count++; // and retry
 				log.warn("FHIR REST call failed attempt number " + count + " with status " + client.getTracker().getResponseStatusCode() + " and error. Retrying after waiting " + (delay * count) + "ms", t);
 			}
 		}
-		throw new RuntimeException("After " + count + " retries, invocation of clal still failed");
+		throw new RuntimeException("After " + count + " retries, invocation of call still failed");
 	}
 
 	public int getDelay(int count, int delay) {
