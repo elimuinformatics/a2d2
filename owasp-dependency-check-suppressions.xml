@@ -11,9 +11,10 @@
       <notes><![CDATA[
       file name: spring-security-crypto-5.7.5.jar
       ]]></notes>
-      <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
+      <packageUrl regex="true">
+         ^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
       <vulnerabilityName>CVE-2020-5408</vulnerabilityName>
-   </suppress>   
+   </suppress>
    <suppress>
       <notes><![CDATA[
       file name: maven-core-3.3.9.jar
@@ -27,7 +28,7 @@
       file name: xstream-1.4.19.jar
       ]]></notes>
       <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
-     <cve>CVE-2022-40151</cve>
+      <cve>CVE-2022-40151</cve>
    </suppress>
    <suppress>
       <notes><![CDATA[
@@ -145,7 +146,8 @@
       <notes><![CDATA[
       file name: wildfly-elytron-password-impl-2.0.0.Final.jar
       ]]></notes>
-      <packageUrl regex="true">^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-password\-impl@.*$</packageUrl>
+      <packageUrl regex="true">
+         ^pkg:maven/org\.wildfly\.security/wildfly\-elytron\-password\-impl@.*$</packageUrl>
       <vulnerabilityName>CVE-2022-3143</vulnerabilityName>
    </suppress>
    <suppress>
@@ -252,5 +254,82 @@
       ]]></notes>
       <packageUrl regex="true">^pkg:maven/org\.quartz\-scheduler/quartz@.*$</packageUrl>
       <cve>CVE-2023-39017</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: wildfly-elytron-2.0.0.Final.jar (shaded: org.apache.sshd:sshd-common:2.7.0)
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.sshd/sshd\-common@.*$</packageUrl>
+      <vulnerabilityName>CVE-2023-35887</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-cipher-2.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-cipher@.*$</packageUrl>
+      <cve>CVE-2022-4245</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-cipher-2.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-cipher@.*$</packageUrl>
+      <cve>CVE-2022-4244</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-interpolation-1.26.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-interpolation@.*$</packageUrl>
+      <cve>CVE-2022-4244</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-interpolation-1.26.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-interpolation@.*$</packageUrl>
+      <cve>CVE-2022-4245</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-component-annotations-2.1.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-component\-annotations@.*$</packageUrl>
+      <cve>CVE-2022-4244</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-component-annotations-2.1.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-component\-annotations@.*$</packageUrl>
+      <cve>CVE-2022-4245</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-sec-dispatcher-2.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-sec\-dispatcher@.*$</packageUrl>
+      <cve>CVE-2022-4244</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-sec-dispatcher-2.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-sec\-dispatcher@.*$</packageUrl>
+      <cve>CVE-2022-4245</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-classworlds-2.6.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-classworlds@.*$</packageUrl>
+      <cve>CVE-2022-4244</cve>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: plexus-classworlds-2.6.0.jar
+      ]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus\-classworlds@.*$</packageUrl>
+      <cve>CVE-2022-4245</cve>
    </suppress>
 </suppressions>

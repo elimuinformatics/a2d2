@@ -32,7 +32,7 @@
 
 	<properties>
 		<spymemcached.version>2.12.3</spymemcached.version>
-		<redisson.version>3.18.0</redisson.version>
+		<redisson.version>3.23.5</redisson.version>
 		<btm.version>2.1.4</btm.version>
 	</properties>
 
