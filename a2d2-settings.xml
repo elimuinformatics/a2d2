@@ -50,6 +50,11 @@
             <username>${env.NEXUS_USERNAME}</username>
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
+        <server>
+            <id>elimu-a2d2-api</id>
+            <username>aws</username>
+            <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
+        </server>
     </servers>
     <activeProfiles>
       <activeProfile>default</activeProfile>

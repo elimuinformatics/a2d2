@@ -652,21 +652,6 @@
 		</dependency>
 	</dependencies>
 	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>nexus-repo-releases</id>
-			<name>Nexus Repository</name>
-			<url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
 		<snapshotRepository>
 			<uniqueVersion>true</uniqueVersion>
 			<id>nexus-repo-snapshots</id>
@@ -682,6 +667,11 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</snapshotRepository>
+		<repository>
+			<id>elimu-a2d2-api</id>
+			<name>elimu-a2d2-api</name>
+			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
+		</repository>
 	</distributionManagement>
 	<build>
 		<finalName>${project.artifactId}</finalName>
