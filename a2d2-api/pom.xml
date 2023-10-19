@@ -652,21 +652,6 @@
 		</dependency>
 	</dependencies>
 	<distributionManagement>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<id>nexus-repo-snapshots</id>
-			<name>Nexus Repository</name>
-			<url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</snapshotRepository>
 		<repository>
 			<id>elimu-a2d2-api</id>
 			<name>elimu-a2d2-api</name>
