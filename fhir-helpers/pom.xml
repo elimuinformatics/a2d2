@@ -20,7 +20,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.elimu.a2d2</groupId>
 	<artifactId>fhir-helpers</artifactId>
-	<version>0.0.18</version>
+	<version>0.0.17</version>
 	<packaging>jar</packaging>
 	<name>fhir-helpers</name>
 	<url>http://maven.apache.org</url>
@@ -133,11 +133,20 @@
 		</dependency>
 	</dependencies>
        <distributionManagement>
-			<repository>
-				<id>elimu-a2d2-api</id>
-				<name>elimu-a2d2-api</name>
-				<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-			</repository>
+                <repository>
+                        <uniqueVersion>false</uniqueVersion>
+                        <id>nexus-repo-releases</id>
+                        <name>Nexus Repository</name>
+                        <url>https://repository.elimuinformatics.com/repository/maven-releases/</url>
+                        <layout>default</layout>
+                </repository>
+                <snapshotRepository>
+                        <uniqueVersion>true</uniqueVersion>
+                        <id>nexus-repo-snapshots</id>
+                        <name>Nexus Repository</name>
+                        <url>https://repository.elimuinformatics.com/repository/maven-snapshots/</url>
+                        <layout>default</layout>
+                </snapshotRepository>
 	</distributionManagement>
 	<build>
 		<plugins>
