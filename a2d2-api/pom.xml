@@ -310,7 +310,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-helpers</artifactId>
-			<version>0.0.17</version>
+			<version>0.0.18</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- web development, including Tomcat and spring-webmvc -->
@@ -724,4 +724,3 @@
 		</plugins>
 	</reporting>
 </project>
-
