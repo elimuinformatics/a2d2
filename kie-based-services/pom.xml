@@ -415,6 +415,14 @@
 					<groupId>org.yaml</groupId>
 					<artifactId>snakeyaml</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+    				<artifactId>tomcat-embed-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+    				<artifactId>tomcat-embed-websocket</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -575,4 +583,3 @@
 		<version>0.0.9-SNAPSHOT</version>
 	</parent>
 </project>
-
