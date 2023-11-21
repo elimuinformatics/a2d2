@@ -5,12 +5,16 @@
           <activation>
             <activeByDefault>true</activeByDefault>
           </activation>
-            <repositories>
-                <repository>
-                    <id>elimu-a2d2-api</id>
-                    <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-                 </repository>
-            </repositories>
+          <repositories>
+            <repository>
+              <id>maven-central</id>
+              <url>https://repo.maven.apache.org/maven2/</url>
+            </repository>
+            <repository>
+              <id>elimu-a2d2-api</id>
+              <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
+            </repository>
+          </repositories>
         </profile>
         <profile>
             <id>elimu-java-commons</id>
