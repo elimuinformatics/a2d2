@@ -55,7 +55,7 @@ You will need to install the following:
 
 ## Versioning
 
-Whenever changes are made to the project, it's important to update the version numbers in the project's POM files. This includes both the sub-project POM files and the parent POM file.
+Whenever changes are made to the project, it's important to update the version numbers in the project's POM files. This includes both the sub-project POM files, and the parent POM file and POM files where we want latest version changes mandatory.
 
 ### Updating Sub-Project POM Version
 
