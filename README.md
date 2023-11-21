@@ -77,7 +77,7 @@ If you make changes to a project, navigate to its POM file of parent and update 
 ```xml
 <project>
     <groupId>com.example</groupId>
-    <artifactId>sub-project</artifactId>
+    <artifactId>project</artifactId>
     <version>1.0.0</version> <!-- Update this version number -->
     <!-- ... other configurations ... -->
 </project>
