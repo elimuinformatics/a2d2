@@ -35,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
@@ -115,6 +116,12 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		this.fhirVersionEnum = fhirVersionEnum;
 
 		log.info("Cache config: {}", (cacheService == null) ? "NO_CACHE" : cacheService.getCacheType());
+	}
+	
+	public void setHttpClient(HttpClient client) {
+		for (int count = 0; count < clients.size(); count++) {
+			clients.next().getFhirContext().getRestfulClientFactory().setHttpClient(client);
+		}
 	}
 
 	private synchronized static Rotator<FhirClientWrapper> getClientInstance(FhirContext ctxt, String fhirUrl) {

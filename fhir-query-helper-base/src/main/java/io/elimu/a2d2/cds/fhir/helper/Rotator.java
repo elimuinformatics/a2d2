@@ -41,6 +41,9 @@ public class Rotator<T> {
 			iter = rotation.iterator();
 		}
 		return iter.next();
+	}
 
+	public int size() {
+		return rotation.size();
 	}
 }
