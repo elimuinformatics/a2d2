@@ -52,6 +52,37 @@ You will need to install the following:
 
     mvn test
 
+
+## Versioning
+
+Whenever changes are made to the project, it's important to update the version numbers in the project's POM files. This includes both the sub-project POM files the parent POM file and POM files where we want latest version changes mandatory.
+
+### Updating Sub-Project POM Version
+
+If you make changes to a specific sub-project, navigate to its POM file and update the version number accordingly. Look for the `<version>` element and modify it appropriately.
+
+```xml
+<project>
+    <groupId>com.example</groupId>
+    <artifactId>sub-project</artifactId>
+    <version>1.0.0</version> <!-- Update this version number -->
+    <!-- ... other configurations ... -->
+</project>
+```
+
+### Updating Parent-Project POM Version
+
+If you make changes to a project, navigate to its POM file of parent and update the version number accordingly. Look for the `<version>` element and modify it appropriately.
+
+```xml
+<project>
+    <groupId>com.example</groupId>
+    <artifactId>project</artifactId>
+    <version>1.0.0</version> <!-- Update this version number -->
+    <!-- ... other configurations ... -->
+</project>
+```
+
 ## Deployment
 
 ### Deploying as a WAR file in Tomcat
@@ -107,4 +138,6 @@ You will need to install the following:
    Also, if you want to also configure secure access to it, you will need the following JVM properties as well:
 
 	-Dcache.jedis.use_ssl=true -Dcache.jedis.password=<your-optional-redis-password> -Dcache.jedis.connection.timeout=<your-optional-conn-timeout-in-millis-defaults-to-10-seconds>
+
+
 
