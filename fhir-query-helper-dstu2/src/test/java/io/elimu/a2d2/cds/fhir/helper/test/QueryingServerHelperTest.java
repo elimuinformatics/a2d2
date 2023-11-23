@@ -16,7 +16,6 @@ package io.elimu.a2d2.cds.fhir.helper.test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -25,12 +24,20 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
@@ -95,6 +102,8 @@ public class QueryingServerHelperTest {
 		client.setDontValidateConformance(true);
 		client.setEncoding(EncodingEnum.JSON);*/
 		QueryingServerHelper qsh = new QueryingServerHelper(url);
+		HttpClient client = expectGet("https://hapi.fhir.org/baseDstu2/Patient/131?_format=json", 200, "{\"resourceType\":\"Patient\", \"id\":\"131\"}");
+		qsh.setHttpClient(client);
 		FhirResponse<?> resp = qsh.getResourceByIdInPathResponse("Patient", patientId);
 		Assert.assertEquals(200, resp.getResponseStatusCode());
 		System.out.println(resp.getResult());
@@ -111,6 +120,24 @@ public class QueryingServerHelperTest {
 		Assert.assertEquals(200, resp.getStatusLine().getStatusCode());*/
 	}
 	
+	private HttpClient expectGet(String url, int httpStatus, String responseBody) throws Exception {
+		HttpClient client = Mockito.mock(HttpClient.class);
+		Mockito.when(client.execute(Mockito.any(HttpGet.class))).thenAnswer(new Answer<HttpResponse>() {
+			@Override
+			public HttpResponse answer(InvocationOnMock invocation) throws Throwable {
+				HttpGet get = (HttpGet) invocation.getArgument(0);
+				Assert.assertEquals(url, get.getURI().toASCIIString());
+				HttpResponse response = Mockito.mock(HttpResponse.class);
+				StatusLine statusLine = Mockito.mock(StatusLine.class);
+				Mockito.when(statusLine.getStatusCode()).thenReturn(httpStatus);
+				Mockito.when(response.getStatusLine()).thenReturn(statusLine);
+				Mockito.when(response.getEntity()).thenReturn(new StringEntity(responseBody, ContentType.APPLICATION_JSON));
+				return response;
+			}
+		});
+		return client;
+	}
+
 	@Test
 	public void testQueryBuilder() {
 		doReturn(fhirResponse).when(queryingServerHelper).queryServer(eq(FHIR2_URL + "/Patient?_count=1&_sort=-_lastUpdated"), 
