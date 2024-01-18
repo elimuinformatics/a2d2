@@ -14,6 +14,10 @@
 
 package io.elimu.a2d2.cdsresponse.entity;
 
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+
 public class CardBuilder {
 
 	public static CardBuilder create() {
@@ -63,6 +67,11 @@ public class CardBuilder {
 		return this;
 	}
 
+	public CardBuilder withExtension(String name, Map<String,Object> extension) {
+		card.addExtension(name, new JSONObject(extension));
+		return this;
+	}
+	
 	public Card build() {
 		return card;
 	}

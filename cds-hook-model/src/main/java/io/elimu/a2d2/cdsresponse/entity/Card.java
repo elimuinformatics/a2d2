@@ -16,7 +16,9 @@ package io.elimu.a2d2.cdsresponse.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -30,6 +32,7 @@ public class Card implements Serializable {
 	private String indicator;
 	private List<LinkCard> links;
 	private List<Suggestion> suggestions;
+	private Map<String, JSONObject> extension;
 	private Object source;
 	private Object decisions;
 	private String selectionBehavior;
@@ -127,5 +130,20 @@ public class Card implements Serializable {
 	
 	public void setOverrideReasons(List<JSONObject> overrideReasons) {
 		this.overrideReasons = overrideReasons;
+	}
+	
+	public void setExtension(Map<String, JSONObject> extension) {
+		this.extension = extension;
+	}
+	
+	public Map<String, JSONObject> getExtension() {
+		return extension;
+	}
+	
+	public void addExtension(String key, JSONObject extension) {
+		if (this.extension == null) {
+			this.extension = new HashMap<>();
+		}
+		this.extension.put(key, extension);
 	}
 }
