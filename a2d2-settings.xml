@@ -20,18 +20,6 @@
             </repositories>
         </profile>
         <profile>
-            <id>elimu-a2d2-api</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>elimu-a2d2-api</id>
-                    <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
             <id>elimu-java-commons</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -55,13 +43,20 @@
                 </repository>
             </repositories>
         </profile>
+        <profile>
+            <id>elimu-elimu-codeartifact</id>
+            <activation>
+            <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+            <repository>
+                <id>elimu-elimu-codeartifact</id>
+                <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/elimu-codeartifact/</url>
+            </repository>
+            </repositories>
+        </profile>
     </profiles>
     <servers>
-        <server>
-            <id>elimu-a2d2-api</id>
-            <username>aws</username>
-            <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
-        </server>
         <server>
             <id>elimu-ecdm</id>
             <username>aws</username>
@@ -69,6 +64,11 @@
         </server>
         <server>
             <id>elimu-java-commons</id>
+            <username>aws</username>
+            <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
+        </server>
+        <server>
+            <id>elimu-elimu-codeartifact</id>
             <username>aws</username>
             <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
         </server>

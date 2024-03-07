@@ -132,12 +132,12 @@
 			<version>${kotlin-stdlib.version}</version>
 		</dependency>
 	</dependencies>
-       <distributionManagement>
-			<repository>
-				<id>elimu-a2d2-api</id>
-				<name>elimu-a2d2-api</name>
-				<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-			</repository>
+	<distributionManagement>
+		<repository>
+			<id>elimu-elimu-codeartifact</id>
+			<name>elimu-elimu-codeartifact</name>
+			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/elimu-codeartifact/</url>
+		</repository>
 	</distributionManagement>
 	<build>
 		<plugins>

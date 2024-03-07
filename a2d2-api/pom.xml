@@ -310,7 +310,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-helpers</artifactId>
-			<version>0.0.17</version>
+			<version>0.0.18</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- web development, including Tomcat and spring-webmvc -->
@@ -653,9 +653,9 @@
 	</dependencies>
 	<distributionManagement>
 		<repository>
-			<id>elimu-a2d2-api</id>
-			<name>elimu-a2d2-api</name>
-			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
+			<id>elimu-elimu-codeartifact</id>
+			<name>elimu-elimu-codeartifact</name>
+			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/elimu-codeartifact/</url>
 		</repository>
 	</distributionManagement>
 	<build>
