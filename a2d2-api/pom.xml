@@ -653,10 +653,10 @@
 	</dependencies>
 	<distributionManagement>
 		<repository>
-			<id>elimu-elimu-codeartifact</id>
-			<name>elimu-elimu-codeartifact</name>
-			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/elimu-codeartifact/</url>
-		</repository>
+      <id>default</id>
+      <name>default</name>
+      <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/default/</url>
+    </repository>
 	</distributionManagement>
 	<build>
 		<finalName>${project.artifactId}</finalName>
