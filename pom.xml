@@ -233,7 +233,7 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-helpers</artifactId>
 				<!--version>${cds.helper.version}</version-->
-				<version>0.0.17</version>
+				<version>0.0.18</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
@@ -526,32 +526,12 @@
 	</dependencyManagement>
 	<distributionManagement>
 		<repository>
-			<id>elimu-a2d2-api</id>
-			<name>elimu-a2d2-api</name>
-			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-		</repository>
+      <id>default</id>
+      <name>default</name>
+      <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/default/</url>
+    </repository>
 	</distributionManagement>
-	<repositories>
-		<repository>
-			<id>maven-central</id>
-			<name>Maven Central</name>
-			<url>https://repo.maven.apache.org/maven2/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>elimu-a2d2-api</id>
-			<name>elimu-a2d2-api</name>
-			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-		</repository>
-	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>

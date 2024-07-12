@@ -54,7 +54,7 @@
 		<joda-time.version>2.10.6</joda-time.version>
 		<jdk.version>11</jdk.version>
 		<spring-security.version>5.7.10</spring-security.version>
-		<postgresql.version>42.5.1</postgresql.version>
+		<postgresql.version>42.7.3</postgresql.version>
 		<cloudwatchlogbackappender.version>2.1</cloudwatchlogbackappender.version>
 		<mysql-connector-java.version>8.0.31</mysql-connector-java.version>	
 		<snakeyaml.version>1.33</snakeyaml.version>
@@ -310,7 +310,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-helpers</artifactId>
-			<version>0.0.17</version>
+			<version>0.0.18</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- web development, including Tomcat and spring-webmvc -->
@@ -653,10 +653,10 @@
 	</dependencies>
 	<distributionManagement>
 		<repository>
-			<id>elimu-a2d2-api</id>
-			<name>elimu-a2d2-api</name>
-			<url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/a2d2-api/</url>
-		</repository>
+      <id>default</id>
+      <name>default</name>
+      <url>https://elimu-435911253355.d.codeartifact.us-west-2.amazonaws.com/maven/default/</url>
+    </repository>
 	</distributionManagement>
 	<build>
 		<finalName>${project.artifactId}</finalName>
