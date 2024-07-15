@@ -252,7 +252,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		registerInterceptor(new SimpleRequestHeaderInterceptor(headerName, headerValue));
 		return (T) this;
 	}
-
+	
 	/**
 	 * Returns the base URL used for creating this QueryingServerHelper. Ideal to identify two different instances of QueryingServerHelper 
 	 * @return the base URL used for creating this QueryingServerHelper
@@ -304,32 +304,55 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			client.inUse();
 			//synchronized block is on the actual fhir client object, not the client,  
 			synchronized(client.unwrap()) {
-				for (IClientInterceptor i : interceptors) {
-					log.debug("Registering interceptor " + i);
-					client.registerInterceptor(i);
-				}
+				SimpleRequestHeaderInterceptor noCache = null;
 				SingleAuthInterceptor singleAuth = new SingleAuthInterceptor();
 				CorrelationIdInterceptor correlationId = new CorrelationIdInterceptor();
-				client.registerInterceptor(singleAuth);
-				client.registerInterceptor(tracker);
-				client.registerInterceptor(correlationId);
 				try {
-					result = callback.execute(client);
-				} catch (RuntimeException t) {
-					log.error(ERROR_MSG  + t.getMessage());
+					for (IClientInterceptor i : interceptors) {
+						log.debug("Registering interceptor " + i);
+						client.registerInterceptor(i);
+					}
+					if (!hasCacheHeaderInterceptor(interceptors)) {
+						noCache = new SimpleRequestHeaderInterceptor("Cache-Control: no-cache");;
+						client.registerInterceptor(noCache);
+					}
+					client.registerInterceptor(singleAuth);
+					client.registerInterceptor(tracker);
+					client.registerInterceptor(correlationId);
+					try {
+						result = callback.execute(client);
+					} catch (RuntimeException t) {
+						log.error(ERROR_MSG  + t.getMessage());
+					}
+				} finally {
+					for (IClientInterceptor i : interceptors) {
+						log.debug("Unregistering interceptor " + i);
+						client.unregisterInterceptor(i);
+					}
+					client.unregisterInterceptor(correlationId);
+					client.unregisterInterceptor(singleAuth);
+					client.unregisterInterceptor(tracker);
+					if (noCache != null) {
+						client.unregisterInterceptor(noCache);
+					}
 				}
-				for (IClientInterceptor i : interceptors) {
-					log.debug("Unregistering interceptor " + i);
-					client.unregisterInterceptor(i);
-				}
-				client.unregisterInterceptor(correlationId);
-				client.unregisterInterceptor(singleAuth);
-				client.unregisterInterceptor(tracker);
 			};
 		} finally {
 			client.notInUse();
 		}
 		return new FhirResponse<>(result, tracker.getResponseStatusCode(), tracker.getResponseStatusInfo());
+	}
+	
+	public boolean hasCacheHeaderInterceptor(List<IClientInterceptor> interceptors) {
+		for (IClientInterceptor i : interceptors) {
+			if (i instanceof SimpleRequestHeaderInterceptor) {
+				SimpleRequestHeaderInterceptor srhi = (SimpleRequestHeaderInterceptor) i;
+				if (srhi.getHeaderName().equalsIgnoreCase("cache-control")) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public String getResourceQuery(String resourceType, String subjectId,
@@ -725,5 +748,22 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		if (this.fhirVersionEnum != null) {
 			output.writeUTF(this.fhirVersionEnum.name());
 		}
+	}
+
+	public Map<String, String> getHeaders() {
+		Map<String, String> retval = new HashMap<>();
+		for (IClientInterceptor interceptor : this.interceptors) {
+			if (interceptor instanceof SimpleRequestHeaderInterceptor) {
+				SimpleRequestHeaderInterceptor srhi = (SimpleRequestHeaderInterceptor) interceptor;
+				retval.put(srhi.getHeaderName(), srhi.getHeaderValue());
+			}
+		}
+		return retval;
+	}
+
+	public HttpClient getHttpClient() {
+		//Provided just so that mongodb codecs can use it. 
+		//It cannot return an actual value since HttpClient is not Serializable 
+		return null; 
 	}
 }
