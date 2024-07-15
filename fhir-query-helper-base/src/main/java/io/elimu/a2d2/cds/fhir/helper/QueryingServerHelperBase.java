@@ -304,34 +304,37 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			client.inUse();
 			//synchronized block is on the actual fhir client object, not the client,  
 			synchronized(client.unwrap()) {
-				for (IClientInterceptor i : interceptors) {
-					log.debug("Registering interceptor " + i);
-					client.registerInterceptor(i);
-				}
 				SimpleRequestHeaderInterceptor noCache = null;
-				if (!hasCacheHeaderInterceptor(interceptors)) {
-					noCache = new SimpleRequestHeaderInterceptor("Cache-Control: no-cache");;
-					client.registerInterceptor(noCache);
-				}
 				SingleAuthInterceptor singleAuth = new SingleAuthInterceptor();
 				CorrelationIdInterceptor correlationId = new CorrelationIdInterceptor();
-				client.registerInterceptor(singleAuth);
-				client.registerInterceptor(tracker);
-				client.registerInterceptor(correlationId);
 				try {
-					result = callback.execute(client);
-				} catch (RuntimeException t) {
-					log.error(ERROR_MSG  + t.getMessage());
-				}
-				for (IClientInterceptor i : interceptors) {
-					log.debug("Unregistering interceptor " + i);
-					client.unregisterInterceptor(i);
-				}
-				client.unregisterInterceptor(correlationId);
-				client.unregisterInterceptor(singleAuth);
-				client.unregisterInterceptor(tracker);
-				if (noCache != null) {
-					client.unregisterInterceptor(noCache);
+					for (IClientInterceptor i : interceptors) {
+						log.debug("Registering interceptor " + i);
+						client.registerInterceptor(i);
+					}
+					if (!hasCacheHeaderInterceptor(interceptors)) {
+						noCache = new SimpleRequestHeaderInterceptor("Cache-Control: no-cache");;
+						client.registerInterceptor(noCache);
+					}
+					client.registerInterceptor(singleAuth);
+					client.registerInterceptor(tracker);
+					client.registerInterceptor(correlationId);
+					try {
+						result = callback.execute(client);
+					} catch (RuntimeException t) {
+						log.error(ERROR_MSG  + t.getMessage());
+					}
+				} finally {
+					for (IClientInterceptor i : interceptors) {
+						log.debug("Unregistering interceptor " + i);
+						client.unregisterInterceptor(i);
+					}
+					client.unregisterInterceptor(correlationId);
+					client.unregisterInterceptor(singleAuth);
+					client.unregisterInterceptor(tracker);
+					if (noCache != null) {
+						client.unregisterInterceptor(noCache);
+					}
 				}
 			};
 		} finally {

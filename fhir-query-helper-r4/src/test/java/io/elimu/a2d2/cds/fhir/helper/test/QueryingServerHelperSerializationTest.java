@@ -18,21 +18,20 @@ import io.elimu.a2d2.cds.fhir.helper.r4.QueryingServerHelper;
 
 public class QueryingServerHelperSerializationTest {
 
-	@Test
-	public void testSerialization() {
-		QueryingServerHelper qsh = new QueryingServerHelper("http://fake-fhir-url.elimuinformatics.com/r4");
-		qsh.addHeader("Authorization", "Bearer asdf.asdf.asdf");
-		DocumentCodec codec = new DocumentCodec(CodecRegistries.fromRegistries(
-	            MongoClientSettings.getDefaultCodecRegistry(),
-	            CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())));
-		Document doc = new Document();
-		Document dataDoc = new Document();
-		dataDoc.put("variableValue", qsh);
+    @Test
+    public void testSerialization() {
+        QueryingServerHelper qsh = new QueryingServerHelper("http://fake-fhir-url.elimuinformatics.com/r4");
+        qsh.addHeader("Authorization", "Bearer asdf.asdf.asdf");
+        DocumentCodec codec = new DocumentCodec(CodecRegistries.fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(),
+            CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())));
+        Document doc = new Document();
+        Document dataDoc = new Document();
+        dataDoc.put("variableValue", qsh);
         doc.put("data", dataDoc);
         StringWriter writer = new StringWriter();
-		codec.encode(new JsonWriter(writer), doc, EncoderContext.builder().build());
-		Assert.assertNotNull(writer.toString());
-		Assert.assertNotEquals("", writer.toString());
-	}
-
+        codec.encode(new JsonWriter(writer), doc, EncoderContext.builder().build());
+        Assert.assertNotNull(writer.toString());
+        Assert.assertNotEquals("", writer.toString());
+    }
 }
