@@ -26,7 +26,7 @@
 	</parent>
 
 	<artifactId>fhir-query-helper-r4</artifactId>
-	<version>0.0.18</version>
+	<version>0.0.19</version>
 	<packaging>jar</packaging>
 	<description>CDS Helper R4</description>
 
@@ -93,6 +93,12 @@
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-stdlib</artifactId>
 			<version>${kotlin-stdlib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver-core</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
