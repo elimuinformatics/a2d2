@@ -56,13 +56,14 @@
 		<module>generic-model</module>
 		<module>generic-helpers</module>
 		<module>core-dependencies</module>
-		<module>kie-based-services</module>
+
 		<module>service-daos</module>
-		<module>cds-hook-services</module>
+
 		<module>core-wih</module>
 		<module>cql-mods</module>
 		<module>cql-wih</module>
-		<module>ftl-transform-wih</module>
+
+
 		<module>fhir-resource-wih</module>
 		<module>cdshooks-wih</module>
 		<module>web-util</module>
@@ -74,7 +75,7 @@
 		<module>fhir-helpers</module>
 		<module>task-utilities</module>
 		<module>sms-wih</module>
-		<module>a2d2-api</module>
+	
 	</modules>
 
 	<dependencyManagement>
@@ -233,7 +234,7 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-helpers</artifactId>
 				<!--version>${cds.helper.version}</version-->
-				<version>0.0.19</version>
+				<version>0.0.20</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
