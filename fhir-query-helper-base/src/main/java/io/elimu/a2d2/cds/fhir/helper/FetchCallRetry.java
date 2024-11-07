@@ -24,9 +24,9 @@ public class FetchCallRetry<T> {
 		boolean success = false;
 		while (count < retries && !success) {
 			try {
-				/*if (count > 0) {
+				if (count > 0) {
 					Thread.sleep(getDelay(count, delay));
-				}*/
+				}
 				T retval = function.apply(null);
 				if (client.getTracker().getResponseStatusCode() < 500) {
 					success = true;
@@ -35,21 +35,16 @@ public class FetchCallRetry<T> {
 				log.info("FHIR REST call failed attempt number " + count + " with status " + client.getTracker().getResponseStatusCode() + ". Retrying after waiting " + (delay * count) + "ms");
 				count++;
 			} catch (BaseServerResponseException t) {
-				log.error("ERROR ON QUERYSERVER" + t.getResponseBody());
-				if (client.getTracker().getResponseStatusCode() >= 0 && client.getTracker().getResponseStatusCode() < 500) {
-					throw new RuntimeException("Invocation of call failed with status code " + client.getTracker().getResponseStatusCode() + ". No further retries will be performed");
-				}
-				count++; // and retry
-				log.warn("FHIR REST call failed attempt number " + count + " with status " + client.getTracker().getResponseStatusCode() + " and error. Retrying after waiting " + (delay * count) + "ms", t);
-
+				count++;			
+				log.error("Invocation of call failed with body response: " + t.getResponseBody());
 			}
-			/*catch (Throwable t) {
+			catch (Throwable t) {
 				if (client.getTracker().getResponseStatusCode() >= 0 && client.getTracker().getResponseStatusCode() < 500) {
 					throw new RuntimeException("Invocation of call failed with status code " + client.getTracker().getResponseStatusCode() + ". No further retries will be performed");
 				}
 				count++; // and retry
 				log.warn("FHIR REST call failed attempt number " + count + " with status " + client.getTracker().getResponseStatusCode() + " and error. Retrying after waiting " + (delay * count) + "ms", t);
-			}*/
+			}
 		}
 		throw new RuntimeException("After " + count + " retries, invocation of call still failed");
 	}

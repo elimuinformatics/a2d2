@@ -23,7 +23,7 @@
 		<protobuf-java.version>3.21.8</protobuf-java.version>
 		<mockito.version>2.23.0</mockito.version>
 		<jedis.version>4.0.1</jedis.version>
-		<cds.helper.version>0.0.19</cds.helper.version>
+		<cds.helper.version>0.0.20</cds.helper.version>
 		<freemarker.version>2.3.30</freemarker.version>
 		<jacoco.version>0.8.7</jacoco.version>
 		<jaxb.api.version>2.3.1</jaxb.api.version>
@@ -56,14 +56,13 @@
 		<module>generic-model</module>
 		<module>generic-helpers</module>
 		<module>core-dependencies</module>
-
+		<module>kie-based-services</module>
 		<module>service-daos</module>
-
+		<module>cds-hook-services</module>
 		<module>core-wih</module>
 		<module>cql-mods</module>
 		<module>cql-wih</module>
-
-
+		<module>ftl-transform-wih</module>
 		<module>fhir-resource-wih</module>
 		<module>cdshooks-wih</module>
 		<module>web-util</module>
@@ -75,7 +74,7 @@
 		<module>fhir-helpers</module>
 		<module>task-utilities</module>
 		<module>sms-wih</module>
-	
+		<module>a2d2-api</module>
 	</modules>
 
 	<dependencyManagement>
