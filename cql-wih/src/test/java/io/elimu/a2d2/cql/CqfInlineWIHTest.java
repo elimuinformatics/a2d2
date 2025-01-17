@@ -1010,7 +1010,7 @@ public class CqfInlineWIHTest {
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
         workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-stage.elimuinformatics.com/fhir");
         String clientSecret = "";
         String clientId = "fhir4-terminology-api";
         String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
@@ -1056,7 +1056,7 @@ public class CqfInlineWIHTest {
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
         workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-stage.elimuinformatics.com/fhir");
         String clientSecret = "";
         String clientId = "fhir4-terminology-api";
         String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
@@ -1123,7 +1123,7 @@ public class CqfInlineWIHTest {
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
         workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-stage.elimuinformatics.com/fhir");
         String clientSecret = "";
         String clientId = "fhir4-terminology-api";
         String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
