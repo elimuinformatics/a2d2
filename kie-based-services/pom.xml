@@ -10,7 +10,7 @@
 	<description>Kie Based Services</description>
 
 	<properties>
-		<cxf.version>3.5.5</cxf.version>
+		<cxf.version>3.5.10</cxf.version>
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<org.json.version>20231013</org.json.version>
 		<ant.version>1.10.11</ant.version>
