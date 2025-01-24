@@ -119,7 +119,7 @@ public class OAuthHelperTest {
 	private static class TestQueryingServerHelper extends QueryingServerHelperBase<Resource, IBaseResource> {
 		
 		public TestQueryingServerHelper() {
-			super("https://fhir4-internal.elimuinformatics.com/fhir", FhirVersion.FHIR4, FhirVersionEnum.R4);
+			super("https://fhir4-stage.elimuinformatics.com/fhir", FhirVersion.FHIR4, FhirVersionEnum.R4);
 		}
 
 		@Override
