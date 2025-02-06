@@ -93,6 +93,17 @@ public class QueryingServerHelperTest {
 		fhirResponse2 = new FhirResponse<>(bundle, 200, "responseInfo");
 		fhirResponse3 = new FhirResponse<>(new Bundle(), 200, "responseInfo2");
 	}
+	
+	@Test
+	public void testQshWithEmptyParams() {
+		QueryingServerHelper q = new QueryingServerHelper("https://fhir2-internal.elimuinformatics.com/baseDstu2");
+		String queryStr = "encounter=835288&patient=835336&status=active";
+		String resourceType = "MedicationOrder";
+		FhirResponse<List<IBaseResource>> resp = q.queryResourcesResponseNoCache(resourceType, null, null, queryStr);
+		System.out.println("resp = " + resp);
+		System.out.println("statusCode = " + resp.getResponseStatusCode());
+		System.out.println("statusInfo = " + resp.getResponseStatusInfo());
+	}
 
 	@Test 
 	public void testQSH() throws Exception {

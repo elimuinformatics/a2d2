@@ -717,6 +717,16 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 
 	public abstract FhirResponse<IBaseResource> fetchServer(final String resourceType, String resourceQuery);
 	
+	public FhirFuture<FhirResponse<IBaseResource>> fetchDirectAsync(String resourceType, String id, String asyncId) {
+		Callable<FhirResponse<IBaseResource>> callable = new Callable<FhirResponse<IBaseResource>>() {
+			@Override
+			public FhirResponse<IBaseResource> call() throws Exception {
+				return fetchServer(resourceType, id);
+			}
+		};
+		return new FhirFuture<>(asyncId, pool.submit(callable));
+	}
+	
 	public interface FhirVersionAbs {
 		FhirContext getCtx();
 	}
