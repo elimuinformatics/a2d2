@@ -721,7 +721,8 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		Callable<FhirResponse<IBaseResource>> callable = new Callable<FhirResponse<IBaseResource>>() {
 			@Override
 			public FhirResponse<IBaseResource> call() throws Exception {
-				return fetchServer(resourceType, id);
+				String resourceQuery = fhirUrl + "/" + resourceType + "/" + id;
+				return fetchServer(resourceType, resourceQuery);
 			}
 		};
 		return new FhirFuture<>(asyncId, pool.submit(callable));
