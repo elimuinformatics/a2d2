@@ -59,7 +59,7 @@ public class CqfInlineWIHTest {
         WorkItemImpl workItem = new WorkItemImpl();
         workItem.setParameter("fhirServerAuth", "Bearer " + token);
         workItem.setParameter("fhirTerminologyServerAuth", "Bearer " + token);
-        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
         workItem.setParameter("fhirTerminologyServerUrl", "https://fhir-terminology-sandbox-internal.elimuinformatics.com/baseR4");
 
         workItem.setParameter("context_hook", "patient-view");
@@ -167,7 +167,7 @@ public class CqfInlineWIHTest {
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
         workItem.setParameter("fhirServerAuth", "Bearer " + token);
-        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
         workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
         workItem.setParameter("context_hook", "order-sign");
         workItem.setParameter("context_hookInstance", UUID.randomUUID().toString());
@@ -1009,8 +1009,8 @@ public class CqfInlineWIHTest {
         }
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
-        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-stage.elimuinformatics.com/fhir");
         String clientSecret = "";
         String clientId = "fhir4-terminology-api";
         String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
@@ -1055,8 +1055,8 @@ public class CqfInlineWIHTest {
         }
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
-        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-stage.elimuinformatics.com/fhir");
         String clientSecret = "";
         String clientId = "fhir4-terminology-api";
         String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
@@ -1122,8 +1122,8 @@ public class CqfInlineWIHTest {
         }
         PlanDefCdsInlineWorkItemHandler handler = new PlanDefCdsInlineWorkItemHandler();
         WorkItemImpl workItem = new WorkItemImpl();
-        workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
-        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-internal.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
+        workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-stage.elimuinformatics.com/fhir");
         String clientSecret = "";
         String clientId = "fhir4-terminology-api";
         String tokenUrl = "https://auth-internal.elimuinformatics.com/auth/realms/product/protocol/openid-connect/token";
@@ -1219,7 +1219,7 @@ public class CqfInlineWIHTest {
         WorkItemImpl workItem = new WorkItemImpl();
         workItem.setParameter("fhirServerAuth", "Bearer " + token);
         workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
-        //workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+        //workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
         //workItem.setParameter("fhirServer_header_Epic__Client__ID", "test-value-1");
         workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
         //workItem.setParameter("fhirTerminologyServer_header_Epic__Client__ID", "test-value-2");
@@ -1315,7 +1315,7 @@ public class CqfInlineWIHTest {
         
         workItem.setParameter("fhirServerAuth", "Bearer " + token);
         workItem.setParameter("fhirServerUrl", "https://api.logicahealth.org/cdcgc/data");
-        //workItem.setParameter("fhirServerUrl", "https://fhir4-internal.elimuinformatics.com/fhir");
+        //workItem.setParameter("fhirServerUrl", "https://fhir4-stage.elimuinformatics.com/fhir");
         workItem.setParameter("fhirTerminologyServerUrl", "https://fhir4-terminology-sandbox.elimuinformatics.com/baseR4");
         workItem.setParameter("planDefinitionJson", "{\n"
                 + "    \"resourceType\": \"PlanDefinition\",\n"
