@@ -40,13 +40,20 @@ public class FhirResponse<T> implements Serializable {
 	 * The response string related to the HTTP status
 	 */
 	private String responseStatusInfo;
+	
+	private String responseBody;
 
 	public FhirResponse(T result, int responseStatusCode, String responseStatusInfo) {
+		this(result, responseStatusCode, responseStatusInfo, null);
+	}
+
+	public FhirResponse(T result, int responseStatusCode, String responseStatusInfo, String responseBody) {
 		this.result = result;
 		this.responseStatusCode = responseStatusCode;
 		this.responseStatusInfo = responseStatusInfo;
+		this.responseBody = responseBody;
 	}
-
+	
 	/**
 	 * @return the result object for the query
 	 */
@@ -82,4 +89,11 @@ public class FhirResponse<T> implements Serializable {
 		this.responseStatusInfo = responseStatusInfo;
 	}
 
+	public String getResponseBody() {
+		return responseBody;
+	}
+	
+	public void setResponseBody(String responseBody) {
+		this.responseBody = responseBody;
+	}
 }
