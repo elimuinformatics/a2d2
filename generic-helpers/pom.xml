@@ -23,7 +23,7 @@
 		<version>0.0.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>generic-helpers</artifactId>
-	<version>0.0.21</version>
+	<version>0.0.22</version>
 	<name>Base helpers for the Generic services</name>
 	<description>Contains WIHInvoker</description>
 

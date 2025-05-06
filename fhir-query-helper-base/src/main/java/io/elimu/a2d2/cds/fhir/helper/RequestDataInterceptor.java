@@ -15,6 +15,7 @@
 package io.elimu.a2d2.cds.fhir.helper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class RequestDataInterceptor implements IClientInterceptor {
 
 	private int responseStatusCode = -1;
 	private String responseStatusInfo = "not invoked";
+	private String responseBody = null;
 
 	public int getResponseStatusCode() {
 		return responseStatusCode;
@@ -36,6 +38,10 @@ public class RequestDataInterceptor implements IClientInterceptor {
 
 	public String getResponseStatusInfo() {
 		return responseStatusInfo;
+	}
+	
+	public String getResponseBody() {
+		return responseBody;
 	}
 
 	@Override
@@ -79,6 +85,13 @@ public class RequestDataInterceptor implements IClientInterceptor {
 		if (theResponse.getStatusInfo() != null) {
 			log.trace("HTTP response status info: " + theResponse.getStatusInfo());
 			this.responseStatusInfo = theResponse.getStatusInfo();
+		}
+		try {
+			theResponse.bufferEntity();
+			InputStream respBodyIn = theResponse.readEntity();
+			this.responseBody = new String(respBodyIn.readAllBytes());
+		} catch (Exception e) {
+			log.trace("HTTP response body couldn't be read", e);
 		}
 	}
 

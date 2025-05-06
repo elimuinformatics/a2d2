@@ -340,7 +340,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		} finally {
 			client.notInUse();
 		}
-		return new FhirResponse<>(result, tracker.getResponseStatusCode(), tracker.getResponseStatusInfo());
+		return new FhirResponse<>(result, tracker.getResponseStatusCode(), tracker.getResponseStatusInfo(), tracker.getResponseBody());
 	}
 	
 	public boolean hasCacheHeaderInterceptor(List<IClientInterceptor> interceptors) {
@@ -394,7 +394,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			}
 		}, client);
 		if (resourceBundle.getResult() == null) {
-			return new FhirResponse<>(null, resourceBundle.getResponseStatusCode(), resourceBundle.getResponseStatusInfo());
+			return new FhirResponse<>(null, resourceBundle.getResponseStatusCode(), resourceBundle.getResponseStatusInfo(), resourceBundle.getResponseBody());
 		}
 		return resourceBundle;
 	}
@@ -482,7 +482,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 			if (usePath) {
 				FhirResponse<IBaseResource> resp = fetchServer(resourceType, resourceQuery);
 				List<IBaseResource> result = resp == null || resp.getResult() == null ? null : Arrays.asList(resp.getResult());
-				resourceList = new FhirResponse<List<IBaseResource>>(result, resp.getResponseStatusCode(), resp.getResponseStatusInfo());
+				resourceList = new FhirResponse<List<IBaseResource>>(result, resp.getResponseStatusCode(), resp.getResponseStatusInfo(), resp.getResponseBody());
 			} else {
 				resourceList = queryServer(resourceQuery, qb);
 			}
@@ -490,10 +490,12 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 		if(resourceList != null) {
 			if (resourceList.getResult() != null && resourceList.getResult().size()==1) {
 				return new FhirResponse<>(resourceList.getResult().get(0),
-						resourceList.getResponseStatusCode(), resourceList.getResponseStatusInfo());
+						resourceList.getResponseStatusCode(), resourceList.getResponseStatusInfo(), 
+						resourceList.getResponseBody());
 			} else {
 				return new FhirResponse<>(null, resourceList.getResponseStatusCode(),
-						resourceList.getResponseStatusInfo());
+						resourceList.getResponseStatusInfo(),
+						resourceList.getResponseBody());
 			}
 		} else {
 			return new FhirResponse<>(null, HttpStatus.SC_INTERNAL_SERVER_ERROR, "Unable to get resources");
@@ -632,7 +634,7 @@ public abstract class QueryingServerHelperBase<T, U extends IBaseResource> imple
 				return null;
 			}
 			FhirResponse<IBaseResource> res = fetchServer("Bundle", url);
-			return new FhirResponse<>((IBaseBundle) res.getResult(), res.getResponseStatusCode(), res.getResponseStatusInfo());
+			return new FhirResponse<>((IBaseBundle) res.getResult(), res.getResponseStatusCode(), res.getResponseStatusInfo(), res.getResponseBody());
 		} catch (Exception e) {
 			log.error( ERROR_MSG + e.getMessage() + ". [" + e.getClass().getName() + "]");
 		} finally {

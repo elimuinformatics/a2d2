@@ -128,7 +128,7 @@ public class QueryingServerHelper extends QueryingServerHelperBase<QueryingServe
 			}
 		}, client);
 		if (resourceBundle.getResult() == null) {
-			return new FhirResponse<>(null, resourceBundle.getResponseStatusCode(), resourceBundle.getResponseStatusInfo());
+			return new FhirResponse<>(null, resourceBundle.getResponseStatusCode(), resourceBundle.getResponseStatusInfo(), resourceBundle.getResponseBody());
 		}
 		return resourceBundle;
 	}
