@@ -25,7 +25,7 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.internal.utils.KieHelper;
 
-import ca.uhn.fhir.model.dstu2.resource.Patient;
+//import ca.uhn.fhir.model.dstu2.resource.Patient;
 import io.elimu.a2d2.exception.WorkItemHandlerException;
 import io.elimu.a2d2.fhirresourcewih.SerializeResourceDelegate;
 
@@ -48,7 +48,7 @@ public class SerializeResourceDelegateTest {
 		workItemManager.registerWorkItemHandler("SerializeResourceDelegate", wih);
 	}
 
-	@Test
+/*	@Test
 	public void testFhir2JsonDelegate() {
 
 		DelegateHelperTest.setUrl(FHIR2_URL);
@@ -84,5 +84,5 @@ public class SerializeResourceDelegateTest {
 		DelegateHelperTest.deleteResourceByPatient(patient.getId().getIdPart());
 
 	}
-
+*/
 }

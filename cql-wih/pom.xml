@@ -33,7 +33,7 @@
 	<properties>
 		<mixpanel.version>1.4.4</mixpanel.version>
 		<org.json.version>20231013</org.json.version>
-		<jackson-databind.version>2.13.5</jackson-databind.version>
+		<jackson-databind.version>2.17.1</jackson-databind.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
@@ -68,6 +68,14 @@
         				<groupId>ca.uhn.hapi.fhir</groupId>
         				<artifactId>org.hl7.fhir.r5</artifactId>
         			</exclusion>
+				<exclusion>
+					<groupId>ca.uhn.hapi.fhir</groupId>
+					<artifactId>hapi-fhir-structures-r5</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.github.ben-manes.caffeine</groupId>
+					<artifactId>caffeine</artifactId>
+				</exclusion>
 			</exclusions>
 			<scope>test</scope>
 		</dependency>
@@ -144,17 +152,9 @@
 					<groupId>org.opencds.cqf.cql</groupId>
 					<artifactId>evaluator</artifactId>
 				</exclusion>
-			</exclusions>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>org.hl7.fhir.utilities</artifactId>
-			<version>5.5.7</version>
-			<exclusions>
 				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-text</artifactId>
+					<groupId>com.github.ben-manes.caffeine</groupId>
+					<artifactId>caffeine</artifactId>
 				</exclusion>
 			</exclusions>
 			<scope>test</scope>
@@ -167,35 +167,19 @@
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>org.hl7.fhir.dstu3</artifactId>
-			<version>5.5.7</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>org.hl7.fhir.dstu2</artifactId>
-			<version>5.5.7</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>org.hl7.fhir.r4</artifactId>
-			<version>5.5.7</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-structures-dstu3</artifactId>
+			<artifactId>hapi-fhir-structures-dstu2</artifactId>
+			<version>${hapi.fhir.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-structures-dstu2</artifactId>
+			<artifactId>hapi-fhir-caching-caffeine</artifactId>
+			<version>${hapi.fhir.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

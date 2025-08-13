@@ -31,7 +31,7 @@ public class Fhir3DataFetchServiceImplTest {
 	@Ignore("Broken, fix later")	
 	@Test
 	public void testFetchNoAuth() throws Exception {
-		Fhir2DataFetchServiceImpl service = new Fhir2DataFetchServiceImpl();
+		Fhir3DataFetchServiceImpl service = new Fhir3DataFetchServiceImpl();
 		service.setBaseUrl(FHIR2_SERVER_URL);
 		Assert.assertNotNull(service.fetchPatient("654321"));
 		List<Object> observations = service.fetchObservations("654321");
@@ -42,7 +42,7 @@ public class Fhir3DataFetchServiceImplTest {
 	@Ignore("Broken, fix later")
 	@Test
 	public void testFetchBearerAuth() throws Exception {
-		Fhir2DataFetchServiceImpl service = new Fhir2DataFetchServiceImpl();
+		Fhir3DataFetchServiceImpl service = new Fhir3DataFetchServiceImpl();
 		service.setBaseUrl(FHIR2_SERVER_URL);
 		Map<String, Object> auth = new HashMap<>();
 		auth.put("access_token", MOCK_TOKEN);

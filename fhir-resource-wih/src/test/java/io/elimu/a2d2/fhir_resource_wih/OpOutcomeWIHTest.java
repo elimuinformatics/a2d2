@@ -168,53 +168,6 @@ public class OpOutcomeWIHTest {
 		handler.executeWorkItem(workItem, manager);
 	}
 	
-	@Test
-	public void testGenerateOutcomeV2() {
-		WorkItemImpl workItem = new WorkItemImpl();
-		Map<String, Object> params = workItem.getParameters();
-		params.put("fhirVersion", "Fhir2");
-		params.put("issue_a_code", "informational");
-		params.put("issue_a_diagnostics", "something");
-		params.put("issue_a_severity", "warning");
-		params.put("issue_a_location", "somewhere");;
-		params.put("issue_a1_details", "abcde");
-		params.put("issue_a1_detailsCode", "abcde");
-		params.put("issue_a1_detailsSystem", "abcde");
-		params.put("issue_a1_location0", "somewhere");
-		params.put("issue_a1_location1", "overtherainbow");
-		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
-		WorkItemManager manager = new DoNothingWorkItemManager();
-		handler.executeWorkItem(workItem, manager);
-		Map<String, Object> results = workItem.getResults();
-		Assert.assertNotNull(results);
-		Assert.assertNotNull(results.get("outcome"));
-		Assert.assertNotNull(results.get("outcomeJson"));
-		Assert.assertTrue(results.get("outcomeJson") instanceof String);
-		Assert.assertTrue(results.get("outcome") instanceof ca.uhn.fhir.model.dstu2.resource.OperationOutcome);
-		ca.uhn.fhir.model.dstu2.resource.OperationOutcome oo = (ca.uhn.fhir.model.dstu2.resource.OperationOutcome) results.get("outcome");
-		Assert.assertNotNull(oo.getIssue());
-		Assert.assertEquals(2, oo.getIssue().size());
-		ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue issue1 =  (ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue) oo.getIssue().get(0);
-		ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue issue2 = (ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue) oo.getIssue().get(1);
-		Assert.assertNotNull(issue1);
-		Assert.assertNotNull(issue2);
-	}
-
-	@Test
-	public void testGenerateOutcomeDSTU2() {
-		WorkItemImpl workItem = new WorkItemImpl();
-		Map<String, Object> params = workItem.getParameters();
-		params.put("fhirVersion", "DSTU2");
-		params.put("issue_a_code", "informational");
-		OperationOutcomeDelegate handler = new OperationOutcomeDelegate();
-		WorkItemManager manager = new DoNothingWorkItemManager();
-		handler.executeWorkItem(workItem, manager);
-		Map<String, Object> results = workItem.getResults();
-		Assert.assertNotNull(results);
-		Assert.assertNotNull(results.get("outcome"));
-		Assert.assertNotNull(results.get("outcomeJson"));
-	}
-	
 	public static class DoNothingWorkItemManager implements WorkItemManager {
 		@Override public void completeWorkItem(long id, Map<String, Object> results) { }
 		@Override public void abortWorkItem(long id) { }

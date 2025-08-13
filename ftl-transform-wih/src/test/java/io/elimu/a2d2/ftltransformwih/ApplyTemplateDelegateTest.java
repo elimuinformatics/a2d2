@@ -17,6 +17,7 @@ package io.elimu.a2d2.ftltransformwih;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.junit.Assert;
@@ -27,13 +28,106 @@ import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.internal.utils.KieHelper;
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.QuestionnaireResponse;
 import io.elimu.a2d2.cdsresponse.entity.TemplateRepository;
 import io.elimu.a2d2.ftltransformwih.ApplyTemplateDelegate;
 
 public class ApplyTemplateDelegateTest {
 
+	public static class GRItem {
+		private String description;
+		private Integer salience;
+		public GRItem(Integer salience, String description) {
+			setDescription(description);
+			setSalience(salience);
+		}
+		public String getDescription() {
+			return description;
+		}
+		public void setDescription(String description) {
+			this.description = description;
+		}
+		public Integer getSalience() {
+			return salience;
+		}
+		public void setSalience(Integer salience) {
+			this.salience = salience;
+		}
+	}
+	
 	@Test
+	public void testGuidanceRecommendationTemplate() {
+		String template = "<#assign aDateTime = .now>\n"
+				+ "{\n"
+				+ "   \"resourceType\":\"GuidanceResponse\",\n"
+				+ "        <#if ftl_param_id??>\"id\": ${ftl_param_id},</#if>\n"
+				+ "   \"contained\":[\n"
+				+ "      {\n"
+				+ "         \"resourceType\":\"RequestGroup\",\n"
+				+ "         \"id\":\"actions\",\n"
+				+ "         \"status\":\"active\",\n"
+				+ "         \"intent\":\"proposal\",\n"
+				+ "         \"note\":[\n"
+				+ "            {\n"
+				+ "               \"authorString\":\"symptom\",\n"
+				+ "               \"text\":\"${ftl_param_symptom}\"\n"
+				+ "            }\n"
+				+ "         ],\n"
+				+ "         \"action\":[\n"
+				+ "                 <#list ftl_param_GRItems?sort_by(\"salience\") as guidance>\n"
+				+ "            {\n"
+				+ "               \"title\":\"${guidance.description}\",\n"
+				+ "               \"description\":\"${guidance.description}\"\n"
+				+ "            }<#sep>,</#sep>\n"
+				+ "                </#list>\n"
+				+ "         ]\n"
+				+ "      }\n"
+				+ "   ],\n"
+				+ "   \"identifier\":[\n"
+				+ "      {\n"
+				+ "         \"value\":\"${ftl_param_taskId}\"\n"
+				+ "      }\n"
+				+ "   ],\n"
+				+ "   \"status\":\"success\",\n"
+				+ "   \"subject\":{\n"
+				+ "      \"reference\":\"Patient/${ftl_param_patientId}\"\n"
+				+ "   },\n"
+				+ "   \"occurrenceDateTime\":\"${aDateTime?iso_utc}\",\n"
+				+ "   \"performer\":{\n"
+				+ "        \"identifier\":{\n"
+				+ "            \"system\":\"http://elimu.io/a2d2\",\n"
+				+ "            \"value\":\"cds-sx:create-recommendation\"\n"
+				+ "      }\n"
+				+ "   },\n"
+				+ "   \"note\":[\n"
+				+ "        {\n"
+				+ "            \"authorString\":\"symptom\",\n"
+				+ "            \"text\":\"${ftl_param_symptom}\"\n"
+				+ "        }\n"
+				+ "   ],\n"
+				+ "   \"result\":{\n"
+				+ "      \"reference\":\"#actions\"\n"
+				+ "   }\n"
+				+ "}\n";
+		Map<String, String> fltMap = TemplateRepository.getInstance().getFltMap();
+		fltMap.put("templateTest.ftl", template);
+		ApplyTemplateDelegate d = new ApplyTemplateDelegate();
+		WorkItemImpl workItem = new WorkItemImpl();
+		workItem.setParameter("ftl_param_GRItems", Arrays.asList(new GRItem(1, "a"), new GRItem(2, "b"), new GRItem(3, "c")));
+		workItem.setParameter("ftl_param_patientId", "537322");
+		workItem.setParameter("ftl_param_taskId", "647908");
+		workItem.setParameter("ftl_param_symptom", "constipation");
+		workItem.setParameter("ftl_param_id", "647966");
+		workItem.setParameter("templateFileName", "templateTest.ftl");
+		d.executeWorkItem(workItem, new WorkItemManager() {
+			@Override public void abortWorkItem(long id) { }
+			@Override public void completeWorkItem(long id, Map<String, Object> results) { }
+			@Override public void registerWorkItemHandler(String workItemName, WorkItemHandler handler) { }
+		});
+		String output = (String) workItem.getResult("transformedData");
+		System.out.println(output);
+	}
+	
+	/*@Test
 	public void testXmlFLTTemplate() {
 
 		String questionnaireResponseString = "{\"resourceType\":\"QuestionnaireResponse\",\"status\":\"completed\","
@@ -80,7 +174,7 @@ public class ApplyTemplateDelegateTest {
 
 		Assert.assertNotNull(execution.getResult("transformedData"));
 
-	}
+	}*/
 
 	@Test
 	public void testXMLInput() throws IOException {

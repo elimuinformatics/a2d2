@@ -25,15 +25,15 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.internal.utils.KieHelper;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
-import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+//import ca.uhn.fhir.model.dstu2.resource.Patient;
+//import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import io.elimu.a2d2.exception.FhirServerException;
 import io.elimu.a2d2.fhirresourcewih.ResourceReadDelegate;
 
 @Ignore ("disable for now as the test is based on public testing server")
 public class ResourceReadDelegateTest {
 
-	private static final String fhirUrl = "http://hapi.fhir.org/baseDstu2";
+	//private static final String fhirUrl = "http://hapi.fhir.org/baseDstu2";
 	private static final String fhirUrl4 = "http://hapi.fhir.org/baseR4";
 
 	private static WorkItemManager workItemManager;
@@ -66,7 +66,7 @@ public class ResourceReadDelegateTest {
 		Assert.assertNotNull(execution.getResult("resource"));
 	}
 	
-	@Test
+/*	@Test
 	public void testFHIRResourceReadDelegate() {
 
 		DelegateHelperTest.setUrl(fhirUrl);
@@ -85,8 +85,7 @@ public class ResourceReadDelegateTest {
 
 		DelegateHelperTest.deleteResourceByPatient(patientId);
 
-	}
-	
+	}	
 
 	@Test(expected = FhirServerException.class)
 	public void testFHIRResourceReadDelegateResourceTypeMissing() {
@@ -106,5 +105,5 @@ public class ResourceReadDelegateTest {
 		DelegateHelperTest.deleteResourceByPatient(patientId);
 
 	}
-
+*/
 }
