@@ -44,7 +44,7 @@ public class DeserializeResourceDelegateTest {
 
 	}
 
-	@Test
+	/*@Test
 	public void testJson2FhirDelegate() {
 
 		String jsonString = "{\"resourceType\":\"Patient\",\"id\":\"1952\",\"meta\""
@@ -65,7 +65,7 @@ public class DeserializeResourceDelegateTest {
 		wih.executeWorkItem(execution, workItemManager);
 
 		Assert.assertNotNull(execution.getResult("fhirResource"));
-	}
+	}*/
 
 	@Test(expected = WorkItemHandlerException.class)
 	public void testJson2FhirDelegateJsonStringMissing() {

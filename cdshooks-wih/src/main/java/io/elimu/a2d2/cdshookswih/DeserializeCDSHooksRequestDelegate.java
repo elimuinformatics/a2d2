@@ -151,9 +151,9 @@ public class DeserializeCDSHooksRequestDelegate implements WorkItemHandler {
 			return FormatType.FHIR3;
 		if ("R4".equalsIgnoreCase(fhirVersion))
 			return FormatType.FHIR4;
-		FormatType type = FormatType.FHIR2;
-		if (!"DSTU2".equalsIgnoreCase(fhirVersion))
-			log.warn("Missing supported fhirVersion, parse as FHIR2");
+		FormatType type = FormatType.FHIR4;
+		if (!"R4".equalsIgnoreCase(fhirVersion))
+			log.warn("Missing supported fhirVersion, parse as FHIR4");
 		return type;
 	}
 

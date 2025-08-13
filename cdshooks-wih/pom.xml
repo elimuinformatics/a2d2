@@ -61,7 +61,7 @@
     	<groupId>io.elimu.a2d2</groupId>
     	<artifactId>fhir-parse-util</artifactId>
     </dependency>
-    <dependency>
+    <!--dependency>
     	<groupId>ca.uhn.hapi.fhir</groupId>
     	<artifactId>hapi-fhir-structures-dstu2</artifactId>
     	<scope>test</scope>
@@ -71,7 +71,7 @@
     			<artifactId>commons-text</artifactId>
     		</exclusion>
     	</exclusions>
-    </dependency>
+    </dependency-->
     <dependency>
 	    <groupId>org.apache.commons</groupId>
 	    <artifactId>commons-text</artifactId>

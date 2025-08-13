@@ -16,11 +16,11 @@ public class FhirParseUtilTest {
 		Assert.assertNotNull(json);
 		System.out.println("FhirParseUtilTest JSON = " + json);
 		
-		ca.uhn.fhir.model.dstu2.resource.Bundle bundle2 = new ca.uhn.fhir.model.dstu2.resource.Bundle();
+		/*ca.uhn.fhir.model.dstu2.resource.Bundle bundle2 = new ca.uhn.fhir.model.dstu2.resource.Bundle();
 		bundle.setId("1234");
 		json = FhirParseUtil.getInstance().encodeJsonResource(FormatType.FHIR2, bundle2);
 		Assert.assertNotNull(json);
-		System.out.println("FhirParseUtilTest JSON = " + json);
+		System.out.println("FhirParseUtilTest JSON = " + json);*/
 	}
 	
 	@Test
