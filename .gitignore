@@ -8,3 +8,4 @@ target/
 .recommenders
 .idea/
 .factorypath
+generic-model/.vscode/settings.json
