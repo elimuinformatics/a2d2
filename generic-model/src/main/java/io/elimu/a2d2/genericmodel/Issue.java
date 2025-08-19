@@ -5,10 +5,9 @@ public class Issue implements java.io.Serializable{
     private static final long serialVersionUID = 1L;
 
     public enum IssueSeverity {
-        information,
-        warning,
-        error,
-        fatal
+        INFORMATION,
+        WARNING,
+        ERROR
     }
 
     public enum IssueType {

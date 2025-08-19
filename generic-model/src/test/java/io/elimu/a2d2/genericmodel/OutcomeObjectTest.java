@@ -12,19 +12,19 @@ public class OutcomeObjectTest {
     public void testAddAndGetIssues() {
         OutcomeObject outcome = new OutcomeObject();
         Issue issue = new Issue();
-        issue.setSeverity(Issue.IssueSeverity.warning);
+        issue.setSeverity(Issue.IssueSeverity.WARNING);
         outcome.addIssue(issue);
         assertEquals(1, outcome.getIssues().size());
-        assertEquals(Issue.IssueSeverity.warning, outcome.getIssues().get(0).getSeverity());
+        assertEquals(Issue.IssueSeverity.WARNING, outcome.getIssues().get(0).getSeverity());
     }
 
     @Test
     public void testSetIssues() {
         OutcomeObject outcome = new OutcomeObject();
         Issue issue1 = new Issue();
-        issue1.setSeverity(Issue.IssueSeverity.information);
+        issue1.setSeverity(Issue.IssueSeverity.INFORMATION);
         Issue issue2 = new Issue();
-        issue2.setSeverity(Issue.IssueSeverity.error);
+        issue2.setSeverity(Issue.IssueSeverity.ERROR);
         outcome.setIssues(Arrays.asList(issue1, issue2));
         assertEquals(2, outcome.getIssues().size());
     }
@@ -50,9 +50,9 @@ public class OutcomeObjectTest {
     public void testHasErrors() {
         OutcomeObject outcome = new OutcomeObject();
         Issue info = new Issue();
-        info.setSeverity(Issue.IssueSeverity.information);
+        info.setSeverity(Issue.IssueSeverity.INFORMATION);
         Issue error = new Issue();
-        error.setSeverity(Issue.IssueSeverity.error);
+        error.setSeverity(Issue.IssueSeverity.ERROR);
         outcome.addIssue(info);
         assertFalse(outcome.hasErrors());
         outcome.addIssue(error);

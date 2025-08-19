@@ -43,7 +43,7 @@ public class OutcomeObject implements java.io.Serializable {
             return false;
         }
         for (Issue issue : issues) {
-            if (issue != null && Issue.IssueSeverity.error.equals(issue.getSeverity())) {
+            if (issue != null && Issue.IssueSeverity.ERROR.equals(issue.getSeverity())) {
                 return true;
             }
         }

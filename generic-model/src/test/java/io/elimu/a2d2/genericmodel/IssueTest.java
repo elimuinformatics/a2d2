@@ -9,8 +9,8 @@ public class IssueTest {
     @Test
     public void testSeverityGetterSetter() {
         Issue issue = new Issue();
-        issue.setSeverity(Issue.IssueSeverity.fatal);
-        assertEquals(Issue.IssueSeverity.fatal, issue.getSeverity());
+        issue.setSeverity(Issue.IssueSeverity.ERROR);
+        assertEquals(Issue.IssueSeverity.ERROR, issue.getSeverity());
     }
 
     @Test
