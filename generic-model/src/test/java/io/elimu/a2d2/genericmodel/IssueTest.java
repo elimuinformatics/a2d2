@@ -26,4 +26,11 @@ public class IssueTest {
         issue.setDiagnostics("Some diagnostics");
         assertEquals("Some diagnostics", issue.getDiagnostics());
     }
+    
+    @Test
+    public void testHttpStatusCodeGetterSetter() {
+        Issue issue = new Issue();
+        issue.setHttpStatusCode(404);
+        assertEquals(Integer.valueOf(404), issue.getHttpStatusCode());
+    }
 }

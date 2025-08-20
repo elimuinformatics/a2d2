@@ -152,7 +152,7 @@
 		<dependency>
 			<groupId>io.elimu.a2d2</groupId>
 			<artifactId>generic-model</artifactId>
-			<version>${project.parent.version}</version>
+			<version>${genericmodel.version}</version>
 		</dependency>
 		<dependency>
 				<groupId>org.mockito</groupId>

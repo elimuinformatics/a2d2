@@ -49,6 +49,7 @@
 		<okhttp.version>4.9.3</okhttp.version>
 		<snakeyaml.version>1.33</snakeyaml.version>
 		<guava.version>32.0.0-android</guava.version>
+		<genericmodel.version>0.1.0</genericmodel.version>
 	</properties>
 
 	<modules>
@@ -227,7 +228,7 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>generic-model</artifactId>
-				<version>${base.version}</version>
+				<version>${genericmodel.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
