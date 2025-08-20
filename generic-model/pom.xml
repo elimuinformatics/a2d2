@@ -23,6 +23,14 @@
 		<version>0.0.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>generic-model</artifactId>
+	<version>0.1.0</version>
 	<name>Base model for the Generic services</name>
 	<description>Representation of ServiceRequest and ServiceResponse</description>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>
