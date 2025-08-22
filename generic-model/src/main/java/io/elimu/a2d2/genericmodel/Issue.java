@@ -30,7 +30,16 @@ public class Issue implements java.io.Serializable{
 
     private IssueSeverity severity;
     private String diagnostics;
+    private Integer httpStatusCode;
 
+
+    public Integer getHttpStatusCode() {
+        return httpStatusCode;
+    }
+
+    public void setHttpStatusCode(Integer httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+    }
 
     public Issue() {
     }
