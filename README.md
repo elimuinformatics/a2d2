@@ -1,6 +1,9 @@
-# A2D2
+# A2D2 - DEPRECATED
 
 A2D2 is a clinical decision-support, data integration, and workflow services platform. It supports contemporary healthcare interoperability standards including FHIR and CDS-Hooks.
+
+## DEPRECATION NOTICE
+This library is no longer supported. The recommended replacement is to migrate to kogito libraries.
 
 ## Getting started
 
